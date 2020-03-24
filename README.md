@@ -1,10 +1,10 @@
-# Windless Bight
+# Windless Bay
 An interactive fiction based on R-Page engine
 
 ![](doc/img/hero_image.png)
 
 ## What is this?
-Windless Bight, Mount Erebus. A research station deep into Antarctica, this is where you journey begins...
+Windless Bay, Mount Erebus. A research station deep into Antarctica, this is where you journey begins...
 
 ## Technical stuff
 * A game for the Amiga Classic range of computers
