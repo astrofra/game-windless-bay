@@ -1,0 +1,79 @@
+[
+    {
+        "asset_name": "vue_01",
+        "asset_type": "image",
+        "data_processor": null,
+        "file_compressor": "miniz",
+        "file_name": "vue_01.png"
+    },
+    {
+        "asset_name": "vue_02",
+        "asset_type": "image",
+        "data_processor": null,
+        "file_compressor": "miniz",
+        "file_name": "vue_02.png"
+    },
+    {
+        "asset_name": "vue_03",
+        "asset_type": "image",
+        "data_processor": null,
+        "file_compressor": "miniz",
+        "file_name": "vue_03.png"
+    },
+    {
+        "asset_name": "vue_04",
+        "asset_type": "image",
+        "data_processor": null,
+        "file_compressor": "miniz",
+        "file_name": "vue_04.png"
+    },
+    {
+        "asset_name": "vue_05",
+        "asset_type": "image",
+        "data_processor": null,
+        "file_compressor": "miniz",
+        "file_name": "vue_05.png"
+    },
+    {
+        "asset_name": "vue_06",
+        "asset_type": "image",
+        "data_processor": null,
+        "file_compressor": "miniz",
+        "file_name": "vue_06.png"
+    },
+    {
+        "asset_name": "vue_07",
+        "asset_type": "image",
+        "data_processor": null,
+        "file_compressor": "miniz",
+        "file_name": "vue_07.png"
+    },
+    {
+        "asset_name": "vue_08",
+        "asset_type": "image",
+        "data_processor": null,
+        "file_compressor": "miniz",
+        "file_name": "vue_08.png"
+    },
+    {
+        "asset_name": "vue_09",
+        "asset_type": "image",
+        "data_processor": null,
+        "file_compressor": "miniz",
+        "file_name": "vue_09.png"
+    },
+    {
+        "asset_name": "vue_10",
+        "asset_type": "image",
+        "data_processor": null,
+        "file_compressor": "miniz",
+        "file_name": "vue_10.png"
+    },
+    {
+        "asset_name": "vue_11",
+        "asset_type": "image",
+        "data_processor": null,
+        "file_compressor": "miniz",
+        "file_name": "vue_11.png"
+    }
+]
