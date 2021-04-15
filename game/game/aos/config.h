@@ -5,7 +5,7 @@
 #ifndef _FILE_CONFIG_
 #define _FILE_CONFIG_
 
-#define MAX_PAK_SIZE 19824 /* Maximum size (in byte) of a compressed file */
+#define MAX_PAK_SIZE 16928 /* Maximum size (in byte) of a compressed file */
 #define MAX_SFX_SIZE 16 /* Maximum size of a 8bit mono audio sample */ 
 #endif
 

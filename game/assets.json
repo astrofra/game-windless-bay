@@ -75,5 +75,61 @@
         "data_processor": null,
         "file_compressor": "miniz",
         "file_name": "vue_11.png"
+    },
+    {
+        "asset_name": "vue_12",
+        "asset_type": "image",
+        "data_processor": null,
+        "file_compressor": "miniz",
+        "file_name": "vue_12.png"
+    },
+    {
+        "asset_name": "vue_13",
+        "asset_type": "image",
+        "data_processor": null,
+        "file_compressor": "miniz",
+        "file_name": "vue_13.png"
+    },
+    {
+        "asset_name": "vue_14",
+        "asset_type": "image",
+        "data_processor": null,
+        "file_compressor": "miniz",
+        "file_name": "vue_14.png"
+    },
+    {
+        "asset_name": "vue_15",
+        "asset_type": "image",
+        "data_processor": null,
+        "file_compressor": "miniz",
+        "file_name": "vue_15.png"
+    },
+    {
+        "asset_name": "vue_16",
+        "asset_type": "image",
+        "data_processor": null,
+        "file_compressor": "miniz",
+        "file_name": "vue_16.png"
+    },
+    {
+        "asset_name": "vue_17",
+        "asset_type": "image",
+        "data_processor": null,
+        "file_compressor": "miniz",
+        "file_name": "vue_17.png"
+    },
+    {
+        "asset_name": "vue_18",
+        "asset_type": "image",
+        "data_processor": null,
+        "file_compressor": "miniz",
+        "file_name": "vue_18.png"
+    },
+    {
+        "asset_name": "vue_19",
+        "asset_type": "image",
+        "data_processor": null,
+        "file_compressor": "miniz",
+        "file_name": "vue_19.png"
     }
 ]

@@ -1,0 +1,264 @@
+{
+    "init": {
+        "room": "vue_03",
+        "objects": {}
+    },
+    "rooms": {
+        "vue_01": {
+            "vue": 1,
+            "short": "radio_room",
+            "bitmap": "vue_01.pak",
+            "links": {
+                "east": {
+                    "room": "vue_02"
+                },
+                "south": {
+                    "room": "vue_03"
+                }
+            }
+        },
+
+        "vue_02": {
+            "vue": 2,
+            "short": "technical_room",
+            "bitmap": "vue_02.pak",
+            "links": {
+                "west": {
+                    "room": "vue_01"
+                }
+            }
+        },
+
+        "vue_03": {
+            "vue": 3,
+            "short": "radio_tower",
+            "bitmap": "vue_03.pak",
+            "links": {
+                "south": {
+                    "room": "vue_01"
+                },
+                "north": {
+                    "room": "vue_04"
+                }
+            }
+        },
+
+        "vue_04": {
+            "vue": 4,
+            "short": "ice_land",
+            "bitmap": "vue_04.pak",
+            "links": {
+                "south": {
+                    "room": "vue_03"
+                },
+                "west": {
+                    "room": "vue_05"
+                },
+                "north": {
+                    "room": "vue_06"
+                }
+            }
+        },
+
+        "vue_05": {
+            "vue": 5,
+            "short": "devil_pit",
+            "bitmap": "vue_05.pak",
+            "links": {
+                "east": {
+                    "room": "vue_04"
+                }
+            }
+        },
+
+        "vue_06": {
+            "vue": 6,
+            "short": "northern_house",
+            "bitmap": "vue_06.pak",
+            "links": {
+                "south": {
+                    "room": "vue_04"
+                },
+                "north": {
+                    "room": "vue_07"
+                }
+            }
+        },
+
+        "vue_07": {
+            "vue": 7,
+            "short": "inside_northern_house",
+            "bitmap": "vue_07.pak",
+            "links": {
+                "east": {
+                    "room": "vue_08"
+                },
+                "north": {
+                    "room": "vue_06"
+                }
+            }
+        },
+
+        "vue_08": {
+            "vue": 8,
+            "short": "air_extractor",
+            "bitmap": "vue_08.pak",
+            "links": {
+                "east": {
+                    "room": "vue_09"
+                },
+                "west": {
+                    "room": "vue_07"
+                },
+                "north": {
+                    "room": "vue_10"
+                }
+            }
+        },
+
+        "vue_09": {
+            "vue": 9,
+            "short": "tunnel",
+            "bitmap": "vue_09.pak",
+            "links": {
+                "east": {
+                    "room": "vue_12"
+                },
+                "west": {
+                    "room": "vue_08"
+                }
+            }
+        },
+
+        "vue_10": {
+            "vue": 10,
+            "short": "tunnel",
+            "bitmap": "vue_10.pak",
+            "links": {
+                "north": {
+                    "room": "vue_08"
+                },
+                "south": {
+                    "room": "vue_11"
+                }
+            }
+        },
+
+        "vue_11": {
+            "vue": 11,
+            "short": "radar",
+            "bitmap": "vue_11.pak",
+            "links": {
+                "north": {
+                    "room": "vue_10"
+                }
+            }
+        },
+
+        "vue_12": {
+            "vue": 12,
+            "short": "channel",
+            "bitmap": "vue_12.pak",
+            "links": {
+                "north": {
+                    "room": "vue_13"
+                },
+                "south": {
+                    "room": "vue_14"
+                }
+            }
+        },
+
+        "vue_13": {
+            "vue": 13,
+            "short": "landfill",
+            "bitmap": "vue_13.pak",
+            "links": {
+                "south": {
+                    "room": "vue_12"
+                }
+            }
+        },
+
+        "vue_14": {
+            "vue": 14,
+            "short": "harbor",
+            "bitmap": "vue_14.pak",
+            "links": {
+                "north": {
+                    "room": "vue_12"
+                },
+                "east": {
+                    "room": "vue_15"
+                }
+            }
+        },
+
+        "vue_15": {
+            "vue": 15,
+            "short": "pier",
+            "bitmap": "vue_15.pak",
+            "links": {
+                "west": {
+                    "room": "vue_14"
+                },
+                "east": {
+                    "room": "vue_16"
+                }
+            }
+        },
+
+        "vue_16": {
+            "vue": 16,
+            "short": "sea_tower",
+            "bitmap": "vue_16.pak",
+            "links": {
+                "west": {
+                    "room": "vue_15"
+                },
+                "north": {
+                    "room": "vue_17"
+                }
+            }
+        },
+
+        "vue_17": {
+            "vue": 17,
+            "short": "boathouse",
+            "bitmap": "vue_17.pak",
+            "links": {
+                "east": {
+                    "room": "vue_18"
+                },
+                "south": {
+                    "room": "vue_16"
+                }
+            }
+        },
+
+        "vue_18": {
+            "vue": 18,
+            "short": "lobby",
+            "bitmap": "vue_18.pak",
+            "links": {
+                "west": {
+                    "room": "vue_17"
+                },
+                "north": {
+                    "room": "vue_19"
+                }
+            }
+        },
+
+        "vue_19": {
+            "vue": 19,
+            "short": "tower_top",
+            "bitmap": "vue_19.pak",
+            "links": {
+                "south": {
+                    "room": "vue_18"
+                }
+            }
+        }
+    }
+}

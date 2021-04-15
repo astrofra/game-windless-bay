@@ -1,0 +1,6386 @@
+' ~@check_keyboard
+' ~@check_fffc02
+' *****************************************************************************
+' *                                                                           *
+' *                           A T H A N O R   16/32                           *
+' *                       La l‚gende des hommes-oiseaux                       *
+' *                                                                           *
+' *  Auteur & Atari Code          : Eric Safar                                *
+' *  Amiga Code & Gfx             : Fran‡ois Gutherz                          *
+' *  Illustrations                : Angel Bautista                            *
+' *  MSX2 conversion              : 6502man                                   *
+' *  Atari ST Muzax               : Mathieu Stempell                          *
+' *  Amiga Muzax                  : David Vandensteen                         *
+' *  Additionnals Gfx             : Vincent Jambut                            *
+' *  Cr‚dits                      : GT-Turbo                                  *
+' *                                                                           *
+' *  (C) SafarGames 2018-2020                                                 *
+' *                                                                           *
+' *****************************************************************************
+'
+'
+' ------------------------ D‚packer
+' $C+
+' $P<
+' $S&
+INLINE sp3_unpack%,1602
+INLINE testvideo%,700
+INLINE fade_to%,336
+INLINE sndhplay%,186
+INLINE reloc%,94
+INLINE text_pro%,388
+INLINE font2%,3743
+INLINE reset%,52
+'
+ver$="v8.9.11"
+IF XBIOS(4)<>0
+  ALERT 3,"Basse r‚solution SVP.|Low resolution please",1,"OK",n%
+  END
+ENDIF
+DIM pal&(16)  ! pour sauver la palette
+store_palette
+init_fade
+CLS
+a%=XBIOS(64,-1)         ! Si blitter pr‚sent alors on force son utilisation
+IF BTST(a%,1)
+  a%=BSET(a%,0)
+  ~XBIOS(64,a%)
+ENDIF
+ste!=FALSE
+falcon!=FALSE
+cookies_jar             ! STf, STe, Falcon ?
+' ste!=STE?               ! On est sur STf ou STe ?
+' ste!=FALSE
+' PRINT "Sys free    = ";FRE()
+IF LPEEK(&H436)>&H1F8000                ! 4Mo ?
+  mem%=4096
+  nbs&=72                               ! Nb screen en buffer tournant !
+  RESERVE FRE(0)-((1400*1024)+550*1024)
+ELSE IF LPEEK(&H436)>&HF8000            ! 2Mo ?
+  mem%=2048
+  nbs&=36
+  RESERVE FRE(0)-((600*1024)+550*1024)
+ELSE IF LPEEK(&H436)>&H78000
+  mem%=1040                             ! 1Mo
+  nbs&=6
+  RESERVE FRE(0)-(530*1024)          ! 530Ko pour les MALLOC (For 1040)
+ELSE
+  ALERT 3,"Atari 1040 ST(f)(e) minimum !|Please",1,"OK",n%
+  END
+ENDIF
+' PRINT "Sys free    = ";FRE()
+' PRINT "Malloc free = ";MALLOC(-1)
+' ~INP(2)
+DEFMOUSE 5
+HIDEM
+SPOKE &H484,8             ! r‚p‚tion clavier OFF
+' SDPOKE &H440,2            ! Seekrate 2ms (3=3ms)
+debug!=FALSE
+debug_file!=FALSE
+IF debug_file!
+  open_debug
+ENDIF
+'
+init_var
+set_screen
+' init_fade
+init_loc                ! Menu des langues dispo
+init_vues
+~C:fade_to_black%(5)
+charge_file(gfx.folder$+fri$+".pck",frisebuf%)      ! Frise Invent + Travel
+taillesrc%=tspr%
+reg%(8)=frisebuf%
+RCALL sp3_unpack%,reg%()
+malloc_multi_screen
+language_menu           ! ### On choisi la langue
+set_palette_almost_black
+init_sys                ! Je recharge en cas de changement !
+pro_center(180,MID$(sys$(18),6,LEN(sys$(18))-5),phys%,0)
+init_flag                       ! Clear Flagxxx array !
+'
+intro                   ! Yeahhhhhhh
+malloc_after_intro
+init_ym_player            ! ## Charger le player … part
+' scene_finale
+secure_garbage_collection
+clear_screen(log%)
+clear_screen(phys%)
+set_palette_almost_black
+pro_center(180,MID$(sys$(18),6,LEN(sys$(18))-5),phys%,0)
+'
+init_palettes           ! # Charge palettes.txt
+init_new_defnames
+charge_file(gfx.folder$+bou$+spr.ext$,boubuf%)        ! Charger sprites boussole
+capture_boussole                ! Capture les sprites de la boussole
+charge_vignette("vig482")       ! Charge vignettes perso dialogues
+charge_file(gfx.folder$+ico$+spr.ext$,icobuf%)        ! Charger sprites icones
+'
+init_sprstate                   ! Initialise l'‚tat de tout les sprites
+init_world                      ! Initialise le monde courant
+charge_file(gfx.folder$+"inventor.pck",invbuf%)  ! Load packed .spr inventaire
+taillesrc%=tspr%
+reg%(8)=invbuf%
+RCALL sp3_unpack%,reg%()
+init_combi              ! Load & Init. des combinaisons possible d'objets
+init_bulle              ! Load & Init. des infos-bulles
+init_cursors            ! Load & Init. les cursors souris :)
+' charge_spl("jingle")
+' streplayon(spl%(nbspl|-1,0),spl%(nbspl|-1,1),1) ! On joue un sample
+' ## Chapter ##
+script_chapter(STR$(cc&))
+init_chapter
+~C:fade_to_black%(3)
+charge_gui
+charge_img
+change_vue
+'
+plot_all_icones
+GET 272,149,319,199,bouoff$    ! Boussole entiŠre et ‚teinte sauvegard‚e
+init_boussole(VAL(LEFT$(vue.issue$(cv&),2)))
+plot_boussole
+plot_current_dial
+plot_all_spr_in_log
+fadeto!=TRUE
+IF ste!
+  offpal%=32            ! Offset palette STe dans le format .ne2
+ELSE
+  offpal%=0             ! Offset palette STf dans le format .ne2
+ENDIF
+psw%=offpal%            ! Pour le Palette Switcher (… supprimer)
+set_palette(depack_buf%)
+img_to_phys_with_effect(1)
+' gere_sacados("VER",0)
+'
+SHOWM
+ay%=18
+music!=TRUE   ! Music ON/OFF
+' EVERY 1000 GOSUB check_spl        ! Toute les 5s. (Empirique)
+' EVERY STOP
+antir!=FALSE
+IF music!
+  music_on(sndbuf%)                 ! On envoie la musique !
+ENDIF
+DO
+  main                    ! ### L'aventure !! C'est extra ! :D ###
+  EXIT IF gameover|=1
+  init_gameover           ! On r‚initialise et c'est reparti !
+LOOP
+'
+streplayoff               ! ## Stop DMA
+restore_palette
+restore_screen
+IF music!
+  music_off
+ENDIF
+free_memory
+mfree_multi_screen
+SPOKE &H484,7             ! r‚p‚tion clavier ON
+RESERVE
+IF debug_file!
+  close_debug
+ENDIF
+END
+'
+> PROCEDURE open_debug
+  '
+  ' J'ouvre le canal #99 pour recevoir les infos de debug
+  ' Un TRON #99 lance l'enregistrement
+  ' Un TROFF le stoppe
+  '
+  LOCAL d$
+  d$="c:\bug"+RIGHT$(TIME$,5)+".txt"
+  OPEN "O",#99,d$
+RETURN
+> PROCEDURE close_debug
+  TROFF
+  CLOSE #99
+RETURN
+> PROCEDURE debug(a$,b$)
+  LOCAL a&,b&,y&
+  IF debug!
+    a&=128
+    b&=30
+    y&=10
+    DEFFILL 0
+    PBOX 8,8,a&,b&
+    BOX 8,8,a&,b&
+    ATEXT 10,y&,0,TRACE$
+    ADD y&,6
+    ATEXT 10,y&,0,"a$="+a$
+    ADD y&,6
+    ATEXT 10,y&,0,"b$="+b$
+    ~INP(2)
+  ENDIF
+RETURN
+> PROCEDURE free_memory
+  '  PRINT "Enter free_memory..."
+  IF MFREE(log0%)<>0
+    PRINT "MFREE(log0%) erreur !"
+  ENDIF
+  IF MFREE(sprbuf%)<>0
+    PRINT "MFREE(sprbuf%) erreur !"
+  ENDIF
+  IF MFREE(sndbuf%)<>0
+    PRINT "MFREE(sndbuf%) erreur !"
+  ENDIF
+  IF ste!
+    IF MFREE(digbuf%)<>0
+      PRINT "MFREE(digbuf%) erreur !"
+    ENDIF
+    IF mem%>1040
+      IF MFREE(voiceptr%)<>0
+        PRINT "MFREE(voiceptr%) erreur !"
+      ENDIF
+    ENDIF
+  ENDIF
+  IF falcon!
+    IF MFREE(six%)<>0
+      PRINT "MFREE(sixtotwelve%) erreur !"
+    ENDIF
+  ENDIF
+  IF MFREE(pack_buf%)<>0
+    PRINT "MFREE(pack_buf%) erreur !"
+  ENDIF
+  IF MFREE(depack_buf%)<>0
+    PRINT "MFREE(depack_buf%) erreur !"
+  ENDIF
+  '  PRINT "Start Erase..."
+  erase_tab
+  '  PRINT "Quit free_memory."
+  '
+RETURN
+> PROCEDURE erase_tab
+  ERASE ico$(),cur$(),sys$(),combi$(),bulle$(),con$()
+  ERASE sac.id$(),sac.spr|(),sac.place|(),sac.back$(),sac.bulle$()
+  ERASE tmp$(),var.cmd$(),var.val$()
+  ERASE vue.id&(),vue.name$(),vue.zclic&(),vue.issue$()
+  ERASE vue.clic$()
+  ERASE spr.id$(),spr.vue&(),spr.num|(),spr.x&(),spr.y&(),spr.sx&(),spr.sy&()
+  ERASE spr.data$(),spr.mask$(),spr.anim|(),spr.suj$(),spr.onoff!()
+  ERASE spl%()
+  ERASE flag|(),ico$(),st$()
+RETURN
+> PROCEDURE cookies_jar
+  LOCAL i&
+  '  DIM video$(4),snd$(5),ecran$(3)
+  '
+  '  video$(0)="Atari ST"
+  '  video$(1)="Atari STe"
+  '  video$(2)="Atari TT"
+  '  video$(3)="Atari Falcon"
+  '  video$(4)="Atari Milan"
+  '
+  '  snd$(0)="Soundchip"
+  '  snd$(1)="Stereo Dma"
+  '  snd$(2)="Codec"
+  '  snd$(3)="Dsp"
+  '  snd$(4)="Matrix"
+  '  snd$(5)="Extended Xbios routines"
+  '
+  '  ecran$(0)=" Mono ST "
+  '  ecran$(1)=" Couleur ST "
+  '  ecran$(2)=" Vga "
+  '  ecran$(3)=" Television "
+  '
+  super%=GEMDOS(32,L:0)
+  adr_cookies%=LONG{&H5A0}
+  IF adr_cookies%<>0
+    REPEAT
+      cookie_null%=LONG{adr_cookies%}
+      cookies_name$=""
+      FOR i&=0 TO 3
+        cookies_name$=cookies_name$+CHR$(BYTE{adr_cookies%+i&})
+        val_cookie%=LONG{adr_cookies%+4}
+      NEXT i&
+      '    PRINT cookies_name$;" ";HEX$(val_cookie%)
+      SELECT cookies_name$
+      CASE "_CPU"
+        proc&=val_cookie%
+      CASE "_MCH"
+        machine_type%=val_cookie%
+      CASE "_VDO"
+        video&=SHR(val_cookie%,16)
+      CASE "_SND"
+        snd&=val_cookie%
+      ENDSELECT
+      ADD adr_cookies%,8
+    UNTIL cookie_null%=0
+  ENDIF
+  ~GEMDOS(32,L:super%)
+  '
+  ecran%=-1
+  '  PRINT "Machine : ";
+  SELECT machine_type%
+  CASE &H0
+    ste!=FALSE
+    '    PRINT "Atari ST"
+    '  CASE &H4D34
+    '    PRINT "Medusa w SCSI"
+  CASE &H10000
+    ste!=TRUE
+    '    PRINT "Atari STe"
+  CASE &H10010
+    ste!=TRUE
+    '    megaste!=TRUE
+    '    PRINT "Mega STe"
+    '  CASE &H10100
+    '    PRINT "Sparrow"
+  CASE &H20000
+    ste!=TRUE
+    '    PRINT "TT or Hades"
+    ' CASE &H24D34
+    '    PRINT "Medusa with SCSI"
+  CASE &H30000
+    '    PRINT "Falcon"
+    ste!=TRUE
+    falcon!=TRUE
+    '    PRINT "Falcon !!! :D"
+    '    ~INP(2)
+    ecran%=XBIOS(&H59)  ! Si c'est un Falcon demande type d'‚cran
+  CASE &H40000
+    ste!=TRUE
+    '    PRINT "Milan"
+  CASE &H50000
+    ste!=TRUE
+    '    PRINT "Aranym"
+  ENDSELECT
+  IF video&=3
+    falcon!=TRUE
+    '    PRINT "Falcon !!!! :D"
+    '    ~INP(2)
+  ENDIF
+  '  PRINT "Proc    : ";proc&+68000
+  '  PRINT "Video   : ";video$(video&)
+  '  IF ecran%>-1
+  '  PRINT "Ecran   : ";ecran$(ecran%)
+  ' ENDIF
+  '  PRINT "Son     : "
+  '  FOR i&=0 TO 5
+  '  IF BTST(snd&,i&)
+  '  PRINT "          ";snd$(i&)
+  ' ENDIF
+  ' NEXT i&
+  '
+  '  PRINT "Press a key"
+  '  REPEAT
+  ' UNTIL LEN(INKEY$)
+  '
+  '  PRINT "ste!=";ste!
+  '  PRINT "falcon=";falcon!
+  '  ~INP(2)
+RETURN
+> PROCEDURE vigenere
+  LOCAL a%,n%,c%,y%
+  r$=""
+  c%=1
+  FOR n%=1 TO LEN(m$)
+    y%=ASC(MID$(c$,c%,1))-48
+    FOR a%=0 TO 9
+      IF MID$(vi$(a%),y%+1,1)=CHR$(ASC(MID$(m$,n%,1)))
+        r$=r$+CHR$(48+a%)
+      ENDIF
+    NEXT a%
+    INC c%
+    IF c%>LEN(c$)
+      c%=1
+    ENDIF
+  NEXT n%
+RETURN
+> PROCEDURE vig_table
+  LOCAL c%,i%,j%,n%
+  FOR i%=0 TO 9
+    n%=i%
+    FOR j%=0 TO 9
+      c%=48+n%
+      IF c%>57
+        n%=0
+        c%=48
+      ENDIF
+      vi$(i%)=vi$(i%)+CHR$(c%)
+      INC n%
+    NEXT j%
+  NEXT i%
+RETURN
+'
+> PROCEDURE main
+  LOCAL ff%,mx%,my%,e|,a$
+  REPEAT
+    '    fra_special_edition
+    ' ##### Boucle g‚rant le mode Inventaire ####
+    KEYTEST ff%
+    IF ff%=3997696              ! F3 (Music ON/OFF)
+      '      debug_file!=TRUE
+      music!=NOT music!
+      IF music!
+        music_on(sndbuf%)
+      ELSE
+        music_off
+      ENDIF
+    ENDIF
+    '
+    read_timers                ! TIMERS ?
+    '    ATEXT 9,7,0,"Sys free      = "+STR$(FRE(0))
+    '    ATEXT 9,13,0,"Malloc free   = "+STR$(MALLOC(-1))
+    '
+    REPEAT
+      mx%=MOUSEX
+      my%=MOUSEY
+      IF objenmain&<>0
+        HIDEM
+        plot_objet_en_main(objenmain&-1)
+        '      ELSE
+        ' SHOWM
+      ENDIF
+      IF cm&=7             ! AND MOUSEK=1 AND antir!=false       ! Inventaire ouvert ?
+        IF my%>147 AND mx%>15 AND mx%<265
+          e|=@calculate_invent_place(mx%,my%)         ! Caresse quel emplacement ?
+          IF objenmain&=0
+            plot_infobulle(e|)
+          ENDIF
+          IF MOUSEK=1 AND antir!=FALSE
+            gere_inventaire(mx%+12,my%+12,MOUSEK,e|)
+            antir!=TRUE
+          ENDIF
+        ENDIF
+      ENDIF
+      IF antir!=TRUE AND MOUSEK=0
+        antir!=FALSE
+      ENDIF
+      '      IF ff%=3735584                    ! Space bar !
+      '      cm&=0
+      '      DEFMOUSE 5
+      '    ENDIF
+      IF MOUSEK=2                    ! Enter/Quit mode inventaire
+        plot_icone(cm&-1,0)        ! Icone mode Off
+        IF cm&=4 OR vig!
+          '          plot_icone(cm&-1,0)        ! Icone mode Off
+          IF vig!                    ! Une vignette ‚tait pr‚sente ?
+            anim_vignette(cd&,1,4)   ! Dans ce cas on ouvrira pas l'inventaire
+          ENDIF
+          cm&=0
+          DEFMOUSE 5
+        ELSE
+          cm&=0
+          scroll_sacados(mi!)
+          mi!=NOT mi!
+        ENDIF
+      ENDIF
+    UNTIL cm&<7
+    ' ###########################################
+    '
+    '    IF ff%=1638512 AND ste!           ! P (Palette Switcher)
+    '    ~XBIOS(6,L:depack_buf%+psw%)
+    '    IF psw%=0
+    '    psw%=32
+    '    ATEXT 10,6,0,"STf"
+    '  ELSE
+    '    psw%=0
+    '    ATEXT 10,6,0,"STe"
+    '  ENDIF
+    '  ENDIF
+    ' ######################## GESTION GUI #########################
+    ' # Je g‚re ici les icones d'actions (utiliser, prendre...)    #
+    ' #                                                            #
+    ' ##############################################################
+    '
+    mx%=MOUSEX
+    my%=MOUSEY
+    IF mx%>ix& AND my%<iy&+ih&*4       ! J'entre dans la zone icones ?
+      a|=@check_icones(mx%,my%)
+      IF MOUSEK=1 AND a|<>255
+        plot_all_icones
+        IF vig!                   ! mode dialogue ?
+          anim_vignette(cd&,1,4)  ! Sortir du mode dialogue
+        ENDIF
+        IF a|<3 OR (a|>2 AND objenmain&=0)
+          cm&=a|+1                  ! On renseigne le MODE COURANT
+          plot_icone(a|,1)          ! Icone mode ON
+          ~@set_var("Mode",ico$(cm&))
+          DEFMOUSE cur$(a|)
+          IF cm&=5              ! SAVE ?
+            sauver_partie
+            plot_icone(cm&-1,0)     ! Effacer le pr‚c‚dent mode
+            cm&=0
+          ELSE IF cm&=6         ! LOAD ?
+            charger_partie
+            plot_icone(cm&-1,0)     ! Effacer le pr‚c‚dent mode
+            cm&=0
+          ENDIF
+        ENDIF
+      ELSE
+        ' #### MODE ROLLOVER ####
+        '
+        IF a|<>255 AND a|<>lastico| AND cm&=0
+          IF lastico|<>255
+            plot_icone(lastico|,0)          ! On remet la derniŠre icone allum‚e dans son ‚tat normale
+          ENDIF
+          plot_icone(a|,2)                  ! Etat rollover
+          lastico|=a|
+        ENDIF
+      ENDIF
+    ELSE IF lastico|<>255 AND cm&=0
+      plot_icone(lastico|,0)          ! On remet la derniŠre icone allum‚e dans son ‚tat normale
+      lastico|=255
+    ENDIF
+    '
+    ' ########## GESTION ZONES DE CLICS DANS L'IMAGE #########
+    ' #
+    ' # Check des ClicZone  =@check_zne
+    ' # Check des ClicPerso =@check_perso
+    ' #
+    ' ########################################################
+    IF MOUSEK=1
+      IF @check_zne(mx%,my%)=TRUE OR @check_perso(mx%,my%)=TRUE
+        '        LOCATE 1,1
+        read_script                     ! On clique = Script :)
+        a$=var.val$(@search_var("Chapter"))             ! ## ex : Chapter=3
+        IF a$<>""
+          script_chapter(a$)
+        ENDIF
+        '        IF interpreter!                 ! A-t-on forc‚ la r‚interpr‚tation ?
+        '          read_script
+        '        interpreter!=FALSE
+        '      ENDIF
+        IF cv&<>oldcv&                  ! On change r‚ellement de vue ?
+          IF nst|<100                   ! ## Si r‚plique d'entr‚e
+            nst|=0                      ! ## diff‚rente de 0
+          ELSE
+            SUB nst|,100
+          ENDIF
+          is&=VAL(LEFT$(vue.issue$(cv&),2))
+          plot_all_icones               ! On eteint les icones GUI
+          IF cm&=4
+            anim_vignette(cd&,1,4)       ! Sortir du mode dialogue
+          ENDIF
+          cm&=0
+          EVERY STOP                   ! On change de vue donc je stoppe les interruptions Digit
+          '          HIDEM
+          charge_img                   ! Charge la nouvelle vue
+          check_initzone               ! Il existe une /INIT pour cette vue ?
+          init_boussole(is&)           ! Init nouvelles issues
+          plot_boussole                ! Plot les
+          plot_all_spr_in_log          ! Affiche les sprites de la vue
+          img_to_phys_with_effect(1)   ! On balance l'image ‚cran LOG => PHYS avec effet
+          plot_current_dial
+          IF fadetoblack!               ! Il y a eu un FadeOUT ?
+            fadeto!=TRUE
+            set_palette(depack_buf%)
+            fadetoblack!=FALSE
+          ENDIF
+          DEFMOUSE 5
+        ENDIF
+        SHOWM
+        oldcv&=cv&              ! Je le fais aprŠs 'Check_zoneinit' pour garder le LastVue correct
+      ELSE IF z!=FALSE
+        ATEXT 10,184,0,"No ClicZone to explore in this view !"
+      ENDIF
+      ' ########### GESTION BOUSSOLE ##############
+      '
+      way|=@check_boussole(mx%,my%)    ! Clic sur une issue ?
+      IF way|<>FALSE
+        change_vue
+        '        check_initzone
+        IF cv&<>oldcv&                 ! On change r‚ellement de vue ?
+          check_initzone
+          IF nst|<100
+            nst|=0
+          ELSE
+            SUB nst|,100
+          ENDIF
+          is&=VAL(LEFT$(vue.issue$(cv&),2))
+          plot_all_icones               ! ## On eteint les icones GUI
+          IF cm&=4
+            anim_vignette(cd&,1,4)       ! Sortir du mode dialogue
+          ENDIF
+          cm&=0
+          EVERY STOP                   ! On change de vue donc je stoppe les interruptions Digit
+          '          HIDEM
+          charge_img                   ! Charge la nouvelle vue
+          '          check_initzone         ! ### AJOUT ###
+          clear_logdialzone
+          init_boussole(is&)           ! Init nouvelles issues
+          plot_boussole                ! Plot Nouvelles issues
+          plot_all_spr_in_log          ! Affiche les sprites de la vue
+          img_to_phys_with_effect(1)   ! On balance l'image ‚cran LOG => PHYS avec effet
+          plot_current_dial
+          IF fadetoblack!               ! On sort d'un FadeOUT ?
+            fadeto!=TRUE
+            set_palette(depack_buf%)
+            fadetoblack!=FALSE
+          ENDIF
+          DEFMOUSE 5
+        ENDIF
+        SHOWM
+        oldcv&=cv&              ! Je le fais aprŠs 'Check_zoneinit' pour garder le LastVue correct
+      ENDIF
+      way|=FALSE
+    ENDIF
+    IF ff%=4456448              ! F10
+      ALERT 3,"Exit !|Athanor 2",2,"Ok|NON",n%
+      EXIT IF n%=1
+    ENDIF
+  UNTIL gameover|<>0            ! exit if GameOver
+  INC gameover|
+RETURN
+> PROCEDURE malloc_after_intro
+  sprbuf%=MALLOC(48*1024)          ! 48Ko pour sprites lieu courant
+  IF sprbuf%=0
+    PRINT "Erreur Malloc sprbuf% !"
+    ~INP(2)
+    END
+  ENDIF
+  sndbuf%=MALLOC(54*1024)       ! 54Ko pour Player + BigZik
+  player%=sndbuf%               ! Ptr player (30Ko)
+  ymbuf%=player%+30004          ! Ptr zik courante  (12Ko)
+  bigbuf%=ymbuf%+12288          ! Ptr BigZik (12Ko)
+  IF sndbuf%=0
+    PRINT "Erreur Malloc sndbuf% !"
+    ~INP(2)
+    END
+  ENDIF
+  IF ste!
+    digbuf%=MALLOC(64*1024)        ! 64Ko pour les digits du .zne
+    digptr%=digbuf%                ! Le pointeur qui avance dans le buf
+    IF digbuf%=0
+      PRINT "Erreur Malloc digbuf% !"
+      ~INP(2)
+      END
+    ENDIF
+    IF mem%>1040
+      voiceptr%=MALLOC(6000*30)    ! 30' max pour un dial !
+      IF voiceptr%=0
+        PRINT "Erreur Malloc voiceptr% !"
+        ~INP(2)
+        END
+      ENDIF
+    ENDIF
+  ENDIF
+  IF falcon!
+    six%=MALLOC(48*1024)   ! Pour tricker le 6Khz manquant sur Falcon
+    sixtotwelve%=(six%+2) AND &HFFFFFE        ! MOD 2
+    IF six%=0
+      PRINT "Erreur Malloc sixtotwelve% !"
+      ~INP(2)
+      END
+    ENDIF
+  ENDIF
+RETURN
+> PROCEDURE malloc_multi_screen
+  '
+  ' On rends le jeu plus agr‚able ici en r‚servant
+  ' un buffer pour les images pack‚es !
+  '
+  ' Je gŠre ‚galement si le joueur … 2048 voir 4096 Ko !
+  ' (Et dans ce cas, c'est la fete :D)
+  '
+  LOCAL n&
+  msc%=MALLOC(nbs&*(17*1024))
+  IF msc%=0
+    PRINT "Malloc msc% error !"
+    ~INP(2)
+  ENDIF
+  FOR n&=0 TO nbs&-1
+    msc%(n&,0)=msc%+(n&*(17*1024))
+    msc%(n&,1)=0
+  NEXT n&
+RETURN
+> FUNCTION gere_multi_screen(a$)
+' On gŠre ici le transfert de l'image courante !
+' en FIFO
+'
+' a$="OUT" => On regarde si elle est en buffers
+' a$="IN"  => Elle n'y ‚tait pas donc on l'a fait entrer !
+LOCAL n&
+IF a$="OUT"
+  FOR n&=0 TO nbs&-1
+    IF msc%(n&,1)=cv&
+      taillesrc%=17*1024
+      BMOVE msc%(n&,0),pack_buf%,17*1024
+      @depack(pack_buf%,taillesrc%)
+      taillesrc%=69   ! On simule ;-)
+      RETURN TRUE
+    ENDIF
+  NEXT n&
+ELSE IF a$="IN"
+  BMOVE pack_buf%,msc%(next&,0),17*1024
+  msc%(next&,1)=cv&
+  taillesrc%=69   ! On simule ;-)
+  INC next&
+  IF next&=nbs&
+    next&=0
+  ENDIF
+  RETURN TRUE
+ENDIF
+RETURN FALSE
+ENDFUNC
+> PROCEDURE mfree_multi_screen
+IF MFREE(msc%)<>0
+  PRINT "Mfree msc% error !"
+  '    ~INP(2)
+ENDIF
+RETURN
+> PROCEDURE init_var
+'
+'  ~FRE(0)
+'
+hd$="g:"
+dd$="\athanor\"
+hd$=""
+dd$=""
+'
+DIM vi$(10)      ! Vigenere table
+DIM msc%(nbs&,1) ! Gestion du multiscreen ! (buf%,vue%)
+DIM lang$(5)
+next&=0       ! Prochain multi buffer … remplir ! (0,1,2)
+rom$=""       ! Puzzle pieuvre
+dec$=""       ! Puzzle pieuvre
+lang$(0)="FR" ! Fran‡ais
+lang$(1)="GB" ! Anglais
+lang$(2)="SP" ! Espagnole (suppos‚e)
+lang$(3)="GE" ! Allemande (suppos‚e)
+lang$(4)="WA" ! Bonus
+language&=0   ! (0 = French, 1=English, 2=Spanish, 3=German, 4=Bonus)
+info!=FALSE   ! Afficher tout pleins d'info (virer tout pour MASTER)
+fadeto!=FALSE ! Si on doit faire un fade to Palette
+antir!=FALSE  ! Anti Rebond du clic souris
+currentdisk|=1 ! 1 ou 2 (Selon le disk … ins‚rer)
+world&=1      ! (1=Cnossos, 2=Indus, 3=Rapa, 4=Bateau)
+cv&=25        ! Vue courante
+cc&=1         ! Chapitre courant (1=Cnossos, 2=Bateau, 3=Indus, 8=Rapa)
+zik$=""       ! Current Zik name
+gameover|=0   ! =1 si GameOver, =2 si QUIT Game
+'
+timer1%=0     ! Timer 200hz
+timer2%=0     ! Timer 200hz
+timers_ptr%=0         ! ptr sur /TIMERS
+timers_finptr%=0      ! ptr sur /FINTIMERS
+master_ptr%=0         ! ptr sur /MASTER
+master_finptr%=0      ! ptr sur /FINMASTER
+nbvue&=90     ! Nb vues max du jeu
+way|=0        ! Direction prise (1=nord, 2=sud, 4=est, 8=ouest)
+z!=FALSE      ! Passe … TRUE si au moins une zone de clic existe dans la vue courante
+lastico|=255  ! DerniŠre icone allum‚e
+ico|=0        ! Icone cliqu‚e
+ste|=0        ! TRUE si on est sur STE
+oldcv&=cv&    ! DerniŠre vue
+cm&=0         ! Mode en cours (selon l'icone cliqu‚e ou autres)
+oldcm&=0
+newchap!=FALSE ! TRUE si /set(Chapter=xx)
+'
+' 0 = Mode nothing to do :)
+' 1 = Mode Prendre
+' 2 = Mode Examiner
+' 3 = Mode Utiliser
+' 4 = Mode Parler
+' 5 = Save
+' 6 = Load
+' 7 = Mode inventaire
+' 8 = Menu travel around the Athanor's world
+' 9 = Mode Puzzle
+'
+DIM ico$(12),cur$(8),sys$(48),loc$(25),combi$(8),bulle$(32)
+ico$(0)="RIEN"
+ico$(1)="TAKE"
+ico$(2)="LOOK"
+ico$(3)="USE"
+ico$(4)="TALK"
+ico$(5)="SAVE"
+ico$(6)="LOAD"
+ico$(7)="INVENT"
+ico$(8)="TRAVEL"
+ico$(9)="PUZZLE"
+ico$(10)="QUIT"
+'
+'
+nst|=0        ! current r‚plique
+mx&=MOUSEX
+my&=MOUSEY
+ix&=272        ! CoinX zone icones
+iy&=4          ! CoinY zone icones
+il&=24         ! Largeur icones
+ih&=24         ! Hauteur icones
+'
+bx1%=275      ! CoinX boussole
+by1%=150      ! CoinY boussole
+bl%=50        ! Largeur boussole
+bh%=50        ! Hauteur boussole
+'
+vig!=FALSE    ! Passe … TRUE si vignette dial … l'‚cran
+ddx&=10       ! Real posX dial lieux
+ddy&=155      ! Real posY dial lieux
+dx&=ddx&      ! PosX pour dial lieux
+dy&=ddy&      ! PosY pour dial lieux
+ay%=18        ! Y pour affichage des ATEXT debug
+' ---------------------
+max_line%=512         ! 512 lignes MAX dans un .con
+'  DIM con$(max_line%)   ! UNIQUEMENT pour l'‚dition d'un .con (… supprimer pour le master)
+' ---------------------
+'
+ini$="/init"
+con$="/con"
+set$="/set"
+zero$="/000"
+com$=""
+ms!=FALSE     ! Passe … TRUE si la derniŠre condition test‚e est remplie
+andon!=FALSE  ! Passe … TRUE si un AND est en cours
+oron!=FALSE   ! Passe … TRUE si un OR est en cours
+interpreter!=FALSE    ! TRUE si on veut forcer une r‚interpr‚tation du script
+'
+' ### .ZNE ###
+'
+DIM zne$(4)
+zne$(1)="cnossos"
+zne$(2)="indus"
+zne$(3)="rapa"
+zne$(4)="bateau"
+'
+' ##### Sac … dos :) #####
+'
+max_in_sacados|=20
+ibx&=21                ! PosX infobulle
+iby&=140               ! PosY infobulle
+aff|=0                 ! Antirebond pour les infos-bulles
+pix&=16                ! PosX de l'obj.0
+piy&=146               ! PosY de l'obj.0
+invent_stepx|=24       ! StepX entre deux objets dans l'invent
+invent_stepy|=24       ! StepY entre deux objets dans l'invent
+sprsac$=""    ! Sprite de la frise sacados
+sprbcksac$="" ! On sauve le fond de la frise sacados
+nb_obj&=0     ! Nb d'objet dans le sac … dos :)
+objenmain&=0  ! Nø spr (bank spr inventaire) de l'obj en main
+mi!=TRUE      ! TRUE (invent UP) FALSE (Invent DOWN)
+DIM sac.id$(max_in_sacados|)       ! Id (ex : CROCUS)
+DIM sac.spr|(max_in_sacados|)      ! Nø du spr dans la bank spr d'inventaire
+DIM sac.place|(max_in_sacados|)    ! Emplacement dans la barre d'inventaire
+DIM sac.bulle$(max_in_sacados|)
+DIM sac.back$(max_in_sacados|)     ! Background dans la zone inventaire
+ARRAYFILL sac.spr|(),0
+'
+' ###### Gestion vignette dialogue #####
+'
+cd&=0                 ! Nø de vignette dialogue courante (/set(Dial=2,2))
+sprdial$=""           ! Spr vignette dialogue
+sprmskdial$=""        ! Mask vignette dialogue
+sprdial%=0            ! Pointeur sur spr vignette
+sprbckdial$=""        ! Fond vignette dial
+left_border&=4        ! Entr‚e/Sortie bord gauche vignette dialogue
+'  right_border&=270  ! Entr‚e/Sortie bord droit vignette dialogue
+right_border&=20
+xv&=right_border&     ! X d'affichage vignette dialogue
+'  yv&=18             ! Y d'affichage vignette dialogue
+yv&=197               ! Y d'affichage vignette dialogue
+syv&=yv&
+lv&=48                ! Largeur vignette dialogue
+hv&=48                ! Hauteur vignette dialogue
+'  dr&=0
+dr1&=0                ! Longueur trajectoire 1 & 2 (entr‚e/sortie)
+dr3&=90               ! Longueur trajectoire 3 & 4 (entr‚e/sortie)
+'
+' ###### Gestion des samples #####
+'
+max_digit_per_vue&=8  ! Nb digit max par vue
+dsk$=""
+drive$=hd$
+sfx.folder$=drive$+dd$+"sfx\"
+sfx.ext$=".pck"
+nbspl|=0      ! Nb de sample actuellement en m‚moire (max 8)
+spl%=0        ! Adresse du sample … jouer
+tspl%=0       ! Taille du sample … jouer
+DIM tmp$(256) ! Tableau temporaire suite … chargement .zne
+DIM spl%(max_digit_per_vue&-1,1)   ! (adr%, size%)
+'
+' ###### Gestion des ziks #####
+'
+snd.folder$=drive$+dd$+"zik\"
+snd.ext$=".sne"
+'
+' ###### Gestion boussole #####
+'
+is&=0                 ! Issues possible de la vue courante
+bou$="boubou"         ! Sprites boussole filename
+ico$="ico"            ! Icons filename
+fri$="travel"
+'
+DIM bou.spr$(4)
+DIM bou.msk$(4)
+DIM bou.x&(4)
+DIM bou.y&(4)
+DIM bou.on!(4)
+'
+DIM pal2&(16) ! Utiliser pour les changements de palette InGame
+DIM a&(4)     ! Anim icones
+'
+' Structure des vues
+'
+max_clic_per_vue&=32          ! Nb zone de clic max par vue
+DIM reg%(16)                  ! pour initialiser les registres
+DIM re%(16)                   ! registres pour RCALL
+DIM vue.id&(nbvue&)
+DIM vue.name$(nbvue&)
+DIM vue.zclic&(nbvue&)
+DIM vue.issue$(nbvue&)
+DIM vue.clic$(nbvue&,max_clic_per_vue&-1)
+'
+nbz&=0                        ! Nb de zones du .zne courant
+nbsys%=0                      ! Nb messages systemes contenus dans sys.txt
+combi%=0                      ! Nb de combinaisons d'objets dans combi.txt
+bulle%=0                      ! Nb d'infos-bulles
+nbvar%=0                      ! Nb de variables dans defvar.txt
+nbpal%=0                      ! Nb palettes dans palettes.txt
+maxzone&=256                  ! Nb de zones max par .zne
+'  DIM spl.name$(max_digit_per_vue&-1)     ! Digit name to play
+DIM spl.timer|(nbvue&,max_digit_per_vue&-1)     ! <>0 si timer
+'
+DIM st$(2)
+'
+' Structure des persos
+'
+nbsprmax&=40                 ! Nb spr max EN TOUT
+nbspr&=0                     ! Nb de sprite du lieu courant
+offspr&=0                    ! Offset dans la structure sprites
+DIM spr.id$(nbsprmax&)       ! Id du sprite (ex:LILLA)
+DIM spr.vue&(nbsprmax&)      ! Vue ou ce sprite est visible
+DIM spr.num|(nbsprmax&)      ! Indice dans le fichier .spr
+DIM spr.x&(nbsprmax&)        ! Pos X du spr
+DIM spr.y&(nbsprmax&)        ! Pos Y du spr
+DIM spr.sx&(nbsprmax&)       ! Size X
+DIM spr.sy&(nbsprmax&)       ! Size Y
+DIM spr.data$(nbsprmax&)     ! Data du sprite au format PUT
+DIM spr.mask$(nbsprmax&)     ! Mask du sprite au format PUT
+'  DIM spr.back$(nbsprmax&)     ! Sauvegarde du fond
+DIM spr.anim|(nbsprmax&)     ! Nø de l'anim. (v2.0)
+DIM spr.suj$(nbsprmax&,8)    ! Tab. suj. de dials par sprite/perso (v2.0 : 8max)
+DIM spr.onoff!(nbsprmax&)    ! Flag du spr ON/OFF
+'
+DIM flag|(256)                  ! Tableau pour les variables Flagxxx
+DIM var.cmd$(128)
+DIM var.val$(128)
+DIM pal$(16)
+'
+' #### PUZZLES ####
+'
+DIM pe$(4)    ! Bouchons pour le puzzle peche
+DIM bz$(4)    ! Anim bousier
+DIM x&(8),y&(8),fb$(4),s&(3)  ! PosX, Y & Backs (Fishs or Bugs)
+DIM penalty&(4)       ! # Ralentissement bousier
+DIM cr%(3)    ! ## Puzzle pieuvre
+DIM rv%(2)    ! ##
+DIM rx%(2),ry%(2) ! ##
+'
+st$(0)="ST"
+st$(1)="STE"
+gfx.folder$=drive$+dd$+"gfx\"
+vue.ext$=".sp5"
+spr.ext$=".spr"
+chap.folder$=drive$+dd$+"scenar\"
+chap.ext$=".coo"
+cc$=""               ! Current chapter Filename
+zne.folder$=chap.folder$
+zne.ext$=".zne"
+dial.folder$=drive$+dd$+"dials\"
+dial.ext$=".txt"
+com$=STRING$(16,0)             ! Variable … tester
+'
+'
+'
+friseback$=STRING$(10*1024,0)  ! Sauvegarde du fond frise inventaire
+backbulle$=STRING$(512,0)      ! Sauvegarde fond info-bulle
+inv$=STRING$(22*1024,0)        ! 22Ko pour les sprites d'inventaire
+invbuf%=V:inv$
+frise$=STRING$(13*1024,0)      ! 13Ko pour la frise d'inventaire+travel
+frisebuf%=V:frise$
+boub$=STRING$(3*1024,0)        !  3Ko pour sprites boussole
+boubuf%=V:boub$
+icon$=STRING$(10*1024,0)       ! 10Ko pour sprites icones
+icobuf%=V:icon$
+chap$=STRING$(12*1024,0)       ! 11ko pour .con (chapter courant)
+chap%=V:chap$
+zne$=STRING$(4*1024,0)         !  4ko pour fichier .zne
+zne%=V:zne$
+dial$=STRING$(16*1024,0)       ! 16ko pour le fichier de dial courant
+dial%=V:dial$
+'
+pack_buf%=MALLOC(17*1024)      ! 17Ko pour buffer image pack‚e
+IF pack_buf%=0
+  PRINT "Erreur Malloc pack_buf% !"
+  ~INP(2)
+  END
+ENDIF
+depack_buf%=MALLOC(33*1024)          ! 33Ko pour buffer image d‚compress‚e
+IF depack_buf%=0
+  PRINT "Erreur Malloc depack_buf% !"
+  ~INP(2)
+  END
+ENDIF
+'
+RESTORE bouxy
+FOR n&=0 TO 3
+  READ bou.x&(n&),bou.y&(n&)
+NEXT n&
+bouxy:
+DATA 288,144,288,168,288,160,272,160
+RETURN
+> PROCEDURE init_flag
+ARRAYFILL flag|(),0
+flag|(9)=1            ! 1 Cnossos ouvert de base
+RETURN
+> PROCEDURE init_world
+'
+' L'init de world& implique :
+'  - Charger le fichier de dials correspondant
+'  - Charger le fichier .ZNE correspondant
+'  - Charger le fichier de sprites correspondant
+'  - Initialiser le fichier de sprites charg‚
+'  - Charger le BigZik du monde courant
+'
+'  # Le fichier de sprites inventaire est commun … tout le jeu
+'
+secure_garbage_collection    ! ##### Anti Garbage collection #####
+streplayoff                  ! ## STOP DMA
+'
+IF world&=1                       ! ## Cit‚ de Cnossos
+  check_insertdisk(1)
+  charge_file(dial.folder$+"cnos"+lang$(language&)+".pck",dial%)
+  taillesrc%=tspr%
+  reg%(8)=dial%
+  RCALL sp3_unpack%,reg%()
+  charge_zne2("cnossos")                                 ! .zne
+  charge_file(gfx.folder$+"cnosspr6.pck",sprbuf%)        ! .spr pack‚
+  taillesrc%=tspr%
+  reg%(8)=sprbuf%
+  RCALL sp3_unpack%,reg%()
+  init_sprites
+  init_bigzik(world&)             ! On charge toutes les musiques !
+ELSE IF world&=2                  ! ## Vall‚e de l'Indus
+  check_insertdisk(2)
+  charge_file(dial.folder$+"indus"+lang$(language&)+".pck",dial%)
+  taillesrc%=tspr%
+  reg%(8)=dial%
+  RCALL sp3_unpack%,reg%()
+  charge_zne2("indus")                                   ! .zne
+  charge_file(gfx.folder$+"induspr.spr",sprbuf%)         ! .spr
+  init_sprites
+  init_bigzik(world&)             ! On charge toutes les musiques !
+ELSE IF world&=3                  ! ## Rapa Nui
+  check_insertdisk(2)
+  charge_file(dial.folder$+"rapa"+lang$(language&)+".pck",dial%)
+  taillesrc%=tspr%
+  reg%(8)=dial%
+  RCALL sp3_unpack%,reg%()
+  IF dec$<>""                     ! ## Tags des dialogues li‚s au puzzPieuvre
+    puzzle_pieuvre_tag_dialogue
+    puzzle_pieuvre_tag_dialogue
+    puzzle_pieuvre_tag_dialogue   ! ### 3 fois car 3 r‚pliques concern‚es
+  ENDIF
+  charge_zne2("rapa")                                    ! .zne
+  charge_file(gfx.folder$+"rapaspr4.pck",sprbuf%)        ! .spr pack‚
+  taillesrc%=tspr%
+  reg%(8)=sprbuf%
+  RCALL sp3_unpack%,reg%()
+  init_sprites
+  init_bigzik(world&)             ! On charge toutes les musiques !
+ELSE IF world&=4                  ! ## Bateau
+  charge_file(dial.folder$+"bateau"+lang$(language&)+".pck",dial%)
+  taillesrc%=tspr%
+  reg%(8)=dial%
+  RCALL sp3_unpack%,reg%()
+  charge_zne2("bateau")                                  ! .zne
+  charge_file(gfx.folder$+"boatspr.spr",sprbuf%)         ! .spr
+  init_sprites
+  init_bigzik(world&)             ! On charge toutes les musiques !
+ENDIF
+~@set_var("DepartVue",STR$(cv&))
+~@set_var("LastVue",STR$(oldcv&))
+secure_garbage_collection    ! ##### Anti Garbage collection #####
+RETURN
+> PROCEDURE init_chapter
+secure_garbage_collection    ! ##### Anti Garbage collection #####
+timers_ptr%=INSTR(chap$,"/TIMERS")               ! On rep‚re un /TIMERS
+timers_finptr%=INSTR(chap$,"/FINTIMERS")         ! On rep‚re le /FINTIMERS
+IF timers_ptr%=0 OR timers_finptr%=0
+  ATEXT 10,184,0,"/TIMERS or /FINTIMERS not found in this chapter !"
+  ~INP(2)
+ENDIF
+'
+master_ptr%=INSTR(chap$,"/MASTER")               ! On rep‚re un /MASTER
+master_finptr%=INSTR(chap$,"/FINMASTER")         ! On rep‚re le /FINMASTER
+IF master_ptr%<>0 AND master_finptr%<>0
+  check_masterzone
+ELSE
+  ATEXT 10,184,0,"/MASTER or /FINMASTER not found in this chapter !"
+  ~INP(2)
+ENDIF
+RETURN
+> PROCEDURE init_vues
+'
+' Initialise la structure des vues
+'
+' vue.issue$ = ttNNSSEEOO
+' tt = somme des destinations possible depuis cette vue
+' NN = Warp destination si NORD  (01)
+' SS = Warp destination si SUD   (02)
+' EE = Warp destination si EST   (08)
+' OO = Warp destination si OUEST (04)
+'
+LOCAL n&
+n&=0
+RESTORE vuestruct
+REPEAT
+  INC n&
+  READ vue.id&(n&)
+  READ vue.name$(n&)
+  READ vue.zclic&(n&)
+  READ vue.issue$(n&)
+UNTIL vue.id&(n&)=-1
+vuestruct:
+rapa_vues:
+DATA 1,vue_01,10,0800000200
+DATA 2,vue_02,10,1503060501
+DATA 3,vue_03,11,0204020000
+DATA 4,vue_04,10,0200030000
+DATA 5,vue_05,10,0400000002
+DATA 6,vue_07,10,0302070000
+DATA 7,vue_06,10,0506000008
+DATA 8,vue_08,10,0909000700
+DATA 9,vue_09,10,0311080000
+DATA 10,vue_10,10,0800000900
+DATA 11,vue_11,10,0712090013
+DATA 12,vue_12,10,0200110000
+DATA 13,vue_13,10,0914001100
+DATA 14,vue_14,10,0200130000
+DATA 15,vue_15,10,0117000000
+DATA 16,xxxxxx,10,0
+DATA 17,vue_17,10,0318150000
+DATA 18,vue_18,10,0200170000
+DATA 19,vue_19,10,0
+DATA 99,xxxxxx,10,0
+DATA 99,xxxxxx,10,0
+DATA 99,xxxxxx,10,0
+DATA 99,xxxxxx,10,0
+DATA 99,xxxxxx,10,0
+cnosos_vues:
+DATA 25,vue_25,10,0929002600
+DATA 26,vue_26,10,1200002725
+DATA 27,vue_27,10,1200002826
+DATA 28,vue_28,10,0400000027
+DATA 29,vue_29,10,1130253600
+DATA 30,vue_30,10,1132293100
+DATA 31,vue_31,10,0400000030
+DATA 32,vue_32,10,10003033
+DATA 33,vue_33,10,0734360032
+DATA 34,vue_34,10,0741330035
+DATA 35,vue_35,10,0800003400
+DATA 36,vue_36,10,1333003729
+DATA 37,vue_37,10,0400000036
+DATA 38,vue_38,10,0339370000
+DATA 39,vue_39,10,0240380000
+DATA 40,vue_40,10,0200390000
+DATA 41,vue_41,10,0200340000
+DATA 42,vue_42,10,0800003400
+DATA 99,xxxxxx,10,0
+DATA 99,xxxxxx,10,0
+indus_vues:
+DATA 45,vue_45,10,1200004652
+DATA 46,vue_46,10,1347004845
+DATA 47,vue_47,10,020046
+DATA 48,vue_48,10,0549000046
+DATA 49,vue_49,10,11604851
+DATA 50,vue_50,10,035149
+DATA 51,vue_51,10,0400000049
+DATA 52,vue_52,10,1200004553
+DATA 53,vue_53,10,09540052
+DATA 54,vue_54,10,0755530057
+DATA 55,vue_55,10,0600540056
+DATA 56,vue_56,10,08000055
+DATA 57,vue_57,10,09580054
+DATA 58,vue_58,10,11595760
+DATA 59,vue_59,10,020058
+DATA 60,vue_60,10,0600490058
+DATA 61,vue_61,10,00
+DATA 62,vue_62,10,0800003400
+DATA 99,xxxxxx,10,0
+DATA 99,xxxxxx,10,0
+DATA 99,xxxxxx,10,0
+DATA 99,xxxxxx,10,0
+DATA 99,xxxxxx,10,0
+DATA 99,xxxxxx,10,0
+DATA 99,xxxxxx,10,0
+DATA 99,xxxxxx,10,0
+bateau_vues:
+DATA 71,vue_71,10,0800007200
+DATA 72,vue_72,10,0200710000
+DATA 73,vue_73n,10,1200007471
+DATA 74,vue_74n,10,0400000073
+DATA -1,-1,-1,-1
+RETURN
+> PROCEDURE init_sprstate
+LOCAL a$,a&,b&,c!,n&
+RESTORE cnossos_spr
+n&=0
+REPEAT
+  READ a$,a&,b&,c!
+  IF LEFT$(a$,1)<>"#"
+    spr.onoff!(n&)=c!            ! On/Off
+    INC n&
+  ENDIF
+UNTIL a$="CRYO"
+RETURN
+> PROCEDURE init_sprites
+'
+' Initialise tous les sprites du lieu courant
+' Suis d‚sol‚ mais va falloir me revoir tout ‡a mec !!
+'
+LOCAL a$,a&,b&,c&
+LOCAL n&,o%,s&,ls&,bf%,d%,m%,nop!
+offspr&=0
+bf%=sprbuf%
+RESTORE cnossos_spr
+IF world&=1
+  REPEAT
+    READ a$,a&,b&,c&
+    IF LEFT$(a$,1)<>"#"
+      INC offspr&
+    ENDIF
+  UNTIL a$="#CNOSSOS"
+ELSE IF world&=2
+  REPEAT
+    READ a$,a&,b&,c&
+    IF LEFT$(a$,1)<>"#"
+      INC offspr&
+    ENDIF
+  UNTIL a$="#INDUS"
+ELSE IF world&=3
+  REPEAT
+    READ a$,a&,b&,c&
+    IF LEFT$(a$,1)<>"#"
+      INC offspr&
+    ENDIF
+  UNTIL a$="#RAPA"
+ELSE IF world&=4
+  REPEAT
+    READ a$,a&,b&,c&
+    IF LEFT$(a$,1)<>"#"
+      INC offspr&
+    ENDIF
+  UNTIL a$="#BATO"
+ENDIF
+nbspr&=DPEEK(sprbuf%)             ! Nb de sprite du fichier courant
+o%=2+10*DPEEK(sprbuf%)            ! De base l'offest d‚marre juste aprŠs les tables
+s&=0
+a&=0
+'
+FOR n&=0 TO offspr&+nbspr&-1      ! Ne pas encombrer la m‚moire !!!
+  spr.data$(n&)=""
+  spr.mask$(n&)=""
+NEXT n&
+FOR n&=offspr& TO offspr&+nbspr&-1
+  ls&=s&
+  READ spr.id$(n&)               ! ID du sprite (fichier sprite)
+  READ spr.vue&(n&)              ! Vue o— le sprite est visible
+  spr.num|(n&)=n&                ! Indice dans le fichier .spr (encore utile ?)
+  READ spr.anim|(n&)             ! nø de l'anim (fichier sprite)
+  READ nop!                      ! Je ne retouche pas … l'‚tat !
+  '    READ spr.onoff!(n&)            ! On/Off
+  spr.x&(n&)=DPEEK(sprbuf%+2+a&*10)+8           ! Pos X
+  spr.y&(n&)=DPEEK(sprbuf%+4+a&*10)+4           ! Pos Y
+  spr.sx&(n&)=DPEEK(sprbuf%+6+a&*10)          ! Size X
+  spr.sy&(n&)=DPEEK(sprbuf%+8+a&*10)          ! Size Y
+  s&=DPEEK(sprbuf%+10+a&*10)                      ! Size en octet du spr
+  ADD o%,ls&*2                       ! Calcul offset datas (*2 car SPR+MASK)
+  spr.data$(n&)=STRING$(s&,0)
+  spr.mask$(n&)=STRING$(s&,0)
+  d%=V:spr.data$(n&)
+  m%=V:spr.mask$(n&)
+  bf%=sprbuf%+o%
+  BMOVE bf%,d%,s&
+  BMOVE bf%+s&,m%,s&
+  INC a&
+NEXT n&
+'
+' ############################################################
+' Les DATAs doivent etre dans le meme ordre que les sprites
+' se trouvant dans le fichier .spr
+'
+' ID    = ID utilis‚ dans les SafarScript :)
+' Vue   = Vue active pour le sprite
+' Anim  = 1
+' State = TRUE = Visible, FALSE = Unvisible
+'
+cnossos_spr:
+DATA "#CNOSSOS",0,0,0
+'
+DATA "LILLA34",34,1,0
+DATA "LILLA35",35,1,-1
+DATA "CHAT",26,1,-1
+DATA "CHAT2",26,1,0
+DATA "TENTAC",40,1,-1
+DATA "POISSON",28,1,0
+DATA "POISSON_SQUEL",28,1,0
+DATA "CAILLOU",32,1,-1
+DATA "IENCH",32,1,-1
+DATA "VENDEUR_PROCHE",41,1,-1
+DATA "VENDEUR_LOIN",41,1,0
+DATA "CRUCHE",38,1,-1
+DATA "CROCUS",29,1,-1
+DATA "TABLEAU",39,1,-1
+DATA "POISSON_SAU",28,1,0
+DATA "GARDE_ON",37,1,-1
+DATA "GARDE_OFF",37,1,0
+DATA "CAILLOU2",40,1,0
+'  DATA "CRYO",0,0,0
+'
+' ##################################
+indus_spr:
+DATA "#INDUS",0,0,0
+'
+DATA "MARTEAU",47,1,-1
+DATA "ROCKON",48,1,-1
+DATA "ROCKOFF",48,1,0
+DATA "BRINDILLE",57,1,-1
+DATA "FOURRAGE",60,1,0
+DATA "BOUSE",60,1,0
+DATA "MASQUE",61,1,-1
+'  DATA "CRYO",0,0,0
+'
+' ##################################
+rapa_spr:
+DATA "#RAPA",0,0,0
+'
+DATA "PLANCHES",03,1,-1
+DATA "OFFRANDE",10,1,0
+DATA "NUAGES",09,1,-1
+DATA "ALTOS",17,1,-1
+DATA "ALTOS18",18,1,0
+DATA "CRISTALON",18,1,0
+DATA "CRISTALOFF",18,1,0
+'  DATA "CRYO",0,0,0
+'
+' ##################################
+bateau_spr:
+DATA "#BATO",0,0,0
+'
+DATA "PORTE_CASSEE",71,1,0
+DATA "GOELAND",72,1,0
+DATA "GUANO",72,1,0
+DATA "VER",72,1,0
+DATA "SNAKE",74,1,0
+DATA "GOELAND_LOIN",72,1,-1
+DATA "CRYO",0,0,0
+RETURN
+> PROCEDURE init_img
+' ## Je fais ici toutes les inits n‚cessaire lorsque le joueur
+' ## change de vues !
+'
+' - Charger toutes les digits de la vue
+' - Init quelques flags
+' -
+flag|(10)=0           ! # Compteur RESERVE aux dials multiples
+flag|(68)=1           ! # Flag to avoid RestartMusik
+'  init_digits
+RETURN
+> PROCEDURE old_init_digits
+LOCAL n&
+' ### Les digits
+'
+secure_garbage_collection    ! ##### Anti Garbage collection #####
+digptr%=digbuf%              ! On remets le pointeur au d‚but du buf
+nbspl|=0
+n&=0
+DO
+  EXIT IF spl.name$(n&)=""
+  '    SDPOKE &HFF8240,&HF00
+  charge_spl(spl.name$(n&))
+  INC n&
+LOOP
+RETURN
+> PROCEDURE init_bigzik(world&)
+' On charge le BigFile des musiques du world courant
+' La d‚compression se fera … la vol‚e lors du
+' Lancement d'une musique
+'
+' Nom : bigzik01.big (Cnossos)
+'       bigzik02.big (Indus)
+'       bigzik03.big (Rapa)
+'       bigzik04.big (Bateau)
+' (Le tout dans le r‚pertoire zik)
+'
+' Entete : 32*Word = Table des offsets
+'          Datas
+'
+charge_file(snd.folder$+"bigzik0"+STR$(world&)+".big",bigbuf%)
+RETURN
+> PROCEDURE init_inventaire
+cnossos_invent:
+DATA "CROCUS",1
+DATA "CRUCHE",1
+DATA "CAILLOU",1
+DATA "TENTACULE",1
+DATA "POISSON",1
+DATA "POISSON_SAU",1
+DATA "SAFRAN",1
+DATA "VER",1
+DATA "CRUCHE_PLEINE",1
+DATA "POISSON_SECHE",1
+DATA "FEUILLES",1
+'
+' indus_invent:
+DATA "MARTEAU",1
+DATA "SNAKE",1
+DATA "EAU",1
+DATA "TERRE",1
+DATA "ARGILE",1
+DATA "BOUSIER",1
+DATA "BOUSIER2",1
+DATA "BRINDILLE",1
+DATA "BOUSE",1
+DATA "HACHE",1
+DATA "TORCHE",1
+DATA "SYMBOL1",1
+DATA "SYMBOL2",1
+DATA "STATUETTE2",1
+DATA "MASQUE",1
+DATA "STATUETTE",1
+'
+' rapa_invent:
+DATA "CRISTAL",1
+'
+' bateau_invent:
+'
+DATA "CRYO",1
+'
+RETURN
+> PROCEDURE gere_inventaire(x&,y&,k&,e|)
+' #######################################################################
+'
+'   On gŠre ici tout ce qui se passe lorsque l'inventaire est ouvert !
+'   Prises d'objets, d‚pots d'objets, combinaisons d'objets
+'
+' Il est maintenant inutile de faire dans un Script :
+' /set(ObjetEnMain=CROCUS)
+' /set(SacADos=CROCUS)
+'
+' Seule la commande /set(ObjetEnMain=ID) est n‚cessaire
+' car elle s'occupe elle meme de l'ajout de l'objet
+' Au moment o— il est d‚pos‚ dans l'inventaire.
+' Ou de la suppression !
+' En revanche, la commande seule : /set(SacADos=ID) reste pertinente
+' pour faire entrer/sortir un objet directement dans/de (le) SacADos !
+' (Sans passer par ObjetEnMain)
+'
+' #######################################################################
+LOCAL n&,xx&,yy&,m$,s$
+IF y&>147-12 AND x&>15-12 AND x&<265       ! AND k&=1 AND antir!=false
+  xx&=pix&+e|*invent_stepx|
+  yy&=piy&
+  IF e|>9                                 ! On gŠre la ligne 2
+    xx&=pix&+(e|-10)*invent_stepx|
+    yy&=piy&+invent_stepy|
+  ENDIF
+  IF sac.spr|(e|)<>0
+    '      PRINT "e|=";e|
+    IF objenmain&=0                         ! ## TAKE OBJ ##
+      ~XBIOS(5,L:log%,L:XBIOS(2),-1)
+      VSYNC
+      ~@set_var("ObjetEnMain",sac.id$(e|))
+      objenmain&=sac.spr|(e|)
+      objenmain$=sac.id$(e|)
+      PUT xx&,yy&,sac.back$(e|)        ! On remets le fond sous l'obj choisi
+      RC_COPY log%,xx&,yy&,24,24 TO phys%,xx&,yy&
+      gere_sacados("NOT_"+sac.id$(e|),e|+1)    ! On retire l'objet
+    ELSE
+      ' Le joueur est-il en train de tenter une combinaison ?
+      objects_combination(e|,xx&,yy&)
+    ENDIF
+  ELSE
+    IF objenmain&<>0                           ! ## PUT OBJ ##
+      ~XBIOS(5,L:log%,L:XBIOS(2),-1)
+      gere_sacados(objenmain$,e|+1)             ! Un obj. dans l'invent !
+      m$=MID$(inv$,1+((objenmain&-1)*780),390)               ! Msk
+      s$=MID$(inv$,1+((objenmain&-1)*780)+390,390)           ! Spr
+      RC_COPY log%,blix%,bliy%,24,24 TO phys%,blix%,bliy% ! ## HOT NEWS ##
+      GET xx&,yy&,xx&+24,yy&+24,sac.back$(e|)  ! Sauve sous le spr
+      PUT xx&,yy&,m$,1                      ! Plot Mask
+      PUT xx&,yy&,s$,7                      ! Plot Spr
+      RC_COPY log%,xx&,yy&,24,24 TO phys%,xx&,yy&
+      ~@set_var("ObjetEnMain","")
+      objenmain&=0
+      objenmain$=""
+      SHOWM
+    ENDIF
+  ENDIF
+  ~XBIOS(5,L:XBIOS(2),L:XBIOS(2),-1)
+ENDIF
+RETURN
+> PROCEDURE objects_combination(e|,xx&,yy&)
+'
+' On v‚rifie ici qu'une combinaison est possible entre deux objets
+' Les combinaisons possible sont d‚crites dans : combi.txt
+' e| = emplacement cliqu‚
+'
+LOCAL m$,s$,n&,a$,b$,c$,x&,y&
+FOR n&=0 TO combi%-1
+  x&=INSTR(combi$(n&)," ")
+  y&=INSTR(combi$(n&)," ",x&+1)
+  a$=MID$(combi$(n&),1,x&-1)
+  b$=MID$(combi$(n&),x&+1,y&-(x&+1))
+  c$=RIGHT$(combi$(n&),LEN(combi$(n&))-y&)
+  IF (objenmain$=a$ AND sac.id$(e|)=b$) OR (objenmain$=b$ AND sac.id$(e|)=a$)
+    '      PRINT "Combination OK"
+    ~XBIOS(5,L:log%,L:XBIOS(2),-1)
+    PUT xx&,yy&,sac.back$(e|)            ! On remets le fond sous l'obj
+    ' L'obj 1 est d‚j… retir‚ de l'inventaire puisqu'il est en main
+    gere_sacados("NOT_"+sac.id$(e|),0)   ! On retire l'objet 2
+    gere_sacados(c$,e|+1)                ! On cr‚e l'objet 3
+    m$=MID$(inv$,1+((sac.spr|(e|)-1)*780),390)               ! Msk
+    s$=MID$(inv$,1+((sac.spr|(e|)-1)*780)+390,390)           ! Spr
+    GET xx&,yy&,xx&+23,yy&+23,sac.back$(e|)  ! Sauve sous le spr
+    PUT xx&,yy&,m$,1                      ! Plot Mask
+    PUT xx&,yy&,s$,7                      ! Plot Spr
+    ~@set_var("ObjetEnMain","")
+    objenmain&=0
+    objenmain$=""
+    SHOWM
+    RC_COPY log%,xx&-8,yy&-8,32+16,32+16 TO phys%,xx&-8,yy&-8
+    VSYNC
+  ENDIF
+NEXT n&
+RETURN
+> PROCEDURE plot_infobulle(c|)
+'
+' Si la souris passe sur une (c|) occup‚e
+' Alors j'affiche l'info-bulle sinon je restitue le fond
+' (Le fond a ‚t‚ sauvegard‚ lors du scrollUP de la frise
+'
+VOID XBIOS(5,L:log%,L:XBIOS(2),-1)
+IF sac.spr|(c|)<>0 AND aff|<>sac.spr|(c|)
+  PUT ibx&,iby&,backbulle$
+  ATEXT ibx&,iby&,0,sac.bulle$(c|)
+  aff|=sac.spr|(c|)
+ELSE IF aff|<>sac.spr|(c|) AND aff|<>255
+  PUT ibx&,iby&,backbulle$
+  aff|=255
+ENDIF
+RC_COPY log%,ibx&,iby&,20*6,6 TO phys%,ibx&,iby&
+VOID XBIOS(5,L:XBIOS(2),L:XBIOS(2),-1)
+RETURN
+> FUNCTION calculate_invent_place(x&,y&)
+'
+' Coordonn‚es X, Y de la souris => Emplacement dans l'inventaire
+' de  0 - 09 (PremiŠre ligne)
+' de 10 - 19 (Seconde ligne)
+'
+p|=(x&-pix&)/invent_stepx|
+IF y&>piy&+invent_stepy|
+ADD p|,10
+ENDIF
+RETURN p|
+ENDFUNC
+> PROCEDURE gere_sacados(id$,p|)
+' Ajout et retrait d'objet du sacados :)
+' /set(sacados=NOT_ID) = Retrait de l'obj. ID du sac
+' /set(sacados=ID)     = Ajout de l'obj. ID au sac
+'
+' id$ = ID de l'objet … ajouter
+' p|  = Nø d'Emplacement (ou 0 pour premier emplacement libre)
+'
+LOCAL a&,n&,i$,s|,d!
+d!=FALSE
+IF LEFT$(id$,4)="NOT_"       ! On perd un obj?
+d!=TRUE
+id$=RIGHT$(id$,LEN(id$)-4)
+ENDIF
+n&=@invent_id(id$)
+IF n&<>FALSE
+IF d!=FALSE                ! ## AJOUT ##
+  '    ATEXT 10,25,0,"p|="+STR$(p|)
+  IF p|>0
+    sac.id$(p|-1)=id$       ! id de l'obj
+    sac.spr|(p|-1)=n&       ! Nø spr dans la bank
+    sac.place|(p|-1)=p|-1   ! Emplacement dans l'invent
+    sac.bulle$(p|-1)=bu$    ! Info bulle (bu$ en GLOBAL=Pas bo)
+    INC nb_obj&
+    IF nb_obj&=max_in_sacados|
+      ALERT 3,"ATTENTION|Trop d'obj. dans l'inventaire",1,"OK",n&
+      STOP
+    ENDIF
+  ELSE
+    a&=0                      ! Premier emplacement libre !
+    DO
+      IF sac.id$(a&)=""
+        sac.id$(a&)=id$      ! id de l'obj
+        sac.spr|(a&)=n&      ! Nø spr dans la bank
+        sac.place|(a&)=a&    ! Emplacement dans l'invent
+        sac.bulle$(a&)=bu$   ! Info bulle (bu$ en GLOBAL=Pas bo)
+        INC nb_obj&
+        EXIT IF TRUE
+      ENDIF
+      INC a&
+    LOOP
+    IF nb_obj&=max_in_sacados|
+      ALERT 3,"ATTENTION|Trop d'obj. dans l'inventaire",1,"OK",n&
+    ENDIF
+  ENDIF
+ELSE
+  a&=0                        ! #### Supression ####
+  DO
+    IF sac.id$(a&)=id$
+      sac.id$(a&)=""
+      sac.spr|(a&)=0
+      sac.place|(a&)=0
+      sac.bulle$(a&)=""
+      sac.back$(a&)=""
+      DEC nb_obj&
+      EXIT IF TRUE
+    ENDIF
+    INC a&
+  LOOP
+  IF a&=max_in_sacados|
+    ALERT 3,"ATTENTION|Id introuvable '"+id$+"'",1,"OK",n&
+    STOP
+  ENDIF
+ENDIF
+ENDIF
+RETURN
+> FUNCTION invent_id(id$)
+'
+' Return l'indice d'un OBJ d'inventaire
+'
+'
+LOCAL n&,i$,s|,b$
+RESTORE cnossos_invent
+'
+n&=1
+DO
+READ i$,s|
+'    bu$=bulle$(n&-1)
+EXIT IF id$=i$ OR i$="CRYO"
+INC n&
+LOOP
+IF i$="CRYO"
+ALERT 3,"ATTENTION|Id introuvable '"+id$+"'",1,"OK",n&
+RETURN 0
+ELSE
+bu$=bulle$(n&-1)
+ENDIF
+RETURN n&
+ENDFUNC
+> FUNCTION check_sacados(id$)
+' On v‚rifie si un objet se trouve (ou pas) dans l'inventaire
+' return TRUE/FALSE
+' ex : /con(sacados=NOT_PIERRE)
+'        -> V‚rifie que l'on a PAS la PIERRE dans l'inventaire
+'
+LOCAL n&,d!
+d!=FALSE
+IF LEFT$(id$,4)="NOT_"
+id$=RIGHT$(id$,LEN(id$)-4)
+d!=NOT d!
+ENDIF
+FOR n&=0 TO max_in_sacados|-1
+IF sac.id$(n&)=id$
+RETURN NOT d!
+ENDIF
+NEXT n&
+RETURN d!
+ENDFUNC
+'
+> PROCEDURE change_vue
+'
+' On change r‚ellement de vue ?
+'
+LOCAL a|
+is&=VAL(LEFT$(vue.issue$(cv&),2))
+clear_boussole
+IF (way|=1 AND is& AND 1) OR (way|=2 AND is& AND 2) OR (way|=8 AND is& AND 8) OR (way|=4 AND is& AND 4)
+oldcv&=cv&
+a|=way|*2+1
+IF a|=17
+a|=7
+ENDIF
+cv&=VAL(MID$(vue.issue$(cv&),a|,2))
+~@set_var("DepartVue",STR$(cv&))            ! Je me dirige vers quelle vue !
+~@set_var("LastVue",STR$(oldcv&))           ! Je viens de quelle vue !
+'    ~@set_var("ArriveeVue",STR$(oldcv&))
+'    PRINT "oldcv&=";oldcv&
+'    PRINT "cv&=";cv&
+streplayoff                 ! ## STOP DMA before changing view
+ENDIF
+'  ~@set_var("ArriveeVue","")
+RETURN
+> PROCEDURE check_spl
+'
+' Jouer les .spl g‚rer sous timer avec % d'apparition
+'
+LOCAL n&,r&,t|
+FOR n&=0 TO max_digit_per_vue&-1
+t|=spl.timer|(cv&,n&)
+IF t|<>0
+r&=(RND(0)*100)+1         ! On tire un %
+IF r&<t|
+streplayon(spl%(n&,0),spl%(n&,1),1)
+ATEXT 15,15,0,"Spl Playing..."
+PRINT "Joue un .spl !"
+ENDIF
+ENDIF
+NEXT n&
+RETURN
+> PROCEDURE secure_garbage_collection
+'
+' On r‚initiaise les pointeurs de temps en temps
+' Pour contrer les ‚ventuels Gargabe collection du GFA
+' (genre des cr‚ations de variables qui d‚callent toutes les
+'  adresses des pr‚c‚dentes)
+'  LOCAL n&
+'
+~FRE(0)
+invbuf%=V:inv$
+frisebuf%=V:frise$
+boubuf%=V:boub$
+icobuf%=V:icon$
+chap%=V:chap$
+'  def%=V:def$
+zne%=V:zne$
+dial%=V:dial$
+' pack_buf%=V:pack_buf$
+'  depack_buf%=V:depack_buf$
+'  FOR n&=0 TO nbspl|
+'  spl%(n&,0)=V:spl$(n&)       ! Adr% du sample
+' NEXT n&
+RETURN
+'
+' #################################
+' #### Interpr‚teur de scripts ####
+' #################################
+'
+> PROCEDURE check_masterzone
+' On v‚rifie s'il existe une zone MASTER dans ce chapitre
+' Si c'est le cas, on check les conditions.
+'
+' Cette routine n'est execut‚e qu'… l'entr‚e dans le chapitre
+'
+LOCAL a%,n%
+n%=master_ptr%
+DO
+a%=INSTR(chap$,"/con",n%)           ! On rep‚re le /con qui suit
+EXIT IF (a%=0) OR (a%>master_finptr%)
+EXIT IF @check_con(INSTR(chap$,"(",a%)+1)
+n%=a%+1                           ! Pour ne pas chopper le meme /con en boucle
+LOOP
+RETURN
+> PROCEDURE check_initzone
+' On v‚rifie s'il existe une zone d'INIT dans la vue
+' dans laquelle on entre.
+' Si c'est le cas, on check les conditions.
+'
+' /con = Test d'une ou plusieurs conditions
+' /set = Initialiser des variables
+'
+' Optimisation TO DO
+'
+' 1 - Lorsque l'on charge une vue, PRECALC les pointeurs sur cette vue dans le
+'     Script /xxx ainsi que le /000
+'     = Grosse acc‚l‚ration de l'interpr‚tation !!!
+'
+' 2 - Autoriser de mettre des /SET direct (qui seront donc execut‚ … chaque fois)
+'     Avec ‚ventuellement des /CON ensuite
+'
+LOCAL v$,i$,f$
+LOCAL a%,n%,f%,i%,fi%
+i$="/INIT"
+f$="/FININIT"
+v$="/"+STR$(cv&)
+a%=INSTR(chap$,v$)                  ! On cherche le /xx de la vue courante
+f%=INSTR(chap$,zero$,a%)            ! On rep‚re le /000
+i%=INSTR(chap$,i$,a%)               ! On cherche s'il existe un /INIT
+fi%=INSTR(chap$,f$,a%)              ! On rep‚re le /FININIT
+IF a%<>0 AND i%<>0 AND fi%<>0 AND i%<f% AND fi%<f%
+n%=i%
+DO
+a%=INSTR(chap$,con$,n%)           ! On rep‚re le /con qui suit
+EXIT IF (a%=0) OR (a%>fi%)
+EXIT IF @check_con(INSTR(chap$,"(",a%)+1)
+n%=a%+1                           ! Pour ne pas chopper le meme /con en boucle
+LOOP
+ENDIF
+RETURN
+> PROCEDURE check_timerszone
+' ## On a un timer en cours
+'
+LOCAL a%,n%
+IF timers_ptr%<>0 AND timers_finptr%<>0
+n%=timers_ptr%
+DO
+a%=INSTR(chap$,"/con",n%)           ! On rep‚re le /con qui suit
+EXIT IF (a%=0) OR (a%>timers_finptr%)
+EXIT IF @check_con(INSTR(chap$,"(",a%)+1)
+n%=a%+1                           ! Pour ne pas chopper le meme /con en boucle
+LOOP
+ELSE
+ATEXT 10,184,0,"No TIMERS zone to run in this chapter !"
+~INP(2)
+ENDIF
+RETURN
+'
+> PROCEDURE read_script
+'
+' On interprete le .con courant
+' Ce systeme est tir‚ de ce que j'avais d‚velopp‚ pour ATLANTIS en 1993 ;)
+' Petite larmichette donc...
+'
+' /con = Test d'une ou plusieurs conditions
+' /set = Initialiser des variables
+'
+LOCAL v$
+LOCAL a%,b%,n%,f%
+newchap!=FALSE
+v$="/"+STR$(cv&)
+a%=INSTR(chap$,v$)             ! On cherche le /xx concernant la vue courante
+'
+' #### Chercher une /FININIT pour la SAUTER !
+'
+n%=a%
+IF a%<>0
+f%=INSTR(chap$,zero$,n%)          ! On rep‚re le /000 synonyme de fin de zone
+b%=INSTR(chap$,"/FININIT",a%)
+IF b%<f% AND b%<>0
+n%=b%                           ! S'il y a une zone INIT alors le d‚but
+ENDIF                             ! se trouve juste aprŠs !
+DO
+a%=INSTR(chap$,con$,n%)           ! On rep‚re le /con qui suit
+EXIT IF (a%=0) OR (a%>f%)
+EXIT IF @check_con(INSTR(chap$,"(",a%)+1)
+n%=a%+1            ! Pour ne pas chopper le meme /con en boucle
+LOOP
+' ### Je traite ici le cas de Chapter car il faut avoir fini l'interpr‚tation
+' ### pour en charger un nouveau !
+' ### A r‚p‚ter dans le checkzoneinit et le checkTimers
+' (VOIR PROCEDURE MAIN)
+ELSE
+ATEXT 10,184,0,"No script to run in this view !"
+ENDIF
+RETURN
+> FUNCTION check_con(a%)
+' Je v‚rifie ici la (ou les) condition(s) d'un ligne /Con
+' a% pointe sur la premiŠre condition … v‚rifier juste aprŠs la (
+' (Le nom de la variable ne doit exceder 16char)
+'
+LOCAL r&,s&,l&,b$,c|,v$,a$
+secure_garbage_collection    ! ##### Anti Garbage collection #####
+ms!=FALSE
+andon!=FALSE
+oron!=FALSE
+DO
+com$=""
+r&=0
+FOR c|=0 TO 16                      ! Longueur d'une variable+1
+a$=MID$(chap$,a%+c|,1)
+IF a$="="
+r&=@check_variable(1,a%+c|+1)          ! EGAL
+EXIT IF r&
+ELSE IF a$="<"
+r&=@check_variable(2,a%+c|+1)          ! INFERIEUR
+EXIT IF r&
+ELSE IF a$=">"
+r&=@check_variable(3,a%+c|+1)          ! SUPERIEUR
+EXIT IF r&
+ELSE IF a$="!"
+r&=@check_variable(4,a%+c|+1)          ! DIFFERENT
+EXIT IF r&
+ENDIF
+com$=com$+a$                    ! com$ = La commande … v‚rifier
+NEXT c|
+EXIT IF r&=0
+s&=a%+c|+r&+2                     ! je pointe la fin de la condition courante
+b$=MID$(chap$,s&,1)
+andon!=FALSE
+oron!=FALSE
+IF b$="&"
+' ### On remets ‡a avec un AND
+a%=s&+2
+andon!=TRUE
+ELSE IF b$="|"
+' ### One again avec un OR
+a%=s&+2
+oron!=TRUE
+ELSE IF ASC(b$)=13 OR ASC(b$)=10          ! Fin de la ligne
+IF ms!=TRUE               ! La (les) condition(s) sont toutes v‚rifi‚es ?
+'
+' ##### On va maintenant ex‚cuter le(s) /set #####
+DO
+debug("ExecuteSET",MID$(chap$,l&,20))
+l&=@execute_set(s&)
+EXIT IF MID$(chap$,l&,4)<>"/set"    ! OR newchap!=TRUE
+s&=l&-2             ! On pointe la fin de ligne pr‚c‚dente
+LOOP
+ENDIF
+EXIT IF ASC(b$)<>0     ! OR newchap!
+ENDIF
+LOOP
+RETURN ms!
+ENDFUNC
+> FUNCTION check_variable(o&,a%)
+' a% pointe la valeur … tester
+' o& = operator
+'  1 = equal (=)
+'  2 = minus (<)
+'  3 = plus (>)
+'  4 = different (!)
+'
+LOCAL n&,r$,a$,r&,i&,b%,a!,b!
+a!=FALSE
+b!=FALSE
+r$=""
+debug("Check_Variable",com$)
+n&=0
+DO                         ! R‚cupŠre la valeur … tester
+a$=MID$(chap$,a%+n&,1)
+EXIT IF a$=")"
+r$=r$+a$
+INC n&
+LOOP
+IF LEFT$(com$,4)="Flag"       ! Cas particulier du tableau Flag()
+n&=VAL(RIGHT$(com$,3))      ! Je r‚cupŠre l'indice du flag
+a$=STR$(flag|(n&))          ! Et maintenant le contenu
+ELSE
+i&=@search_var(com$)    ! Cherche l'indice de la variable dans DEFNAMES
+debug("i&=",STR$(i&))
+debug(com$,r$)
+IF com$="SacADos"       ! #### Cas particulier du sacados :) ####
+debug("checkVariable","vide")
+debug(com$,r$)
+a!=FALSE
+b!=FALSE
+a$=r$
+IF LEFT$(r$,4)="NOT_"
+a!=TRUE
+a$=RIGHT$(r$,LEN(r$)-4)   ! D‚barass‚ du _NOT
+ENDIF
+FOR n&=0 TO nb_obj&-1         ! Je cherche l'Id dans le sacados
+IF sac.id$(n&)=a$
+b!=TRUE
+EXIT IF TRUE
+ENDIF
+NEXT n&
+IF a!<>b!
+a$=r$                      ! La condition est v‚rifi‚e
+ELSE
+a$="NIET"       ! Condition non v‚rifi‚e
+ENDIF
+ELSE
+a$=var.val$(i&)         ! a$=contenu de la variable test‚e
+IF r$="VIDE" AND a$=""
+a$="VIDE"             ! Sp‚cifiquement pour le cas du test
+ENDIF                   ! ObjetEnMain=VIDE
+ENDIF
+ENDIF
+'
+' ###### Maintenant que la variable et son contenu sont identifi‚s
+' ###### Je vais g‚rer les AND, OR etc...
+'
+IF (o&=1 AND a$=r$) OR (o&=2 AND a$<r$) OR (o&=3 AND a$>r$) OR (o&=4 AND a$<>r$)
+IF (ms!=TRUE AND andon!=TRUE) OR (ms!=FALSE AND oron!=TRUE) OR (andon!=FALSE AND oron!=FALSE)
+debug("Youpi !!","")
+ms!=TRUE
+ENDIF
+ELSE
+IF oron!<>TRUE
+ms!=FALSE
+ENDIF
+ENDIF
+RETURN LEN(r$)
+ENDFUNC
+> FUNCTION execute_set(a%)
+' a% pointe sur le premier /SET
+'
+LOCAL n&,p&,v$,a$,b$,r$,i&
+ADD a%,7                      ! Je saute le 13,10 et /set(
+v$=""
+n&=0
+p&=0
+DO                            ! Je r‚cup‚re la variable … initialiser
+a$=MID$(chap$,a%+n&,1)
+EXIT IF (a$="=") OR (a$="+")    ! + (pour le cas de l'incr‚ment)
+v$=v$+a$
+INC n&
+LOOP
+debug("/set",v$)
+IF LEFT$(v$,4)<>"Flag"
+i&=@search_var(v$)
+ENDIF
+ADD a%,LEN(v$)+1      ! +1, je saute le = (ou le + en cas d'incr‚ment)
+r$=""
+n&=0
+DO                    ! je r‚cup‚re maintenant la valeur
+b$=MID$(chap$,a%+n&,1)
+EXIT IF b$=")"
+r$=r$+b$
+INC n&
+LOOP
+debug("/set",r$)
+IF LEFT$(v$,4)<>"Flag"
+debug("i&",STR$(i&))
+var.val$(i&)=r$
+after_interpretation
+ELSE
+p&=VAL(MID$(v$,5,3))                ! ## Nø du Flag (Flagxxx+5)
+IF a$="+"
+ADD flag|(p&),VAL(r$)             ! ## Incr‚ment
+ELSE
+flag|(p&)=VAL(r$)                 ! ## Init
+ENDIF
+ENDIF
+RETURN a%+n&+3      ! +3 car ")" et 13,10
+ENDFUNC
+> PROCEDURE after_interpretation
+' On r‚percute les ‚ventuels changements
+'
+LOCAL a$
+debug("Dans AFTER","")
+DO
+a$=var.val$(@search_var("Dial"))        ! ## Dial=08,01
+IF a$<>""                               ! (Toujours 2 digits pour num‚ro de r‚plique & vignette)
+script_dial(a$)
+EXIT IF TRUE
+ENDIF
+a$=var.val$(@search_var("CurrentVue"))          ! ## CurrentVue=38
+IF a$<>""
+script_currentvue(a$)
+EXIT IF TRUE
+ENDIF
+a$=var.val$(@search_var("Special"))               ! ## Special=PUZZLE_PECHE
+IF a$<>""
+script_special(a$)
+EXIT IF TRUE
+ENDIF
+a$=var.val$(@search_var("Tempo"))               ! ## Tempo=50 (1/50e)
+IF a$<>""
+script_tempo(a$)
+EXIT IF TRUE
+ENDIF
+a$=var.val$(@search_var("AbortDepart"))         ! ## AbortDepart=1
+IF a$<>""
+script_abortdepart(a$)
+EXIT IF TRUE
+ENDIF
+a$=var.val$(@search_var("PlaySPL"))             ! ## PlaySPL=1
+IF a$<>""
+script_playspl(a$)
+EXIT IF TRUE
+ENDIF
+a$=var.val$(@search_var("ShowSPR"))             ! ## ShowSPR=CROCUS
+IF a$<>""
+script_showspr(a$)
+EXIT IF TRUE
+ENDIF
+a$=var.val$(@search_var("HideSPR"))             ! ## HideSPR=CROCUS
+IF a$<>""
+script_hidespr(a$)
+EXIT IF TRUE
+ENDIF
+a$=var.val$(@search_var("SacADos"))             ! ## SacADos=CROCUS
+IF a$<>""
+script_sacados(a$)
+EXIT IF TRUE
+ENDIF
+a$=var.val$(@search_var("ObjetEnMain"))         ! ## ObjetEnMain=CROCUS
+IF a$<>""
+script_objetenmain(a$)
+ENDIF
+a$=var.val$(@search_var("ChangeZne"))           ! ## ChangeZne=Indus
+IF a$<>""
+script_changezne(a$)
+EXIT IF TRUE
+ENDIF
+a$=var.val$(@search_var("World"))               ! ## World=2
+IF a$<>""
+script_world(a$)
+EXIT IF TRUE
+ENDIF
+a$=var.val$(@search_var("LoadZik"))           ! ## LoadZik=Indus01
+IF a$<>""
+script_loadzik(a$)
+EXIT IF TRUE
+ENDIF
+a$=var.val$(@search_var("PlayZik"))           ! ## PlayZik=1
+IF a$<>""
+script_playzik(a$)
+EXIT IF TRUE
+ENDIF
+a$=var.val$(@search_var("StopZik"))           ! ## StopZik=1
+IF a$<>""
+script_stopzik(a$)
+EXIT IF TRUE
+ENDIF
+a$=var.val$(@search_var("FadeOUTPalette"))    ! ## FadeOUTPalette=TRUE
+IF a$<>""
+script_fadeoutpalette(a$)
+EXIT IF TRUE
+ENDIF
+a$=var.val$(@search_var("FadeINPalette"))     ! ## FadeINPalette=TRUE
+IF a$<>""
+script_fadeinpalette(a$)
+EXIT IF TRUE
+ENDIF
+a$=var.val$(@search_var("SetPalette"))        ! ## SetPalette=777,999,...
+IF a$<>""
+script_setpalette(a$)
+EXIT IF TRUE
+ENDIF
+a$=var.val$(@search_var("OpenNord"))            ! ## OpenNord=38,39
+IF a$<>""
+script_opennord(a$)
+EXIT IF TRUE
+ENDIF
+a$=var.val$(@search_var("CloseNord"))           ! ## CloseNord=38
+IF a$<>""
+script_closenord(a$)
+EXIT IF TRUE
+ENDIF
+a$=var.val$(@search_var("OpenSud"))             ! ## OpenSud=38,39
+IF a$<>""
+script_opensud(a$)
+EXIT IF TRUE
+ENDIF
+a$=var.val$(@search_var("CloseSud"))            ! ## CloseSud=38
+IF a$<>""
+script_closesud(a$)
+EXIT IF TRUE
+ENDIF
+a$=var.val$(@search_var("OpenEst"))             ! ## OpenEst=38,39
+IF a$<>""
+script_openest(a$)
+EXIT IF TRUE
+ENDIF
+a$=var.val$(@search_var("CloseEst"))            ! ## CloseEst=38
+IF a$<>""
+script_closeest(a$)
+EXIT IF TRUE
+ENDIF
+a$=var.val$(@search_var("OpenOuest"))           ! ## OpenOuest=38,39
+IF a$<>""
+script_openouest(a$)
+EXIT IF TRUE
+ENDIF
+a$=var.val$(@search_var("CloseOuest"))          ! ## CloseOuest=39
+IF a$<>""
+script_closeouest(a$)
+EXIT IF TRUE
+ENDIF
+a$=var.val$(@search_var("GameOver"))          ! ## GameOver=1
+IF a$<>""
+script_gameover(a$)
+EXIT IF TRUE
+ENDIF
+a$=var.val$(@search_var("SetTimer1"))          ! ## SetTimer1=ON
+IF a$<>""
+script_set_timer1(a$)
+EXIT IF TRUE
+ENDIF
+a$=var.val$(@search_var("SetTimer2"))          ! ## SetTimer2=OFF
+IF a$<>""
+script_set_timer2(a$)
+EXIT IF TRUE
+ENDIF
+EXIT IF TRUE
+LOOP
+RETURN
+> FUNCTION search_var(c$)
+LOCAL n&
+secure_garbage_collection    ! ##### Anti Garbage collection #####
+n&=0
+REPEAT
+INC n&
+UNTIL c$=var.cmd$(n&) OR n&>127
+IF n&<128
+RETURN n&
+ELSE
+ATEXT 10,180,0,"BUG variable/id'"+c$+"'inconnue dans defvar.txt"
+STOP
+RETURN FALSE
+ENDIF
+ENDFUNC
+> FUNCTION set_var(v$,t$)
+' Cherche 'v$' dans la zone #VARIABLES# et l'initialise avec 't$'
+LOCAL i&
+i&=@search_var(v$)
+IF i&<>FALSE
+var.val$(i&)=t$
+ENDIF
+RETURN TRUE
+ENDFUNC
+> PROCEDURE read_timers
+' ## On check si la Zone TIMERS doit etre execut‚e
+' ## On test 6 digits ce qui nous fait une amplitude de 5h env.
+' ## Timer … 50hz (au lieu de 200hz je pense)
+'
+LOCAL a$,t$
+IF timer1%<>0
+timer1%=LPEEK(&H462)
+t$=STR$(timer1%)
+a$=STRING$(6-LEN(t$),"0")
+a$=a$+t$
+~@set_var("Timer1",a$)      ! ## Attention … tester 6digits dans .con
+'    ATEXT 12,18,0,STR$(timer1%)
+check_timerszone
+ENDIF
+IF timer2%<>0
+timer2%=LPEEK(&H466)
+t$=STR$(timer2%)
+a$=STRING$(6-LEN(t$),"0")
+a$=a$+t$
+~@set_var("Timer2",a$)     ! ## Attention … tester 6digits dans .con
+'    ATEXT 12,24,0,STR$(timer2%)
+check_timerszone
+ENDIF
+RETURN
+'
+' ## Commandes du SafarSCRIPT ##
+'
+> PROCEDURE script_dial(a$)
+LOCAL n&,a&,b&
+'  debug("Def%",STR$(def%))
+'  debug("DIAL",STR$(@search_var("Dial")))
+sys%=0
+cd&=0
+IF MID$(a$,1,3)="SYS"                 ! Messages systeme
+IF MID$(a$,6,1)="-"                 ! al‚atoire (ex: /set(Dial=SYS01-03)
+a&=VAL(MID$(a$,4,2))
+b&=VAL(MID$(a$,7,2))
+sys%=INT(RND(1)*(b&-a&+1))+a&
+ELSE
+sys%=VAL(RIGHT$(a$,2))
+ENDIF
+ELSE IF MID$(a$,3,1)="-"                  ! ## Dial multiples
+nst|=VAL(LEFT$(a$,2))
+n&=VAL(MID$(a$,4,2))                    ! La limite
+ADD nst|,flag|(10)
+IF nst|<n&
+INC flag|(10)                         ! ## Flag010 est r‚serv‚ au compteur de dial (en cas de dial multiple)
+ENDIF
+cd&=VAL(MID$(a$,7,2))
+ELSE IF MID$(a$,3,1)=","
+nst|=VAL(LEFT$(a$,2))       ! Nø de r‚plique
+cd&=VAL(MID$(a$,4,2))       ! Nø vignette perso
+'      ELSE
+'        nst|=VAL(LEFT$(a$,2))
+'        cd&=VAL(MID$(a$,4,2))
+ELSE
+nst|=VAL(MID$(a$,1,2))
+ENDIF
+plot_current_dial
+~@set_var("Dial","")
+RETURN
+> PROCEDURE script_currentvue(a$)
+IF cv&<>VAL(a$)
+oldcv&=cv&
+cv&=VAL(a$)
+is&=VAL(LEFT$(vue.issue$(cv&),2))
+init_boussole(is&)           ! Init nouvelles issues
+plot_boussole                ! Plot Nouvelles issues
+~@set_var("DepartVue",STR$(cv&))
+~@set_var("LastVue",STR$(oldcv&))
+IF MID$(a$,3,1)=","          ! ## Init d'une r‚plique d'entr‚e ? ##
+nst|=VAL(RIGHT$(a$,2))+100  ! Nø de r‚plique
+ENDIF
+ENDIF
+~@set_var("CurrentVue","")
+RETURN
+> PROCEDURE script_special(a$)
+IF a$="TRAVEL"            ! ## Sur le bateau
+travel_menu
+plot_icone(lastico|,0)          ! On remet la derniŠre icone allum‚e dans son ‚tat normale
+lastico|=255
+cm&=0
+ELSE IF a$="ENTER_CODE"
+'    clear_logdialzone
+LOCATE 3,24
+PRINT "Code : ";
+FORM INPUT 9,m$
+IF @check_code(m$)=TRUE
+'      flag|(69)=1
+'      gere_sacados("CLEF_MAGIQUE",0)
+'    ENDIF
+'    ELSE IF a$="COQUINE"
+' ## On va enfin d‚couvrir cette vue tant attendue
+' ##
+~C:fade_to_black%(3)
+'      PAUSE 50
+'      cv&=42
+script_currentvue("42")
+nst|=0
+clear_img_zone
+charge_img                   ! Charge la nouvelle vue
+clear_logdialzone
+'    plot_all_spr_in_log          ! Affiche les sprites de la vue
+'      img_to_phys_with_effect(1)      ! On balance l'image ‚cran LOG => PHYS avec effet
+'      plot_boussole
+'      plot_current_dial
+fadeto!=TRUE
+set_palette(depack_buf%)
+ELSE
+nst|=1
+plot_current_dial
+ENDIF
+ELSE IF a$="THE_END"
+' ## Bravo !!
+' ## Vue19 (rapa19fs.sp5 = 320x200.neo)
+' ## + .Mod
+' ## + Cr‚dits
+' ## + Reset
+'
+scene_finale
+ELSE IF a$="PUZZLE_PECHE" ! ## Puzzle Peche
+puzzle_peche_init
+puzzle_peche_main
+puzzle_peche_restore
+~C:fade_to_black%(3)
+PAUSE 50
+clear_img_zone
+charge_img                   ! Charge la nouvelle vue
+clear_logdialzone
+plot_all_spr_in_log          ! Affiche les sprites de la vue
+img_to_phys_with_effect(1)      ! On balance l'image ‚cran LOG => PHYS avec effet
+plot_boussole
+plot_current_dial
+fadeto!=TRUE
+set_palette(depack_buf%)
+ELSE IF a$="PUZZLE_ALTOS" ! ## Puzzle Altos
+puzzle_altos_init
+puzzle_altos_main
+puzzle_altos_restore
+~C:fade_to_black%(3)
+clear_img_zone
+IF ste!
+initdigits_fromzne                       ! Je recharge les digits ‚ventuelles
+ENDIF
+IF x&(0)=0
+charge_img                   ! Charge la nouvelle vue
+'    clear_logdialzone
+plot_all_spr_in_log          ! Affiche les sprites de la vue
+img_to_phys_with_effect(1)      ! On balance l'image ‚cran LOG => PHYS avec effet
+plot_current_dial
+fadeto!=TRUE
+set_palette(depack_buf%)
+ENDIF
+ELSE IF a$="PUZZLE_BOUSIER" ! ## Puzzle Bousier
+puzzle_bousier_init
+puzzle_bousier_main
+puzzle_bousier_restore
+~C:fade_to_black%(3)
+PAUSE 50
+clear_img_zone
+charge_img                   ! Charge la nouvelle vue
+clear_logdialzone
+plot_all_spr_in_log          ! Affiche les sprites de la vue
+img_to_phys_with_effect(1)      ! On balance l'image ‚cran LOG => PHYS avec effet
+plot_current_dial
+fadeto!=TRUE
+set_palette(depack_buf%)
+ELSE IF a$="PUZZLE_PIEUVRE" ! ## Puzzle Pieuvre
+puzzle_pieuvre_init
+puzzle_pieuvre_main
+puzzle_pieuvre_restore
+~C:fade_to_black%(3)
+clear_img_zone
+IF ste!
+initdigits_fromzne             ! Je recharge les digits ‚ventuelles
+ENDIF
+IF x&(0)=0
+charge_img                   ! Charge la nouvelle vue
+clear_logdialzone
+plot_all_spr_in_log          ! Affiche les sprites de la vue
+img_to_phys_with_effect(1)   ! On balance l'image ‚cran LOG => PHYS avec effet
+plot_current_dial
+fadeto!=TRUE
+set_palette(depack_buf%)
+ENDIF
+ELSE IF a$="INIT_PIEUVRE"         ! ## Tirage du code romain Cnossos
+puzzle_pieuvre_init_romain
+puzzle_pieuvre_tag_dialogue
+ELSE IF a$="TAG_PIEUVRE" ! ## Tag le dialogue
+puzzle_pieuvre_tag_dialogue
+ELSE IF a$="PUZZLE_SABLE"
+PRINT AT(3,24);
+FORM INPUT 16,a$
+n%=INSTR(a$,"128")
+IF n%>0 AND n%<LEN(a$)      ! ## Great !
+nst|=3
+plot_current_dial
+flag|(36)=2
+ELSE
+nst|=8
+plot_current_dial
+ENDIF
+ENDIF
+~@set_var("Special","")
+RETURN
+> PROCEDURE script_tempo(a$)
+PAUSE VAL(a$)
+~@set_var("Tempo","")
+RETURN
+> PROCEDURE script_abortdepart(a$)
+IF cv&<>VAL(a$)
+cv&=oldcv&
+ENDIF
+~@set_var("AbortDepart","")
+RETURN
+> PROCEDURE script_playspl(a$)
+'
+' Joue une Digit : (Only on STe)
+' spl%(x,0) = Adr
+' spl%(x,1) = Taille
+' … 6000 Hz (12500 Hz sur Falcon)
+'
+' ATTENTION : Le second parametre est actuellement pour indiquer
+'             le LOOP ‚ventuel de la digit (,1)
+'             Mais si ce paramŠtre est > 1 alors il indique
+'             un % de chance d'etre jou‚e.
+'             (Cette seconde fonctionnalit‚ ne sera op‚ only in V2
+LOCAL n&
+IF ste!
+n&=VAL(a$)-1
+IF MID$(a$,2,1)=","         ! LOOP or timer to set ?
+b|=VAL(MID$(a$,3,2))
+IF b|>1
+spl.timer|(cv&,n&)=b|
+EVERY  CONT
+streplayon(spl%(n&,0),spl%(n&,1),1)   ! Si timer, joue 1 fois
+ELSE
+streplayon(spl%(n&,0),spl%(n&,1),11)   ! Sinon LOOP
+ENDIF
+ELSE
+streplayon(spl%(n&,0),spl%(n&,1),1)
+ENDIF
+ENDIF
+~@set_var("PlaySPL","")
+RETURN
+> PROCEDURE script_playvoice(a$)
+' Commande pour V2
+' Parle un dialogue en respectant la nomenclature
+' ex : 02502 (fichier : 02502.vce dans r‚pertoire SFX)
+'
+play_voice(a$)
+RETURN
+> PROCEDURE script_showspr(a$)
+LOCAL n&,a!,b!
+a!=FALSE
+b!=FALSE
+FOR n&=0 TO nbsprmax&-1           ! De fa‡on … autoriser un ShowSPR
+IF spr.id$(n&)=a$               ! depuis n'importe o— et pour
+spr.onoff!(n&)=TRUE           ! n'importe quel SPR
+IF spr.vue&(n&)=cv&           ! Le ShowSPR concerne la vue courante ?
+b!=TRUE
+ENDIF
+a!=TRUE
+ENDIF
+NEXT n&
+IF a!=FALSE
+ATEXT 10,184,0,"- l'ID '"+a$+"' m'est inconnu !"
+~INP(2)
+ENDIF
+IF b!
+secure_garbage_collection
+aff_img(depack_buf%,log%+640)
+plot_all_spr_in_log
+img_to_phys
+ENDIF
+~@set_var("ShowSPR","")
+RETURN
+> PROCEDURE script_hidespr(a$)
+LOCAL n&,a!,b!
+a!=FALSE
+b!=FALSE
+FOR n&=0 TO nbsprmax&-1           ! Idem ShowSPR
+IF spr.id$(n&)=a$
+spr.onoff!(n&)=FALSE
+a!=TRUE
+IF spr.vue&(n&)=cv&           ! Le HideSPR concerne la vue courante ?
+b!=TRUE
+ENDIF
+ENDIF
+NEXT n&
+IF a!=FALSE
+ATEXT 10,184,0,"- l'ID '"+a$+"' m'est inconnu !"
+~INP(2)
+ENDIF
+IF b!
+aff_img(depack_buf%,log%+640)
+plot_all_spr_in_log
+img_to_phys
+ENDIF
+~@set_var("HideSPR","")
+RETURN
+> PROCEDURE script_sacados(a$)
+debug("SacADos",a$)
+gere_sacados(a$,0)
+~@set_var("SacADos","")
+RETURN
+> PROCEDURE script_objetenmain(a$)
+LOCAL n&
+IF a$="VIDE" OR a$="0"                    ! Cette commande est un
+objenmain&=0                            ! cas particulier car
+objenmain$=""                  ! Elle est … la fois commande
+img_to_phys                    ! et variable perp‚tuelle
+~@set_var("ObjetEnMain","")    ! donc je ne fais pas de EXIT
+SHOWM
+ELSE                             ! a la fin !
+n&=@invent_id(a$)
+objenmain&=n&
+objenmain$=a$
+'    img_to_phys
+~@set_var("ObjetEnMain",a$)
+ENDIF
+RETURN
+> PROCEDURE script_chapter(a$)
+' Cette commande est une exeption car test‚e en sortie de ReadScript !
+LOCAL n%
+cc&=VAL(a$)
+cc$=chap.folder$+"chap"+STR$(cc&)+chap.ext$
+charge_file(cc$,chap%)
+FOR n%=0 TO tspr%-1
+POKE chap%+n%,PEEK(chap%+n%) XOR 69
+NEXT n%
+init_chapter
+'  newchap!=TRUE
+~@set_var("Chapter","")
+RETURN
+> PROCEDURE script_changezne(a$)
+charge_zne2(a$)
+~@set_var("ChangeZne","")
+RETURN
+> PROCEDURE script_world(a$)
+world&=VAL(a$)
+init_world
+~@set_var("World","")
+RETURN
+> PROCEDURE script_loadzik(a$)
+IF music!
+music_off
+music!=FALSE
+ENDIF
+zik$=a$
+charge_file(snd.folder$+a$+".pck",ymbuf%)       ! Load packed zik
+taillesrc%=tspr%
+reg%(8)=ymbuf%
+RCALL sp3_unpack%,reg%()
+~@set_var("LoadZik","")
+RETURN
+> PROCEDURE script_playzik(a$)
+' ## Attention, un BigZik (InitBigZik) doit avoir ‚t‚ lanc‚ avant
+' ## De faire un PlayZik !
+'
+LOCAL n%,p%,len%,f!,n$
+LOCAL zik!
+zik!=music!
+IF music!
+music_off
+music!=FALSE
+ENDIF
+'
+zik$=a$
+SELECT world&
+CASE 1
+RESTORE cnoszik
+CASE 2
+RESTORE indzik
+CASE 3
+RESTORE rapzik
+CASE 4
+RESTORE boatzik
+DEFAULT
+PRINT "ProblŠme de World pour lancement ZIK !"
+~INP(2)
+ENDSELECT
+f!=FALSE
+n%=0
+p%=DPEEK(bigbuf%)             ! Offset musique 0
+len%=DPEEK(bigbuf%+2)-p%      ! Taille musique 0
+DO
+READ n$
+IF n$="CRYO"
+PRINT "Musique ";a$;" inconnue !"
+~INP(2)
+EXIT IF TRUE
+ENDIF
+IF a$=n$
+f!=TRUE
+EXIT IF TRUE
+ENDIF
+INC n%
+p%=DPEEK(bigbuf%+n%*2)
+len%=DPEEK(bigbuf%+2+n%*2)-p%
+LOOP
+IF f!
+BMOVE bigbuf%+64+p%,ymbuf%,len%             ! Je d‚place la Zik pack‚e
+taillesrc%=len%
+reg%(8)=ymbuf%
+RCALL sp3_unpack%,reg%()
+ENDIF
+IF zik!
+music_on(sndbuf%)                        ! On envoie la musique !
+music!=TRUE
+ENDIF
+~@set_var("PlayZik","")
+cnoszik:
+' ## L'ordre des musiques dans chaque liste doit etre le meme  ##
+' ## que dans le BigZik !! ##
+' TODO : mutualiser la liste des Ziks entre l'outil BigZik
+' et le jeu ! (.txt)
+'
+DATA altpz105,aubrg107,garde103,jeuc_108,lilla103
+DATA march302,mdeva104,ville10b,gamovr01
+DATA CRYO
+indzik:
+DATA alent106,jeui_104,potir107,shamn104,templ103
+DATA gamovr01
+DATA CRYO
+rapzik:
+DATA altos104,plaga204,plgop102,lande109,culte204
+DATA grott305,gamovr01,ppieu101
+DATA CRYO
+boatzik:
+DATA pont_105,reve_103,soute109
+DATA gamovr01
+DATA CRYO
+'
+RETURN
+> PROCEDURE script_stopzik(a$)
+IF music!
+music_off
+'    music!=FALSE
+ENDIF
+zik$=""
+~@set_var("StopZik","")
+RETURN
+> PROCEDURE script_fadeoutpalette(a$)
+~C:fade_to_black%(3)                      ! Fade to Black
+fadetoblack!=TRUE
+~@set_var("FadeOUTPalette","")
+RETURN
+> PROCEDURE script_fadeinpalette(a$)
+fadeto!=TRUE                              ! Fade to Mr White ;-)
+fadetoblack!=FALSE
+set_palette(depack_buf%)
+~@set_var("FadeINPalette","")
+RETURN
+> PROCEDURE script_setpalette(a$)
+' ###############################
+'  Dans le Script
+'  /set(SetPalette=#073)
+'  (attention ID en #+3 chars)
+'
+'  Dans le fichier palette.txt
+'  #073 000,615,777,255,...
+' (Attention … mettre les 16 couleurs)
+'
+LOCAL a&,n&
+FOR a&=0 TO nbpal%-1
+IF a$=LEFT$(pal$(a&),4)
+FOR n&=0 TO 15
+DPOKE ARRPTR(pal2&())+n&*2,VAL("&h"+MID$(pal$(a&),6+(n&*4),3))
+NEXT n&
+EXIT IF TRUE
+ENDIF
+NEXT a&
+fadeto!=TRUE
+set_palette(ARRPTR(pal2&())-offpal%)
+~@set_var("SetPalette","")
+RETURN
+> PROCEDURE script_opennord(a$)
+LOCAL n&,b$
+b$=LEFT$(a$,2)
+MID$(vue.issue$(VAL(b$)),3,2)=RIGHT$(a$,2)
+n&=@somme_issues(vue.issue$(VAL(b$)))
+MID$(vue.issue$(VAL(b$)),1,2)=STR$(n&,2)
+IF VAL(b$)=cv&
+is&=VAL(LEFT$(vue.issue$(cv&),2))
+init_boussole(is&)
+plot_boussole
+ENDIF
+~@set_var("OpenNord","")
+RETURN
+> PROCEDURE script_closenord(a$)
+LOCAL n&,b$
+b$=LEFT$(a$,2)
+MID$(vue.issue$(VAL(a$)),3,2)="00"
+n&=@somme_issues(vue.issue$(VAL(b$)))
+MID$(vue.issue$(VAL(b$)),1,2)=STR$(n&,2)
+IF VAL(b$)=cv&
+is&=VAL(LEFT$(vue.issue$(cv&),2))
+init_boussole(is&)
+plot_boussole
+ENDIF
+~@set_var("CloseNord","")
+RETURN
+> PROCEDURE script_opensud(a$)
+LOCAL n&,b$
+b$=LEFT$(a$,2)
+MID$(vue.issue$(VAL(b$)),5,2)=RIGHT$(a$,2)
+n&=@somme_issues(vue.issue$(VAL(b$)))
+MID$(vue.issue$(VAL(b$)),1,2)=STR$(n&,2)
+IF VAL(b$)=cv&
+is&=VAL(LEFT$(vue.issue$(cv&),2))
+init_boussole(is&)
+plot_boussole
+ENDIF
+~@set_var("OpenSud","")
+RETURN
+> PROCEDURE script_closesud(a$)
+LOCAL n&,b$
+b$=LEFT$(a$,2)
+MID$(vue.issue$(VAL(a$)),5,2)="00"
+n&=@somme_issues(vue.issue$(VAL(b$)))
+MID$(vue.issue$(VAL(b$)),1,2)=STR$(n&,2)
+IF VAL(b$)=cv&
+is&=VAL(LEFT$(vue.issue$(cv&),2))
+init_boussole(is&)
+plot_boussole
+ENDIF
+~@set_var("CloseSud","")
+RETURN
+> PROCEDURE script_openest(a$)
+LOCAL n&,b$
+b$=LEFT$(a$,2)
+MID$(vue.issue$(VAL(b$)),7,2)=RIGHT$(a$,2)
+n&=@somme_issues(vue.issue$(VAL(b$)))
+MID$(vue.issue$(VAL(b$)),1,2)=STR$(n&,2)
+IF VAL(b$)=cv&
+is&=VAL(LEFT$(vue.issue$(cv&),2))
+init_boussole(is&)
+plot_boussole
+ENDIF
+~@set_var("OpenEst","")
+RETURN
+> PROCEDURE script_closeest(a$)
+LOCAL n&,b$
+b$=LEFT$(a$,2)
+MID$(vue.issue$(VAL(a$)),7,2)="00"
+n&=@somme_issues(vue.issue$(VAL(b$)))
+MID$(vue.issue$(VAL(b$)),1,2)=STR$(n&,2)
+IF VAL(b$)=cv&
+is&=VAL(LEFT$(vue.issue$(cv&),2))
+init_boussole(is&)
+plot_boussole
+ENDIF
+~@set_var("CloseEst","")
+RETURN
+> PROCEDURE script_openouest(a$)
+LOCAL n&,b$
+b$=LEFT$(a$,2)
+MID$(vue.issue$(VAL(b$)),9,2)=RIGHT$(a$,2)
+n&=@somme_issues(vue.issue$(VAL(b$)))
+MID$(vue.issue$(VAL(b$)),1,2)=STR$(n&,2)
+IF VAL(b$)=cv&
+is&=VAL(LEFT$(vue.issue$(cv&),2))
+init_boussole(is&)
+plot_boussole
+ENDIF
+~@set_var("OpenOuest","")
+RETURN
+> PROCEDURE script_closeouest(a$)
+LOCAL n&,b$
+b$=LEFT$(a$,2)
+MID$(vue.issue$(VAL(a$)),9,2)="00"
+n&=@somme_issues(vue.issue$(VAL(b$)))
+MID$(vue.issue$(VAL(b$)),1,2)=STR$(n&,2)
+IF VAL(b$)=cv&
+is&=VAL(LEFT$(vue.issue$(cv&),2))
+init_boussole(is&)
+plot_boussole
+ENDIF
+~@set_var("CloseOuest","")
+RETURN
+> PROCEDURE script_gameover(a$)
+gameover|=1
+~@set_var("GameOver","")
+RETURN
+> PROCEDURE script_set_timer1(a$)
+IF a$="ON"
+SLPOKE &H462,1
+timer1%=1
+ELSE IF a$="OFF"
+timer1%=0
+ENDIF
+~@set_var("SetTimer1","")
+RETURN
+> PROCEDURE script_set_timer2(a$)
+IF a$="ON"
+SLPOKE &H466,1
+timer2%=1
+ELSE IF a$="OFF"
+timer2%=0
+ENDIF
+~@set_var("SetTimer2","")
+RETURN
+'
+> PROCEDURE init_gameover
+HIDEM
+charge_file(gfx.folder$+"gameogui.sp5",pack_buf%)
+taillesrc%=tspr%
+depack_img
+music_off
+aff_img(depack_buf%,log%+4*160)     ! Je saute les 4 premiŠres ligne qui ne change pas
+img_to_phys_with_effect(1)
+fadeto!=TRUE
+set_palette(depack_buf%)
+script_playzik("gamovr01")
+~INP(2)
+music!=FALSE
+img_to_phys_with_effect(0)
+currentdisk|=1
+gameover|=0
+cm&=0
+objenmain&=0
+objenmain$=""
+~@set_var("ObjetEnMain","")
+world&=1
+oldcv&=0
+cv&=25
+cc&=1
+timer1%=0
+timer2%=0
+nst|=0
+nbspr&=0
+nb_obj&=0
+music!=TRUE
+init_flag
+init_vues
+init_sprstate
+init_world
+ARRAYFILL sac.spr|(),0
+script_chapter("1")
+'  init_chapter
+fadeto!=TRUE
+charge_img
+change_vue
+plot_all_icones
+init_boussole(VAL(LEFT$(vue.issue$(cv&),2)))
+plot_boussole
+plot_current_dial
+plot_all_spr_in_log
+img_to_phys_with_effect(1)
+DEFMOUSE 5                    ! ## Et c'est reparti ! :D
+SHOWM
+RETURN
+'
+> FUNCTION check_code(m$)
+LOCAL a%,n%,c%,y%,c$,r$
+c$=RIGHT$(m$,3)
+m$=LEFT$(m$,5)
+r$=""
+c%=1
+vig_table                     ! Table d'Init
+FOR n%=1 TO LEN(m$)
+y%=ASC(MID$(c$,c%,1))-48
+IF y%<0 OR y%>9             ! Si <> 0-9
+y%=0
+ENDIF
+FOR a%=0 TO 9
+IF MID$(vi$(a%),y%+1,1)=CHR$(ASC(MID$(m$,n%,1)))
+r$=r$+CHR$(48+a%)
+ENDIF
+NEXT a%
+INC c%
+IF c%>LEN(c$)
+c%=1
+ENDIF
+NEXT n%
+IF r$="11496"
+RETURN TRUE
+ELSE
+RETURN FALSE
+ENDIF
+ENDFUNC
+> FUNCTION somme_issues(i$)
+' Petite fonction pour calculer la somme totale
+' des issues ouvertes d'une vue
+' N=1, S=2, E=8, O=4
+LOCAL s|
+s|=0
+IF MID$(i$,3,2)<>"00"         ! Nord
+INC s|
+ENDIF
+IF MID$(i$,5,2)<>"00"         ! Sud
+ADD s|,2
+ENDIF
+IF MID$(i$,7,2)<>"00"         ! Est
+ADD s|,8
+ENDIF
+IF MID$(i$,9,2)<>"00"         ! Ouest
+ADD s|,4
+ENDIF
+RETURN s|
+ENDFUNC
+> FUNCTION check_zne(x&,y&)
+' Le joueur a-t-il cliqu‚ une zone d‚finie dans le moteur ?
+'
+LOCAL n&,zx&,zy&,zl&,zh&,zi$
+z!=FALSE
+n&=0
+DO
+EXIT IF vue.clic$(cv&,n&)=""
+z!=TRUE
+zx&=VAL(LEFT$(vue.clic$(cv&,n&),3))
+zy&=VAL(MID$(vue.clic$(cv&,n&),4,3))
+zl&=VAL(MID$(vue.clic$(cv&,n&),7,3))
+zh&=VAL(MID$(vue.clic$(cv&,n&),10,3))
+IF debug!
+BOX zx&,zy&,zx&+zl&,zy&+zh&
+ENDIF
+zi$=TRIM$(RIGHT$(vue.clic$(cv&,n&),16))
+IF x&>zx& AND x&<zx&+zl& AND y&>zy& AND y&<zy&+zh&
+IF info!
+ATEXT 10,6,0,"#"+zi$
+ENDIF
+SELECT cm&               ! Le joueur a t-il activ‚ un mode ?
+CASE 1,2,3,4             ! Mode rien, LOOK, USE, TAKE ou TALK ?
+~@set_var("ClicZone",zi$)
+RETURN TRUE
+DEFAULT
+RETURN FALSE
+ENDSELECT
+~@set_var("ClicZone","0")
+RETURN FALSE
+ENDIF
+INC n&
+LOOP
+~@set_var("ClicZone","0")
+RETURN FALSE
+ENDFUNC
+> FUNCTION check_perso(x&,y&)
+' On v‚rifie ici si le joueur clic un Sprite
+'
+LOCAL n&,zx&,zy&,zl&,zh&,zi$
+z!=FALSE
+FOR n&=offspr& TO offspr&+nbspr&-1
+'    EXIT IF vue.clic$(cv&,n&)=""
+z!=TRUE
+zx&=spr.x&(n&)
+zy&=spr.y&(n&)
+zl&=spr.sx&(n&)
+zh&=spr.sy&(n&)
+IF debug! AND spr.vue&(n&)=cv&
+BOX zx&,zy&,zx&+zl&,zy&+zh&
+ENDIF
+zi$=TRIM$(spr.id$(n&))
+IF x&>zx& AND x&<zx&+zl& AND y&>zy& AND y&<zy&+zh& AND spr.vue&(n&)=cv& AND spr.onoff!(n&)
+IF info!
+ATEXT 10,6,0,"#"+zi$
+ENDIF
+SELECT cm&                        ! Le joueur a t-il activ‚ un mode ?
+CASE 1,2,3,4                      ! Mode Take, Look, Use or Talk ?
+~@set_var("ClicZone","0")       ! Pour donner la priorit‚ aux SPRITES
+~@set_var("ClicPerso",zi$)
+RETURN TRUE
+DEFAULT
+~@set_var("ClicPerso","0")
+RETURN FALSE
+ENDSELECT
+ENDIF
+NEXT n&
+~@set_var("ClicPerso","0")
+RETURN FALSE
+ENDFUNC
+'
+' #####################
+' ###   Dialogues   ###
+' #####################
+'
+> PROCEDURE plot_current_dial
+'
+' # V2 -> Passer le buffer (log% ou Phys%) en paramŠtre.
+' (ex : OctoPuz pour r‚plique en Phys% direct car log% utilis‚e)
+'
+LOCAL a&,f&,n&,r$,t$,c$,scr!,t%,k%
+'  OUT 4,18
+scr!=FALSE
+dx&=ddx&
+dy&=ddy&
+'  IF cm&=4              ! Si on dialogue avec un perso on descend l‚gŠrement
+IF cm&=4 AND cd&<>0
+IF NOT vig!         ! La vignette d‚j… … l'‚cran ?
+anim_vignette(cd&,1,3)
+ENDIF
+'    ADD dy&,6   ! … cause de la vignette
+ENDIF
+r$="#"
+IF cv&<10
+r$=r$+"0"
+ENDIF
+IF nst|<10
+r$=r$+"0"+STR$(cv&)+"0"+STR$(nst|)
+ELSE
+r$=r$+"0"+STR$(cv&)+STR$(nst|)
+ENDIF
+a&=INSTR(dial$,r$)
+ADD a&,LEN(r$)
+f&=INSTR(dial$,"#",a&)
+IF f&=0
+PRINT "Aie !! Pas de #xxxx cens‚ se trouver aprŠs le ";r$
+END
+ENDIF
+t$=MID$(dial$,a&,f&-a&)
+n&=1
+clear_logdialzone
+~XBIOS(5,L:log%,L:XBIOS(2),-1)
+IF a&<>LEN(r$)
+IF sys%<>0                  ! ## Je traite un SYSxx ##
+t$=MID$(sys$(sys%),7,LEN(sys$(sys%))-6)
+sys%=0
+ENDIF
+'
+' #### Si les voix existent, je les jouent ! :D
+'
+IF cm&=4            ! dialogue en cours ?
+play_voice(MID$(r$,2,LEN(r$)-1))
+ENDIF
+' #### Allez, je pr‚d‚coupe mes r‚pliques dans le .txt ! :)
+'
+DO
+c$=MID$(t$,n&,1)
+IF ASC(c$)=13 THEN        ! Un passage … la ligne ?
+ADD dy&,8
+dx&=ddx&
+INC n&
+EXIT IF n&>=LEN(t$)
+'        IF dy&=173+(3*6)+6
+IF dy&=195
+IF NOT scr!
+RC_COPY log%,ddx&,ddy&,255,43 TO phys%,ddx&,ddy&
+t%=TIMER
+REPEAT
+KEYTEST k%
+EXIT IF k%=65563 OR k%=3735584 OR MOUSEK<>0    ! ESC or SPC
+UNTIL TIMER-t%>200*9        ! 9secs
+scr!=TRUE
+ENDIF
+scroll_dialzone
+SUB dy&,8
+ENDIF
+ELSE IF ASC(c$)=156
+ADD dy&,8               ! le œ est utilis‚ dans les SYSxx
+dx&=ddx&
+ELSE
+'        ATEXT dx&,dy&,0,c$
+' ADD dx&,6
+pro_print(dx&,dy&,c$,log%,0)
+ADD dx&,PEEK(font2%+ASC(c$))
+ENDIF
+INC n&
+EXIT IF n&>LEN(t$)
+LOOP
+ELSE
+ATEXT dx&,dy&,0,"- R‚plique "+r$+" introuvable !"
+ENDIF
+RC_COPY log%,ddx&,ddy&,255,43 TO phys%,ddx&,ddy&
+VOID XBIOS(5,L:XBIOS(2),L:XBIOS(2),-1)
+'  OUT 4,8
+RETURN
+> PROCEDURE play_voice(r$)
+' ####################################################
+' # Je v‚rifie ici que la digit du dialogue existe
+' # et que l'on est au moins sur un 1040 STe
+' # Si c'est le cas, alors le reve peut commencer :)
+' #
+' # ex. Format R$=02502
+' ####################################################
+LOCAL vce$
+vce$=sfx.folder$+r$+".vce"
+IF vce$=voice$                ! ## d‚j… en RAM ?
+streplayon(voiceptr%,voicel%,1)     ! ## Parle !
+ELSE IF ste! AND mille40! AND EXIST(vce$)
+charge_file(vce$,voiceptr%)   ! ## Attention les voix sont en .pck
+taillesrc%=tspr%
+reg%(8)=voiceptr%
+RCALL sp3_unpack%,reg%()
+streplayon(voiceptr%,reg%(0),1)     ! ## Parle !
+voice$=vce$
+voicel%=reg%(0)     ! Taille digit
+ENDIF
+RETURN
+> PROCEDURE clear_dialzone
+' Nettoie la zone de dialogue
+' en dur....Biiiiiiiiiim
+'
+DEFFILL 0
+PBOX ddx&-3,ddy&-4,264,196
+RC_COPY log%,ddx&,ddy&,255,43 TO phys%,ddx&,ddy&
+RETURN
+> PROCEDURE scroll_dialzone
+LOCAL n%,t%,k%
+FOR n%=0 TO 7
+RC_COPY log%,ddx&,ddy&,254,43 TO log%,ddx&,ddy&-1
+RC_COPY log%,ddx&,ddy&,254,43 TO phys%,ddx&,ddy&
+VSYNC
+t%=TIMER
+REPEAT
+KEYTEST k%
+EXIT IF k%=65563 OR k%=3735584 OR MOUSEK<>0    ! Esc, Spc or clic
+UNTIL TIMER-t%>40
+NEXT n%
+RETURN
+> PROCEDURE clear_logdialzone
+' Nettoie la zone de dialogue
+' en dur....Biiiiiiiiiim
+' (en logique et en physique)
+'
+VOID XBIOS(5,L:log%,L:XBIOS(2),-1)
+DEFFILL 0
+PBOX ddx&-3,ddy&-4,264,196
+RC_COPY log%,ddx&,ddy&,255,43 TO phys%,ddx&,ddy&
+VOID XBIOS(5,L:XBIOS(2),L:XBIOS(2),-1)
+RETURN
+> PROCEDURE anim_vignette(n&,t1&,t2&)
+'
+' Lance une anim de vignette de type t1& sur une trajectoire de type t2&
+' avec la vignette nø n&
+'
+'  n& = Num‚ro de sprite dans la bank
+'       (1=Lilla, 2=Garde, 3=Exxos, 4=Vine, 5=Potier, 6=Ermite, 7=Pecheur, 8=Altos)
+' t1& = 1 (Vignette perso dialogue)
+'     = 2 (Evenement)
+' t2& = 1 (Arriv‚e vignette droite->gauche)
+'     = 2 (Sortie vignette gauche->droite)
+'     = 3 (Trajectoire verticale bas->haut)
+'     = 4 (Trajectoire verticale haut->bas)
+'
+LOCAL s$,s%
+HIDEM
+'  OUT 4,18
+VOID XBIOS(5,L:log%,L:XBIOS(2),-1)
+IF n&<>0
+DEC n&
+ENDIF
+s$=MID$(sprdial$,n&*1158+1,1158)         ! SPR vignette visage
+s%=5
+IF ste!
+s%=2
+ENDIF
+IF t2&=3                      ! ### Vignette monte ###
+vig!=TRUE
+yv&=syv&
+clear_dialzone
+GET xv&,yv&-dr3&,xv&+lv&,yv&+2,sprbckdial$
+FOR n&=0 TO dr3&/s%
+PUT xv&,yv&,s$
+RC_COPY log%,xv&,yv&,lv&,syv&-yv& TO phys%,xv&,yv&
+VSYNC
+PUT xv&,syv&-dr3&,sprbckdial$
+SUB yv&,s%
+NEXT n&
+ELSE IF t2&=4                 ! ### Vignette Descends ###
+ADD yv&,s%
+vig!=FALSE
+cd&=0
+clear_dialzone
+FOR n&=0 TO dr3&/s%
+PUT xv&,yv&,s$
+RC_COPY log%,xv&,yv&-s%,lv&,syv&-yv&+s% TO phys%,xv&,yv&-s%
+VSYNC
+PUT xv&,syv&-dr3&,sprbckdial$
+ADD yv&,s%
+NEXT n&
+ENDIF
+VOID XBIOS(5,L:XBIOS(2),L:XBIOS(2),-1)
+SHOWM
+'  OUT 4,8
+RETURN
+'
+> PROCEDURE pro_print(px&,py&,t$,adr%,mode%)
+~C:text_pro%(px&,py&,LEN(t$),L:(V:t$),L:font2%,L:adr%,0)
+RETURN
+> PROCEDURE pro_center(py&,t$,adr%,mode%)
+LOCAL a%
+'
+' The width of the string is calculated here by indexing each character
+' value into the width table held at an offset of 32 within the font data.
+' As the first printable character is a space (char 32) the 32s cancel
+' out, thus simplifying the routine slightly.
+'
+' ie, would be,  PEEK(font%+32+ASC(MID$(t$,a&,1))-32)
+'
+width&=0
+FOR a%=1 TO LEN(t$)
+ADD width&,PEEK(font2%+ASC(MID$(t$,a%,1)))
+NEXT a%
+'
+' Subtract string width from screen width and divide by 2 to give
+' left x coordinate.
+'
+px&=(320-width&) DIV 2
+~C:text_pro%(px&,py&,LEN(t$),L:(V:t$),L:font2%,L:adr%,mode%)
+RETURN
+'
+' #####################
+' ### Vid‚o & Audio ###
+' #####################
+'
+> PROCEDURE language_menu
+' #
+' # Petit menu choix de de la langue !
+' # (Celles d‚crites dans loc.txt)
+' #
+LOCAL x&,y&,ys&,l&,h&,n&,n1&,a&,b&,c&
+LOCAL tr$
+a&=0
+x&=96
+y&=84
+ys&=y&
+l&=127
+h&=127
+'
+charge_img
+fadeto!=TRUE
+set_palette(depack_buf%)
+SDPOKE &HFFFF8240,0                   ! On s'assure un fond noir
+PAUSE 100
+VSYNC
+tr$=MID$(frise$,1+8198,4102)          ! ## Spr du zoli cadre … fra
+WHILE (loc$(a&)<>"nop")
+INC a&
+WEND
+DEC a&
+y&=108-(a&*8)
+ys&=y&
+PUT 96,72,tr$
+FOR b&=0 TO a&
+ATEXT x&+(l&/2)-LEN(loc$(b&))*3,y&+b&*8,0,loc$(b&)
+NEXT b&
+b&=a&
+n&=0
+n1&=n&
+SETMOUSE 160,100
+ATEXT 0,194,0,ver$
+ATEXT x&+6,ys&-1+n&*8,1,CHR$(175)         ! >>
+ATEXT x&+l&-12,ys&-1+n&*8,1,CHR$(174)     ! <<
+WHILE MOUSEK=0
+mx&=MOUSEX
+my&=MOUSEY
+IF my&>ys& AND my&<ys&+((b&+1)*8)
+n&=INT((my&-ys&)/8)
+IF n&<>n1&
+a&=n&*5
+PUT 96,72,tr$
+ATEXT x&+6,ys&-1+n&*8,1,CHR$(175)         ! >>
+ATEXT x&+l&-12,ys&-1+n&*8,1,CHR$(174)     ! <<
+FOR c&=0 TO b&
+ATEXT x&+(l&/2)-LEN(loc$(a&+c&))*3,y&+c&*8,0,loc$(a&+c&)
+NEXT c&
+ATEXT x&+6,ys&-1+n1&*8,1," "
+ATEXT x&+l&-12,ys&-1+n1&*8,1," "
+n1&=n&
+ENDIF
+ENDIF
+WEND
+~C:fade_to_black%(3)
+PAUSE 50
+language&=n&
+CLS
+RETURN
+> PROCEDURE travel_menu
+' #
+' # Petit menu choix de destination.
+' #
+'
+LOCAL x&,y&,ys&,l&,h&,flag|,n&,n1&
+LOCAL b$,tr$
+flag|=flag|(9)         ! # Flag009
+x&=72
+y&=48
+ys&=y&+12
+l&=127
+h&=72
+'
+'  DEFFILL 0
+DEFMOUSE 5
+GET x&,y&,x&+l&,y&+h&,b$              ! ## Sauve le fond mec
+tr$=MID$(frise$,1+8198,4102)          ! ## Le sprite
+PUT x&,y&,tr$
+'
+' ## Rester … bord
+ATEXT x&+(l&/2)-((LEN(sys$(20))-6)*3),y&+12,0,RIGHT$(sys$(20),LEN(sys$(20))-6)
+ADD y&,8
+' ## Cnossos
+ATEXT x&+(l&/2)-((LEN(sys$(21))-6)*3),y&+12,0,RIGHT$(sys$(21),LEN(sys$(21))-6)
+ADD y&,8
+'
+IF flag|>1
+' ## Indus
+ATEXT x&+(l&/2)-((LEN(sys$(22))-6)*3),y&+12,0,RIGHT$(sys$(22),LEN(sys$(22))-6)
+ADD y&,8
+ENDIF
+IF flag|>2
+' ## Rapa
+ATEXT x&+(l&/2)-((LEN(sys$(23))-6)*3),y&+12,0,RIGHT$(sys$(23),LEN(sys$(23))-6)
+ADD y&,8
+ENDIF
+n&=0
+n1&=n&
+WHILE MOUSEK=0
+mx&=MOUSEX
+my&=MOUSEY
+IF mx&>x& AND mx&<x&+l& AND my&>=ys& AND my&<ys&+((flag|+1)*8)
+n&=INT((my&-ys&)/8)
+ATEXT x&+6,ys&-1+n&*8,1,CHR$(175)
+ATEXT x&+l&-12,ys&-1+n&*8,1,CHR$(174)
+IF n&<>n1&
+ATEXT x&+6,ys&-1+n1&*8,1," "
+ATEXT x&+l&-12,ys&-1+n1&*8,1," "
+ENDIF
+n1&=n&
+ENDIF
+WEND
+PUT x&,ys&-12,b$               ! ## On restaure le fond
+IF n&=0               ! ## Stay aboard
+' On ne fait rien :)
+ELSE IF n&=1      ! ## Cnossos
+HIDEM
+~C:fade_to_black%(3)
+PAUSE 50
+clear_screen(phys%)
+PUT 90,58,tr$
+GET 90,80,210,96,friseback$
+ATEXT 154-(LEN(sys$(21))-6)*3,87,0,RIGHT$(sys$(21),LEN(sys$(21))-6)
+fadeto!=TRUE
+set_palette(depack_buf%)
+PAUSE 50
+world&=1
+oldcv&=cv&
+cv&=25
+init_world
+var.val$(@search_var("Chapter"))="1"
+~C:fade_to_black%(3)
+PAUSE 50
+BMOVE log%,phys%,32000
+clear_img_zone
+ELSE IF n&=2          ! ## Indus
+~C:fade_to_black%(3)
+PAUSE 50
+clear_screen(phys%)
+PUT 90,58,tr$
+GET 90,80,210,96,friseback$
+ATEXT 154-(LEN(sys$(22))-6)*3,87,0,RIGHT$(sys$(22),LEN(sys$(22))-6)
+fadeto!=TRUE
+set_palette(depack_buf%)
+PAUSE 50
+world&=2
+oldcv&=cv&
+cv&=45
+init_world
+var.val$(@search_var("Chapter"))="3"
+~C:fade_to_black%(3)
+PAUSE 50
+BMOVE log%,phys%,32000
+clear_img_zone
+ELSE IF n&=3          ! ## Rapa
+~C:fade_to_black%(3)
+PAUSE 50
+clear_screen(phys%)
+PUT 90,58,tr$
+GET 90,80,210,96,friseback$
+ATEXT 154-(LEN(sys$(23))-6)*3,87,0,RIGHT$(sys$(23),LEN(sys$(23))-6)
+fadeto!=TRUE
+set_palette(depack_buf%)
+PAUSE 50
+world&=3
+oldcv&=cv&
+cv&=1
+init_world
+var.val$(@search_var("Chapter"))="8"
+~C:fade_to_black%(3)
+PAUSE 50
+BMOVE log%,phys%,32000
+clear_img_zone
+ENDIF
+RETURN
+> PROCEDURE scroll_sacados(s!)
+' Scroll le sacados sur le bas de l'‚cran
+' s! = -1 (up)
+'    =  0 (down)
+'
+LOCAL x%,y%,l%,h%,n%,s%
+LOCAL fr$
+x%=10
+y%=199
+l%=252
+h%=64
+'  OUT 4,18
+s%=16
+IF ste!
+s%=4
+ENDIF
+HIDEM
+~XBIOS(5,L:log%,L:XBIOS(2),-1)
+fr$=MID$(frise$,1,8198)
+IF s!                                      ! ### INVENT UP ###
+GET x%,y%-h%,x%+l%,y%,friseback$         ! On mets le fond au chaud
+PUT x%,y%-h%,fr$                         ! On mets d'abord la frise
+plot_invent                              ! et ensuite les objets dessus
+FOR n%=0 TO h% STEP s%
+RC_COPY log%,x%,y%-h%,l%,n% TO phys%,x%,y%-n%
+VSYNC
+NEXT n%
+oldcm&=cm&
+DEFMOUSE 5
+cm&=7               ! Mode inventaire
+GET ibx&,iby&,ibx&+20*6,iby&+5,backbulle$         ! Fond infobulle mis de cot‚
+ELSE
+PUT ibx&,iby&,backbulle$
+RC_COPY log%,ibx&,iby&,16*6,6 TO phys%,ibx&,iby&
+GET x%,y%-h%,x%+l%,y%,frise2$
+FOR n%=0 TO h% STEP s%                    ! #### INVENT DOWN ####
+PUT x%,(y%-h%)+n%,frise2$
+RC_COPY log%,x%,y%-h%,l%,h% TO phys%,x%,y%-h%
+VSYNC
+PUT x%,y%-h%,friseback$
+NEXT n%
+friseback$=""
+IF objenmain&=0             ! Si on quitte l'inventaire avec un objet
+cm&=oldcm&                ! en main, j'active auto. le mode MAIN
+plot_icone(cm&-1,0)      ! Old mode OFF
+plot_icone(0,0)
+ELSE
+plot_icone(oldcm&-1,0)      ! Old mode OFF
+plot_icone(cm&,0)      ! Old mode OFF
+plot_icone(0,1)          ! Icone mode ON
+cm&=1
+~@set_var("Mode",ico$(1))
+ENDIF
+IF cm&<>0
+DEFMOUSE cur$(cm&-1)              ! On r‚tabli le curseur :)
+ELSE
+DEFMOUSE 5
+ENDIF
+ENDIF
+'  OUT 4,8
+~XBIOS(5,L:XBIOS(2),L:XBIOS(2),-1)
+IF objenmain&=0
+SHOWM
+ENDIF
+RETURN
+> PROCEDURE plot_invent
+'
+' On plot le contenu de l'inventaire
+' (On verra aprŠs pour le scroll Droite/Gauche ;)
+'
+' Spr en 24x24 = 390 octets (780 = Msk+Spr)
+'
+LOCAL a&,b&,n|,x&,y&,m$,s$
+x&=pix&
+y&=piy&
+FOR a&=0 TO max_in_sacados|-1
+b&=a&
+IF sac.spr|(a&)<>0
+IF a&>9
+y&=piy&+invent_stepy|
+b&=a&-10
+ENDIF
+n|=sac.spr|(a&)-1
+m$=MID$(inv$,1+(n|*780),390)               ! Msk
+s$=MID$(inv$,1+(n|*780)+390,390)           ! Spr
+GET x&+(b&*invent_stepx|),y&,x&+(b&*invent_stepx|)+23,y&+23,sac.back$(a&)  ! Sauve sous le spr
+PUT x&+(b&*invent_stepx|),y&,m$,1          ! Plot Mask
+PUT x&+(b&*invent_stepx|),y&,s$,7          ! Plot Spr
+ENDIF
+NEXT a&
+RETURN
+> PROCEDURE plot_objet_en_main(o&)
+' o&=Nø de spr dans la bank spr inventaire (0 included)
+'
+LOCAL b$,x%,y%
+b$=""
+~XBIOS(5,L:log%,L:XBIOS(2),-1)
+x%=MOUSEX-12
+y%=MOUSEY-12
+IF debug_file!
+TRON #99
+ENDIF
+'
+IF x%<8
+x%=8
+ENDIF
+IF x%>295
+x%=295
+ENDIF
+IF y%<6
+y%=6
+ENDIF
+IF y%>174
+y%=174
+ENDIF
+GET x%,y%,x%+24,y%+24,b$               ! On mets le fond au chaud
+m$=MID$(inv$,1+(o&*780),390)           ! Msk
+s$=MID$(inv$,1+(o&*780)+390,390)       ! Spr
+PUT x%,y%,m$,1                      ! Plot Mask
+PUT x%,y%,s$,7                      ! Plot Spr
+RC_COPY log%,blix%,bliy%,24,24 TO phys%,blix%,bliy% ! ## HOT NEWS ##
+RC_COPY log%,x%,y%,24,24 TO phys%,x%,y%
+blix%=x%
+bliy%=y%
+VSYNC
+PUT x%,y%,b$
+~XBIOS(5,L:XBIOS(2),L:XBIOS(2),-1)
+IF debug_file!
+TROFF
+ENDIF
+RETURN
+> PROCEDURE depack_img
+@depack(pack_buf%,taillesrc%)
+RETURN
+> PROCEDURE plot_gui(dest%)
+' On balance le background dans l'‚cran point‚ par dest%
+' A l'origine l'image est une .neo
+'
+BMOVE depack_buf%+128,dest%,32000
+RETURN
+> PROCEDURE aff_img(buf%,logc%)
+'
+' Je gŠre (aussi) ici le cas particulier du changement de palette
+' des W73 & W74
+'
+'  LOCAL b%
+'  secure_garbage_collection
+b%=buf%
+IF (cv&=73 AND flag|(22)=1) OR (cv&=74 AND flag|(23)=1)
+b%=ARRPTR(pal2&())-offpal%  ! c'est moche :(
+ENDIF
+ADD buf%,64           ! Saute les palettes (STf & STe)
+'
+' ### Transfert direct buffer=>Video (No effect)
+re%(0)=999    ! Image direct
+re%(8)=buf%   ! a0
+re%(9)=logc%  ! a1
+RCALL testvideo%,re%()
+VSYNC
+IF fadetoblack!=FALSE
+fadeto!=TRUE                  ! Un fade entre la palette actuelle
+set_palette(b%)               ! et la nouvelle, c'est plus doux !
+ENDIF
+RETURN
+> PROCEDURE clear_screen(screen%)
+' ### CLS (32000 octets) de screen%)
+'
+re%(0)=998       ! CLS
+re%(8)=screen%   ! a0
+RCALL testvideo%,re%()
+RETURN
+> PROCEDURE clear_img_zone
+VSYNC
+VOID XBIOS(5,L:log%,L:XBIOS(2),-1)
+DEFFILL 0
+PBOX 7,4,265,148
+RC_COPY log%,0,4,272,144 TO phys%,0,4
+RETURN
+> PROCEDURE img_to_phys
+'
+' Balance la zone ‚cran de l'image de Log vers Phys
+' Direct sans fioriture. (pas comme la routine du dessous ;-)
+' (Uniquement la zone 0,4,272,144
+'
+RC_COPY log%,0,4,272,144 TO phys%,0,4
+VSYNC
+RETURN
+> PROCEDURE img_to_phys_with_effect(b%)
+'
+' On envoi l'image de l'‚cran logique => physique
+' Avec un p'ti effet visuel !
+'
+' Si on passe 0 alors effacement w/ CPC Style
+'
+LOCAL r|,a&,n&,b&,c&,d&,e&,a%,n%
+OUT 4,18
+r|=RAND(5)+1
+IF b%=0      ! # 0=Clear w/CPC Style
+r|=0
+ENDIF
+SELECT r|
+CASE 1                ! ### Rideau Gauche => Droite
+FOR a&=0 TO 16
+FOR n&=a& TO a&+153 STEP 17
+re%(0)=n&        ! Nø cube
+re%(8)=log%      ! a0
+re%(9)=XBIOS(2)  ! a1
+RCALL testvideo%,re%()
+PAUSE 0.5
+NEXT n&
+NEXT a&
+CASE 2                ! ### Rideau Bas => Haut
+FOR n&=153 TO 0 STEP -17
+FOR a&=n& TO n&+16
+re%(0)=a&        ! Nø cube
+re%(8)=log%      ! a0
+re%(9)=XBIOS(2)  ! a1
+RCALL testvideo%,re%()
+PAUSE 0.2
+NEXT a&
+NEXT n&
+CASE 3                ! ### Mosaique
+RESTORE mosaique
+DO
+READ re%(0)      ! Nø cube
+EXIT IF re%(0)=-1
+re%(8)=log%      ! a0
+re%(9)=XBIOS(2)  ! a1
+RCALL testvideo%,re%()
+PAUSE 0.2
+LOOP
+CASE 4                ! ### Escargot :)
+b&=0
+c&=16
+d&=169
+e&=153
+DO
+FOR a&=b& TO c&
+re%(0)=a&        ! Nø cube
+re%(8)=log%      ! a0
+re%(9)=XBIOS(2)  ! a1
+RCALL testvideo%,re%()
+PAUSE 0.1
+NEXT a&
+FOR a&=c& TO d& STEP 17
+re%(0)=a&        ! Nø cube
+re%(8)=log%      ! a0
+re%(9)=XBIOS(2)  ! a1
+RCALL testvideo%,re%()
+PAUSE 0.1
+NEXT a&
+FOR a&=d& TO e& STEP -1
+re%(0)=a&        ! Nø cube
+re%(8)=log%      ! a0
+re%(9)=XBIOS(2)  ! a1
+RCALL testvideo%,re%()
+PAUSE 0.1
+NEXT a&
+FOR a&=e& TO b& STEP -17
+re%(0)=a&        ! Nø cube
+re%(8)=log%      ! a0
+re%(9)=XBIOS(2)  ! a1
+RCALL testvideo%,re%()
+PAUSE 0.1
+NEXT a&
+ADD b&,18
+ADD c&,16
+SUB d&,18
+SUB e&,16
+EXIT IF b&=5*18
+LOOP
+CASE 5                ! ### Amstrad style :)
+FOR c&=0 TO 7
+a%=log%+c&*160
+n%=XBIOS(2)+c&*160
+FOR b&=0 TO 18
+FOR a&=0 TO 16
+LPOKE n%,LPEEK(a%)
+LPOKE n%+4,LPEEK(a%+4)
+ADD a%,8
+ADD n%,8
+NEXT a&
+ADD a%,(160*8)-136
+ADD n%,(160*8)-136
+NEXT b&
+NEXT c&
+CASE 0                ! ### Clear Phys w/Amstrad style :)
+FOR c&=0 TO 7
+n%=XBIOS(2)+8+(4*160)+c&*160
+FOR b&=0 TO 18-2
+FOR a&=0 TO 16-2
+LPOKE n%,0
+LPOKE n%+4,0
+ADD n%,8
+NEXT a&
+ADD n%,(160*8)-120
+NEXT b&
+NEXT c&
+ENDSELECT
+OUT 4,8
+mosaique:
+DATA 29,59,65,124,35,73,92,53,47,165,43,7,64,122,33,17,11,3,63,140,54,45,121,107,37,167
+DATA 137,40,102,9,164,84,139,80,62,101,32,118,75,1,50,156,49,70,82,158,87,51,14,110
+DATA 91,148,13,71,151,127,41,61,8,78,46,117,105,96,4,131,130,52,26,98,19,113,83,36
+DATA 93,143,126,38,23,56,109,116,27,133,74,97,120,108,163,141,30,119,155,21,103,44,157
+DATA 138,58,161,57,81,6,145,146,112,79,152,15,142,20,169,154,153,48,2,31,55,12,69,160
+DATA 123,136,88,150,60,77,89,42,168,162,86,95,147,99,166,5,125,94,72,18,149,22,106
+DATA 24,111,128,25,10,68,67,39,28,85,34,135,134,115,114,132,90,129,100,144,66,76,159
+DATA 104,16,0,-1
+RETURN
+> PROCEDURE capture_boussole
+' Capture la boussole ‚teinte + les 4 ‚tats allum‚s
+'
+LOCAL n&
+FOR n&=0 TO 3
+bou.spr$(n&)=MID$(boub$,1+((n&*2)*262),262)
+bou.msk$(n&)=MID$(boub$,1+((n&*2+1)*262),262)
+bou.on!(n&)=FALSE
+NEXT n&
+RETURN
+> PROCEDURE plot_boussole
+' On plot les issues dans la boussole
+'
+LOCAL n&
+VOID XBIOS(5,L:log%,L:XBIOS(2),-1)
+PUT 272,149,bouoff$           ! On r‚initialise la boussole
+FOR n&=0 TO 3
+IF bou.on!(n&)
+PUT bou.x&(n&),bou.y&(n&),bou.msk$(n&),1
+PUT bou.x&(n&),bou.y&(n&),bou.spr$(n&),7
+ENDIF
+NEXT n&
+RC_COPY log%,272,149,48,50 TO phys%,272,149
+~XBIOS(5,L:XBIOS(2),L:XBIOS(2),-1)
+RETURN
+> PROCEDURE plot_all_icones
+LOCAL tix&,tiy&,a&,b&,i$
+VOID XBIOS(5,L:log%,L:XBIOS(2),-1)
+PBOX ix&,iy&,319,iy&+24*3
+tix&=ix&+il&
+tiy&=iy&
+FOR a&=0 TO 2
+i$=MID$(icon$,(406*(a&*2))+1,406)
+PUT ix&,iy&+(ih&*a&),i$
+i$=MID$(icon$,406*(a&*2+1)+1,406)
+PUT tix&,tiy&+(ih&*a&),i$
+NEXT a&
+VSYNC
+RC_COPY log%,ix&,iy&,24*2+1,24*3 TO phys%,ix&,iy&
+VOID XBIOS(5,L:XBIOS(2),L:XBIOS(2),-1)
+RETURN
+> PROCEDURE plot_icone(a|,b|)
+'
+' Plot l'icone a| (0-7) tir‚e de la bank b| (0-2) (Off, On, Roll)
+'
+LOCAL tix&,tiy&,i$
+IF a|<0
+a|=0
+ENDIF
+IF a|>7
+a|=7
+ENDIF
+VOID XBIOS(5,L:log%,L:XBIOS(2),-1)
+tix&=ix&+ABS(ODD(a|))*il&
+tiy&=iy&+(INT(a|/2)*ih&)
+i$=MID$(icon$,(b|*3248)+(406*a|)+1,406)
+PUT tix&,tiy&,i$
+VSYNC
+RC_COPY log%,ix&,iy&,24*2+1,24*5 TO phys%,ix&,iy&
+VOID XBIOS(5,L:XBIOS(2),L:XBIOS(2),-1)
+RETURN
+> PROCEDURE plot_all_spr_in_log
+'
+' Plot le(s) sprite(s)
+' visible dans la vue courante
+'
+' Une correction de +8 en X et +4 en Y (voir fra)
+' est op‚r‚e !
+' (c'est fait dans init_sprites)
+'
+LOCAL n&
+~XBIOS(5,L:log%,L:XBIOS(2),-1)
+FOR n&=offspr& TO offspr&+nbspr&-1
+IF spr.vue&(n&)=cv& AND spr.onoff!(n&)            ! Spr dans la vue ?
+PUT spr.x&(n&),spr.y&(n&),spr.mask$(n&),1       ! Plot Mask
+PUT spr.x&(n&),spr.y&(n&),spr.data$(n&),7       ! Plot Spr
+ENDIF
+NEXT n&
+~XBIOS(5,L:XBIOS(2),L:XBIOS(2),-1)
+RETURN
+> PROCEDURE init_fade
+fade_to_black%=fade_to%+4
+fade_to_white%=fade_to%+8
+' ~C:fade_to%(speed,L:palette)
+' ~C:fade_to_black%(speed)
+' ~C:fade_to_white%(speed)
+RETURN
+> PROCEDURE init_cursors
+' Une petite proc‚dure propre car pour les cursors
+' ya des petites manips … faire :)
+'
+LOCAL a%,s&,tmp$
+s&=74                         ! Cursor size (in octet)
+tmp$=SPACE$(s&*8)             ! Un petit buffer pour 8 cursors max
+charge_file(gfx.folder$+"cursors.spr",V:tmp$)
+FOR a%=0 TO (tspr%/s&)-1
+cur$(a%)=MID$(tmp$,1+a%*s&,s&)
+NEXT a%
+RETURN
+'
+> PROCEDURE streplayon(sample%,length%,boucle|)
+' boucle|=1  (Jou‚ une fois)
+' boucle|=11 (En boucle)
+'
+LOCAL super%,n%,d%,a&
+IF ste!
+IF falcon!
+d%=sixtotwelve%
+FOR n%=sample% TO sample%+length%
+a&=(PEEK(n%)*256)+PEEK(n%)
+DPOKE d%,a&
+'        POKE d%+1,PEEK(n%)
+ADD d%,2
+NEXT n%
+sample%=sixtotwelve%
+ADD length%,length%
+ENDIF
+super%=GEMDOS(32,L:0)         ! on passe en mode superviseur.
+dma%=&HFF8901                      ! adresse m‚moire du DMA du STE.
+'
+BYTE{dma%}=0
+'  d0&=0
+'
+' **** Sample's beginning address ****
+'
+BYTE{dma%+2}=sample%/&H10000      ! Strong  byte of sample's beginning address.
+BYTE{dma%+4}=sample%/&H100        ! Average byte of ........
+BYTE{dma%+6}=sample% AND &HFF     ! Weak    byte of ........
+'
+' **** Counter's address ****
+'
+BYTE{dma%+8}=sample%/&H10000      ! Strong  byte of counter's address.
+BYTE{dma%+&HA}=sample%/&H100      ! Average byte of .......
+BYTE{dma%+&HC}=sample% AND &HFF   ! Weak    byte of .......
+'
+' **** Sample's end address ****
+'
+BYTE{dma%+&HE}=(sample%+length%)/&H10000     ! Strong  byte of sample's end address.
+BYTE{dma%+&H10}=(sample%+length%)/&H100      ! Average byte of ......
+BYTE{dma%+&H12}=(sample%+length%) AND &HFF   ! Weak    byte of ......
+'
+'
+BYTE{dma%+32}=&H80   ! DMA frequency to 6Khz
+IF falcon!
+BYTE{dma%+32}=&H81   ! 12.5 because of Falcon !
+ENDIF
+'                    ! &h80=6KHz | &h81=12.5 KHz | &h82=25 KHz | &h83=50KHz
+'
+BYTE{dma%}=boucle|        ! Switch DMA on.
+'
+~GEMDOS(32,L:super%)          ! on repasser dans le mode utilisateur
+ENDIF
+RETURN
+> PROCEDURE streplayoff
+LOCAL super%
+IF ste!
+super%=GEMDOS(32,L:0)         ! on passe en mode superviseur.
+dma%=&HFF8901                 ! adresse m‚moire du DMA du STE.
+BYTE{dma%}=0                  ! on arrete de jouer la musique
+~GEMDOS(32,L:super%)          ! on repasser dans le mode utilisateur
+ENDIF
+RETURN
+> PROCEDURE init_ym_player
+' ## Je charge le player une fois pour toute !
+' ## Grosse ‚conomie :) (packed version)
+'
+charge_file(snd.folder$+"player.pck",player%)
+taillesrc%=tspr%
+reg%(8)=player%
+RCALL sp3_unpack%,reg%()
+RETURN
+> PROCEDURE music_on(zik_adr%)
+LOCAL super%
+super%=GEMDOS(&H20,L:0)
+re%(7)=50                      ! Frequency
+re%(14)=zik_adr%               ! Zik pointer
+RCALL sndhplay%+28,re%()
+~GEMDOS(&H20,L:super%)
+RETURN
+> PROCEDURE music_off
+LOCAL super%
+super%=GEMDOS(&H20,L:0)
+RCALL sndhplay%+28+4,re%()
+~GEMDOS(&H20,L:super%)
+RETURN
+'
+> PROCEDURE repair
+VOID XBIOS(5,L:XBIOS(2),L:XBIOS(2),-1)
+PRINT "Erreur !!!"
+END
+RETURN
+'
+> PROCEDURE play_module
+'
+PRINT " Cochonnerie de routine de replay !!!"
+PRINT
+PRINT "Do the dance !!!"
+'
+super%=GEMDOS(32,L:0)   ! Supervisor mode, needed !!
+'
+adr_init%=wizz%      ! Init routine adr
+adr_stop%=wizz%+&H1C+2    ! Stop routine adr
+'
+reg%(8)=module%                 ! Module Adr
+reg%(9)=module%+taille_module%+8*1024     ! Workspace
+'                               ! in reg%(9) you must give
+'                               ! the end of the buffer
+'
+RCALL wizz%,reg%()           ! Go for music !!!
+'
+IF reg%(0)=&H1234
+PRINT "Workspace error"
+REPEAT
+UNTIL LEN(INKEY$)
+EDIT
+ENDIF
+'
+RETURN
+> PROCEDURE charge_module
+'  module_name$="C:\WIZZCAT.GFA\V42.MOD"
+module_name$="g:\athanor\zik\v42.MOD"
+OPEN "I",#1,module_name$
+taille_module%=LOF(#1)
+CLOSE #1
+'
+ADD taille_module%,8*1024   ! Workspace
+'
+module%=MALLOC(taille_module%)
+IF module%=0
+PRINT " Malloc error"
+REPEAT
+UNTIL LEN(INKEY$)
+EDIT
+ENDIF
+BLOAD module_name$,module%
+'
+RETURN
+'
+> PROCEDURE error
+RCALL adr_stop%,reg%()
+~MFREE(module%)
+~MFREE(wizz%)
+~GEMDOS(32,L:super%)
+EDIT
+RETURN
+> PROCEDURE stop
+RCALL adr_stop%,reg%()
+~MFREE(module%)
+~MFREE(wizz%)
+~GEMDOS(32,L:super%)
+EDIT
+RETURN
+'
+> PROCEDURE intro
+' ####################################################
+' ## Petite intro, Logo, Page d'intro et .mod !
+' ## D‚roul‚ : - FadeOut
+' ##           - Lancement du .mod
+' ##           - FadeIn + Affichage du Logo
+' ##           - FadeOut
+' ##           - FadeIn + Affichage page Intro
+' ##           - Affichage du Titre (Scroll ?)
+' ##           - Press a key
+' ##           - FadeOut
+' ##           - Enjoy Athanor 2 :)
+' ##
+' ####################################################
+'
+LOCAL t$,m0$,s0$,tback$,n$
+LOCAL x%,y%,r|,len%
+n$=snd.folder$+"intro08.pck"      ! Dma-Sc packed muzik
+'  OPEN "i",#69,n$
+'  len%=LOF(#69)
+'  CLOSE #69
+x%=100000+80000              ! Size .mod + 80Ko
+module%=MALLOC(x%)
+IF module%=0
+PRINT "Module Malloc error"
+~INP(2)
+STOP
+ENDIF
+'
+t$="wizz12sf.pck"
+IF ste!
+t$="wizz25se.pck"
+ENDIF
+charge_file(snd.folder$+t$,module%)
+taillesrc%=tspr%
+reg%(8)=module%
+RCALL sp3_unpack%,reg%()
+taille_rout%=reg%(0)                ! Real player size
+taille_bss%=22*1024
+wizz%=MALLOC(taille_rout%+taille_bss%)           ! WizzRout + 22Ko Bss
+IF wizz%=0
+PRINT "wizz% malloc error"
+~INP(2)
+STOP
+ENDIF
+BMOVE module%,wizz%,taille_rout%
+'
+t$=STRING$(12108,0)
+charge_file(gfx.folder$+"title.pck",V:t$)
+taillesrc%=tspr%
+reg%(8)=V:t$
+RCALL sp3_unpack%,reg%()
+m0$=MID$(t$,1,6054)
+s0$=MID$(t$,6055,6054)
+'
+' ## Chargement & Lancement du .mod
+charge_file(n$,module%)
+taillesrc%=tspr%
+reg%(8)=module%
+RCALL sp3_unpack%,reg%()
+'
+' ## FadeOut
+~C:fade_to_black%(3)
+PAUSE 30
+'
+wizz_init%=wizz%           ! Init routine adr
+wizz_stop%=wizz%+&H1C+2    ! Stop routine adr
+'
+' First of all, relocating the wizzcat rout
+'
+super%=GEMDOS(32,L:0)        ! Supervisor mode, needed !!
+reg%(8)=wizz%                ! Prg Adr to relocate
+RCALL reloc%,reg%()          ! Relocate It !!!
+reg%(8)=module%              ! Module Adr
+reg%(9)=module%+x%           ! End of Mod Buffer
+'
+RCALL wizz%,reg%()           ! Go for music !!!
+OUT 4,18                     ! Turn off mouse to stop interrupt interference
+'
+' ## Affichage du Logo en FadeIn
+charge_file(gfx.folder$+"logo.sp5",depack_buf%)
+taillesrc%=tspr%
+reg%(8)=depack_buf%
+RCALL sp3_unpack%,reg%()
+CLS
+fadeto!=FALSE
+IF ste!
+fadeto!=TRUE
+ENDIF
+set_palette(depack_buf%-offpal%+4)
+FOR n%=0 TO 196 STEP 4
+RC_COPY depack_buf%+128,0,n%,320,2 TO XBIOS(2),0,n%
+VSYNC
+NEXT n%
+FOR n%=198 TO 2 STEP -4
+RC_COPY depack_buf%+128,0,n%,320,2 TO XBIOS(2),0,n%
+VSYNC
+NEXT n%
+IF ste!
+PAUSE 200
+'
+'  ' ## FadeOut
+~C:fade_to_black%(3)
+ELSE
+FOR n%=0 TO 30
+VSYNC
+NEXT n%
+ENDIF
+'
+' ## FadeIn + Affichage page Intro
+'
+charge_file(gfx.folder$+"intro.sp5",pack_buf%)
+taillesrc%=tspr%
+depack_img
+'
+' ## FadeOut
+IF ste!
+~C:fade_to_black%(3)
+PAUSE 50
+ELSE
+clear_screen(log%)
+FOR n%=198 TO 2 STEP -4
+RC_COPY log%,0,n%,320,2 TO XBIOS(2),0,n%
+VSYNC
+NEXT n%
+FOR n%=0 TO 196 STEP 4
+RC_COPY log%,0,n%,320,2 TO XBIOS(2),0,n%
+VSYNC
+NEXT n%
+ENDIF
+CLS                   ! Clear the logo in Phys
+fadeto!=FALSE
+IF ste!
+fadeto!=TRUE
+ENDIF
+set_palette(depack_buf%)
+IF NOT ste!
+FOR n%=0 TO 196 STEP 4
+RC_COPY depack_buf%+64,0,n%,320,2 TO XBIOS(2),0,n%
+VSYNC
+NEXT n%
+FOR n%=198 TO 2 STEP -4
+RC_COPY depack_buf%+64,0,n%,320,2 TO XBIOS(2),0,n%
+VSYNC
+NEXT n%
+ELSE
+FOR n%=0 TO 316 STEP 4
+RC_COPY depack_buf%+64,n%,0,2,200 TO XBIOS(2),n%,0
+VSYNC
+NEXT n%
+FOR n%=318 TO 2 STEP -4
+RC_COPY depack_buf%+64,n%,0,2,200 TO XBIOS(2),n%,0
+VSYNC
+NEXT n%
+ENDIF
+BMOVE XBIOS(2),log%,32000  ! => Ecran Logique
+'
+' ## Affichage Titre
+IF ste!
+PAUSE 100
+ELSE
+FOR n%=0 TO 200
+VSYNC
+VSYNC
+NEXT n%
+ENDIF
+x%=10
+y%=199
+VOID XBIOS(5,L:log%,L:XBIOS(2),-1)
+IF NOT ste!
+PUT 10,150,m0$,1
+PUT 10,150,s0$,7
+BMOVE log%+24000,phys%+24000,7840
+ELSE
+GET 10,150,319,199,tback$     ! On mets le fond au chaud
+r|=RAND(2)+1
+SELECT r|
+CASE 1
+FOR n%=0 TO 48              ! Scroll Vertical
+PUT x%,y%-n%,m0$,1
+PUT x%,y%-n%,s0$,7
+BMOVE log%+24000,phys%+24000,8000
+VSYNC
+PUT 10,150,tback$
+NEXT n%
+CASE 2
+FOR n%=319 TO 20 STEP -2    ! Scroll horizontal
+PUT n%,150,m0$,1
+PUT n%,150,s0$,7
+BMOVE log%+24000,phys%+24000,8000
+VSYNC
+PUT 10,150,tback$
+NEXT n%
+ENDSELECT
+ENDIF
+'
+' ## Press a key
+VOID XBIOS(5,L:XBIOS(2),L:XBIOS(2),-1)
+y%=191
+GET 100,y%,250,199,m0$
+IF ste!
+PAUSE 200
+ELSE
+FOR n%=0 TO 200
+VSYNC
+VSYNC
+NEXT n%
+pro_center(y%,MID$(sys$(17),6,LEN(sys$(17))-5),phys%,0)
+ENDIF
+DO
+IF ste!
+pro_center(y%,MID$(sys$(17),6,LEN(sys$(17))-5),phys%,0)
+'   pro_center(y%,sys$(17),phys%,0)
+PAUSE 6
+PUT 100,y%,m0$
+PAUSE 2
+ENDIF
+EXIT IF PEEK(&HFFFC02)=57
+LOOP
+PUT 100,y%,m0$
+'
+' ## STOP Intro - FadeOut
+RCALL wizz_stop%,reg%()         ! Call the stop routine
+~GEMDOS(32,L:super%)            ! User mode !!
+~C:fade_to_black%(5)
+OUT 4,8                         ! Turn On Mouse
+PAUSE 50
+IF MFREE(wizz%)<>0
+PRINT "MFREE(c%) erreur !"
+~INP(2)
+ENDIF
+IF MFREE(module%)<>0
+PRINT "MFREE(module%) erreur !"
+~INP(2)
+ENDIF
+RETURN
+'
+> PROCEDURE scene_finale
+' #### Sortez les mouchoirs ####
+'
+' ## FadeOut
+'  ~C:fade_to_black%(5)
+'
+LOCAL n$
+LOCAL x%,y%,r|,len%
+mfree_multi_screen
+IF MFREE(sprbuf%)<>0
+PRINT "MFREE(sprbuf%) erreur !"
+ENDIF
+IF MFREE(sndbuf%)<>0
+PRINT "MFREE(sndbuf%) erreur !"
+ENDIF
+IF ste!
+IF MFREE(digbuf%)<>0
+PRINT "MFREE(digbuf%) erreur !"
+ENDIF
+ENDIF
+erase_tab             ! Pour la scŠne finale, il faut faire place nette en m‚moire !!!!
+DIM tmp$(256)
+~FRE(0)
+VOID XBIOS(5,L:log%,L:XBIOS(2),-1)
+init_credits
+n$=snd.folder$+"endng30m.pck"      ! Dma-Sc packed muzik
+x%=150000+80000              ! Size .mod + 80Ko
+module%=MALLOC(x%)
+IF module%=0
+PRINT "Module Malloc error"
+~INP(2)
+STOP
+ENDIF
+'
+t$="wizz12sf.pck"
+IF ste!
+t$="wizz25se.pck"
+ENDIF
+charge_file(snd.folder$+t$,module%)
+taillesrc%=tspr%
+reg%(8)=module%
+RCALL sp3_unpack%,reg%()
+taille_rout%=reg%(0)                ! Real player size
+taille_bss%=22*1024
+wizz%=MALLOC(taille_rout%+taille_bss%)           ! WizzRout + 22Ko Bss
+IF wizz%=0
+PRINT "wizz% malloc error"
+~INP(2)
+STOP
+ENDIF
+BMOVE module%,wizz%,taille_rout%
+'
+' ## Chargement & Lancement du .mod
+charge_file(n$,module%)
+taillesrc%=tspr%
+reg%(8)=module%
+RCALL sp3_unpack%,reg%()
+'
+'    ## FadeOut
+~C:fade_to_black%(3)
+PAUSE 30
+CLS
+'
+music_off                  ! YM to silence !
+wizz_init%=wizz%           ! Init routine adr
+wizz_stop%=wizz%+&H1C+2    ! Stop routine adr
+'
+' First of all, relocating the wizzcat rout
+'
+super%=GEMDOS(32,L:0)        ! Supervisor mode, needed !!
+reg%(8)=wizz%                ! Prg Adr to relocate
+RCALL reloc%,reg%()          ! Relocate It !!!
+reg%(8)=module%              ! Module Adr
+reg%(9)=module%+x%           ! End of Mod Buffer
+'
+RCALL wizz%,reg%()           ! Go for music !!!
+OUT 4,18                     ! Turn off mouse to stop interrupt interference
+'
+' ## On envoie le module !
+' ## Vas-y DMA-SC fais nous r‚ver. :)
+'
+' ## Fade In de l'Image de fin !
+charge_file(gfx.folder$+"rapa19fs.sp5",pack_buf%)
+taillesrc%=tspr%
+depack_img
+BMOVE depack_buf%+64,log%,32000
+VSYNC
+BMOVE log%,XBIOS(2),32000
+VSYNC
+fadeto!=FALSE
+IF ste!
+fadeto!=TRUE
+ENDIF
+set_palette(depack_buf%)
+VSYNC
+IF ste!
+PAUSE 200
+ELSE
+FOR x%=0 TO 200
+VSYNC
+VSYNC
+NEXT x%
+ENDIF
+'
+new_credits           ! ## Et c'est parti les copains :D
+IF ste!
+PAUSE 300
+ELSE
+FOR x%=0 TO 200
+VSYNC
+VSYNC
+NEXT x%
+ENDIF
+'
+' ## FadeOut
+IF ste!
+~C:fade_to_black%(5)
+PAUSE 100
+clear_screen(log%)
+VSYNC
+clear_screen(XBIOS(2))
+ELSE
+clear_screen(log%)
+FOR n%=0 TO 196 STEP 4
+RC_COPY log%,0,n%,320,2 TO XBIOS(2),0,n%
+VSYNC
+NEXT n%
+FOR n%=198 TO 2 STEP -4
+RC_COPY log%,0,n%,320,2 TO XBIOS(2),0,n%
+VSYNC
+NEXT n%
+ENDIF
+VSYNC
+set_palette_almost_black
+VSYNC
+pro_print(130,100,"THE END",phys%,0)
+VSYNC
+IF ste!
+PAUSE 500
+ELSE
+FOR x%=0 TO 250
+VSYNC
+VSYNC
+NEXT x%
+ENDIF
+' ## Bye Bye everybody - STOP ZIK & FadeOut
+RCALL wizz_stop%,reg%()         ! Stop the .MOD please
+~GEMDOS(32,L:super%)            ! User mode !!
+'
+~C:fade_to_black%(5)
+'  OUT 4,8                         ! Turn On Mouse
+PAUSE 200
+IF MFREE(wizz%)<>0
+PRINT "MFREE(c%) erreur !"
+~INP(2)
+ENDIF
+IF MFREE(module%)<>0
+PRINT "MFREE(module%) erreur !"
+~INP(2)
+ENDIF
+CALL reset%                   ! ## See you les copains !
+RETURN
+> PROCEDURE init_credits
+' charge le fichier credits.txt
+' 256 lignes MAX (on peut augmenter)
+'
+LOCAL z$,n%
+z$=dial.folder$+"credit"+lang$(language&)+".txt"
+IF EXIST(z$)
+OPEN "U",#1,z$
+RECALL #1,tmp$(),256,nbcr%
+CLOSE #1
+IF info!
+ATEXT 10,ay%,0,z$+" charg‚"
+ADD ay%,6
+ENDIF
+ELSE
+PRINT AT(2,20);z$;" does not exist !"
+~INP(2)
+END
+ENDIF
+RETURN
+> PROCEDURE new_credits
+DIM x%(3),y%(3),n$(8)             ! ## Attention un bloc de 8 noms MAX
+x%=8
+y%=8
+l%=0
+n%=0
+c%=0
+x%(0)=100
+y%(0)=110
+x%(1)=20
+y%(1)=120
+x%(2)=40
+y%(2)=130
+n%=0
+DO
+EXIT IF tmp$(n%)="#STOP"
+IF LEFT$(tmp$(n%),1)="#"
+r%=RAND(3)
+ty%=y%(r%)
+n%=@flash_title(x%(r%),ty%,n%)
+ENDIF
+LOOP
+RETURN
+> FUNCTION flash_title(x%,y%,a%)
+LOCAL z%,t$,f$
+t$=tmp$(a%)
+GET x%,y%,x%+8*LEN(t$),y%+8,f$
+FOR z%=0 TO 15                ! ## Flash du #
+pro_print(x%,y%,"#",log%,0)
+RC_COPY log%,x%,y%,8,8 TO phys%,x%,y%
+IF ste!
+PAUSE 3
+ELSE
+VSYNC
+VSYNC
+VSYNC
+ENDIF
+PUT x%,y%,f$
+RC_COPY log%,x%,y%,8,8 TO phys%,x%,y%
+IF ste!
+PAUSE 2
+ELSE
+VSYNC
+VSYNC
+ENDIF
+NEXT z%
+pro_print(x%,y%,t$,log%,0)     ! ## Le titre en log%
+FOR z%=1 TO LEN(t$)   ! ## Puis en phys% lettre par lettre
+RC_COPY log%,x%,y%,z%*8,8 TO phys%,x%,y%
+IF ste!
+PAUSE 2
+ELSE
+VSYNC
+VSYNC
+ENDIF
+NEXT z%
+IF ste!
+PAUSE 50             ! ## On profite un peu du titre
+ELSE
+FOR z%=0 TO 20
+VSYNC
+VSYNC
+NEXT z%
+ENDIF
+'
+a%=@aff_names(x%+8,y%+8,a%+1)  ! ## Maintenant les noms !
+RETURN a%
+ENDFUNC
+> FUNCTION aff_names(x%,y%,c%)
+LOCAL a%,b%,z%,t$,sy%
+sy%=y%
+a%=0
+DO
+y%=sy%
+EXIT IF LEFT$(tmp$(c%+a%),1)="#"
+RC_COPY log%,0,0,100,8 TO phys%,0,0
+VSYNC
+b%=0
+DO
+t$=tmp$(c%+a%)
+EXIT IF t$=""             ! ## Un saut de ligne
+GET x%,y%,x%+8*LEN(t$),y%+8,n$(b%)
+pro_print(x%,y%,t$,log%,0)         ! ## Le nom en log%
+FOR z%=1 TO LEN(t$)
+IF x%+(z%*8)<320
+RC_COPY log%,x%,y%,z%*8,8 TO phys%,x%,y%
+ENDIF
+IF ste!
+PAUSE 2
+ELSE
+VSYNC
+VSYNC
+ENDIF
+NEXT z%
+INC a%
+INC b%
+ADD y%,8
+LOOP
+IF ste!
+PAUSE 100
+ELSE
+FOR z%=0 TO 50
+VSYNC
+VSYNC
+NEXT z%
+ENDIF
+'
+y%=sy%      ! ## On restaure le Y pour le bloc suivant
+'
+IF f$<>""
+PUT x%-8,y%-8,f$     ! # On restaure le fond du titre en log%
+FOR z%=1 TO 24       ! ## En phys% lettre par lettre longueur arbitraire
+IF x%+(z%*8)<320
+RC_COPY log%,x%-8,y%-8,z%*8,z% TO phys%,x%-8,y%-8
+ENDIF
+IF ste!
+PAUSE 2
+ELSE
+VSYNC
+VSYNC
+ENDIF
+NEXT z%
+IF ste!
+PAUSE 50
+ELSE
+FOR z%=0 TO 8
+VSYNC
+VSYNC
+NEXT z%
+ENDIF
+f$=""
+ENDIF
+'
+FOR z%=0 TO b%-1
+PUT x%,y%,n$(z%)      ! # On restaure le fond en log%
+n$(z%)=""             ! On est rickrack en m‚moire :)
+k%=1
+FOR w%=1 TO 24      ! ## En phys% lettre par lettre (longueur arbitraire)
+IF x%+(w%*8)<320
+RC_COPY log%,x%,y%,w%*8,k% TO phys%,x%,y%
+ENDIF
+IF ste!
+PAUSE 1
+ELSE
+VSYNC
+VSYNC
+ENDIF
+INC k%
+IF k%=9
+k%=1
+ENDIF
+NEXT w%
+ADD y%,8
+NEXT z%
+INC a%
+LOOP
+RETURN c%+a%
+ENDFUNC
+'
+> PROCEDURE set_screen
+'
+' Cr‚e un ‚cran logique 32000 octets (MALLOC)
+' et initialise le 320x200x16
+'
+old_phys%=XBIOS(2)
+old_log%=XBIOS(3)
+old_res%=XBIOS(4)
+~XBIOS(5,L:XBIOS(2),L:XBIOS(2),0)
+'  log$=STRING$(32000,0)
+'  log%=V:log$
+log0%=MALLOC(32256)
+'  PRINT "log0% = ";log0%
+log%=(log0%+255) AND &HFFFF00        ! Screen MOD 256
+clear_screen(log%)
+'  PRINT "Log% = ";HEX$(log%)
+'  ~INP(2)
+phys%=XBIOS(2)
+RETURN
+> PROCEDURE restore_screen
+VOID XBIOS(5,L:old_log%,L:old_phys%,old_res%)
+RETURN
+> PROCEDURE store_palette
+FOR n&=0 TO 15
+pal&(n&)=DPEEK(&HFFFF8240+n&*2)
+NEXT n&
+RETURN
+> PROCEDURE set_palette(adr%)
+'
+' ## J'ajoute ici offpal%
+' ##  0 pour STf
+' ## 32 pour STe
+'
+IF fadeto!=TRUE
+IF NOT ste!
+~C:fade_to%(4,L:adr%+offpal%)
+ELSE
+~XBIOS(6,L:adr%+offpal%)    ! arghhhhhh le fade_to est bugg‚ en STe
+ENDIF
+fadeto!=FALSE
+ELSE
+~XBIOS(6,L:adr%+offpal%)
+ENDIF
+RETURN
+> PROCEDURE set_palette_almost_black
+'
+' # On mets la palette … Zero sauf de quoi ‚crire :)
+'
+LPOKE depack_buf%,0
+LPOKE depack_buf%+4,0
+LPOKE depack_buf%+8,0
+LPOKE depack_buf%+12,0
+LPOKE depack_buf%+16,0
+LPOKE depack_buf%+20,0
+LPOKE depack_buf%+24,0
+DPOKE depack_buf%+28,0
+DPOKE depack_buf%+30,&H777
+fadeto!=TRUE
+set_palette(depack_buf%-offpal%)
+RETURN
+> PROCEDURE restore_palette
+VOID XBIOS(6,L:VARPTR(pal&(0)))
+RETURN
+'
+' ########################
+' ###  P U Z Z L E S   ###
+' ########################
+'
+' ## Puzzle Peche
+> PROCEDURE puzzle_peche_init
+' Puzzle de peche :)
+' Je r‚utilise le tableau penalty&(4)
+' 0-2 = Si le poisson concern‚ fait une touche
+' 3 = nb de poisson attrap‚ !
+'
+~FRE(0)
+tab%=MALLOC(2048)
+IF tab%=0
+PRINT "Malloc tab% error !!"
+~INP(2)
+ENDIF
+ATEXT 0,0,1,CHR$(&H7F)
+GET 0,0,7,7,pe$
+ATEXT 0,0,1,CHR$(32)
+fish$=STRING$(17*1024,0)      ! Anim. des poissons
+fish%=V:fish$
+oth$=STRING$(3*1024,0)        ! Bouchon + poisson
+oth%=V:oth$
+~C:fade_to_black%(3)
+charge_file(gfx.folder$+"fish16.pck",fish%)   ! Load packed
+taillesrc%=tspr%
+reg%(8)=fish%
+RCALL sp3_unpack%,reg%()
+charge_file(gfx.folder$+"others.spr",oth%)
+charge_file(gfx.folder$+"tables.bin",tab%)
+charge_file(gfx.folder$+"vue_27g.sp5",pack_buf%)
+taillesrc%=tspr%
+depack_img
+aff_img(depack_buf%,log%+4*160)     ! Je saute les 4 premiŠres ligne qui ne change pas
+img_to_phys
+clear_logdialzone
+fadeto!=FALSE
+set_palette(depack_buf%)
+ARRAYFILL penalty&(),0
+c64&=0        ! Compteur de clic :)
+DEFFILL 0
+PBOX 272,149,319,199                        ! ## On vire la boussole
+RC_COPY phys%,272,149,48,51 TO log%,272,149
+VSYNC
+RETURN
+> PROCEDURE puzzle_peche_main
+'
+' Q & S        = Bait position
+' Left button  = Cast power
+' Right button = Cast
+'
+LOCAL p%,p1%,p2%
+DIM x1&(5),y1&(5),s1&(5)
+p%=tab%+200                   ! Ellipse 1
+p1%=tab%+420+50               ! Ellipse 2
+p2%=tab%+420+420+100          ! Ellipse 3
+j&=0
+sp&=0
+osp&=sp&
+bx&=0         ! ## X bouchon
+by&=0         ! ## Y bouchon
+cx&=50
+cy&=162
+fx&=272       ! # X poissons p‚ch‚s
+fy&=150       ! # Y poissons p‚ch‚s
+fb$(0)=""
+fb$(1)=""
+fb$(2)=""
+fb$(3)=""
+'  x&(0)=PEEK(p%)
+'  y&(0)=PEEK(p%+1)
+'  x&(1)=PEEK(p1%)
+'  y&(1)=PEEK(p1%+1)
+'  x&(2)=PEEK(p2%)
+'  y&(2)=PEEK(p2%+1)
+ff%=0
+cast!=FALSE
+~XBIOS(5,L:log%,L:XBIOS(2),-1)
+HIDEM
+backcur$=""
+GET cx&,cy&,cx&+8,cy&+8,backcur$
+puzzle_peche_plot_curseur(sp&)
+RESTORE anim_bouchon
+REPEAT
+KEYTEST ff%
+IF (ff%=1966193 OR ff%=1966177) AND NOT cast!              ! q (gauche)
+IF sp&>0
+DEC sp&
+puzzle_peche_plot_curseur(sp&)
+ENDIF
+ELSE IF ff%=2031731 AND NOT cast!            ! s (droite)
+IF sp&<3
+INC sp&
+puzzle_peche_plot_curseur(sp&)
+ENDIF
+ENDIF
+IF cast!=FALSE AND MOUSEK=1 AND j&<128      ! Puissance du lanc‚
+ADD j&,4
+ELSE IF cast!=FALSE AND j&>0
+SUB j&,4
+ENDIF
+'    PRINT "4.";
+puzzle_peche_jauge(j&)
+'    PRINT "5.";
+IF MOUSEK>1 AND cast!=FALSE                 ! Lanc‚ !
+cast!=TRUE
+RESTORE anim_bouchon
+bx&=cx&+sp&*56
+by&=120-INT(j&/32)*32
+ENDIF
+'
+' #### On s'occupe maintenant des poissons ! ####
+'
+' ## Poisson 0 ##
+'    PRINT "50.";
+IF penalty&(0)=0
+'      PRINT "51.";
+lx&=x1&(0)
+'      PRINT "511.";
+ly&=y1&(0)
+'      PRINT "52.";
+IF BYTE{p%}=0 AND BYTE{p%+1}=0
+p%=tab%
+ENDIF
+'      PRINT "53.";
+x1&(0)=BYTE{p%}
+y1&(0)=BYTE{p%+1}
+ADD p%,2
+'      PRINT "53.";
+s1&(0)=@puzzle_peche_calcul_angle(lx&-x1&(0),ly&-y1&(0))
+'      PRINT "54.";
+ENDIF
+'
+' ## Poisson 1 ##
+IF penalty&(1)=0
+lx&=x1&(1)
+ly&=y1&(1)
+IF PEEK(p1%)=0 AND PEEK(p1%+1)=0
+p1%=tab%+420
+ENDIF
+x1&(1)=PEEK(p1%)
+y1&(1)=PEEK(p1%+1)
+ADD p1%,2
+'      PRINT "531.";
+s1&(1)=@puzzle_peche_calcul_angle(lx&-x1&(1),ly&-y1&(1))
+'      PRINT "541.";
+ENDIF
+'
+' ## Poisson 2 ##
+IF penalty&(2)=0
+lx&=x1&(2)
+ly&=y1&(2)
+IF PEEK(p2%)=0 AND PEEK(p2%+1)=0
+p2%=tab%+840
+ENDIF
+x1&(2)=PEEK(p2%)
+y1&(2)=PEEK(p2%+1)
+ADD p2%,2
+'      PRINT "55.";
+s1&(2)=@puzzle_peche_calcul_angle(lx&-x1&(2),ly&-y1&(2))
+'      PRINT "56.";
+ENDIF
+'
+'    PRINT "6.";
+puzzle_peche_save_backs       ! ## sauver tout les fonds ##
+'    PRINT "7.";
+puzzle_peche_plot_fishs
+'    PRINT "8.";
+IF cast!
+puzzle_peche_plot_bouchon           ! ## On a lanc‚ ##
+puzzle_peche_check_colide
+ENDIF
+'    PRINT "9.";
+puzzle_peche_plot_all_in_phys
+'    PRINT "a.";
+puzzle_peche_restore_backs
+UNTIL ff%=3866624 OR penalty&(3)=3         ! F1 to exit
+~XBIOS(5,L:XBIOS(2),L:XBIOS(2),-1)
+IF penalty&(3)=3        ! On a captur‚ 3 poissons :)
+nst|=3
+gere_sacados("POISSON",0)
+flag|(25)=1
+ELSE
+nst|=2
+gere_sacados("VER",0)
+ENDIF
+RETURN
+> PROCEDURE puzzle_peche_save_backs
+LOCAL n&
+FOR n&=0 TO 2
+GET x1&(n&),y1&(n&),x1&(n&)+31,y1&(n&)+31,fb$(n&)       ! fishs back
+NEXT n&
+IF cast! OR ab&<0
+GET bx&,by&,bx&+15,by&+15,fb$(3)      ! float
+ENDIF
+RETURN
+> PROCEDURE puzzle_peche_plot_curseur(sp&)
+'
+' Affichage du curseur bas !
+' au spot sp& (0-3)
+'
+IF sp&>=0 AND sp&<4
+PUT cx&+osp&*56,cy&,backcur$
+GET cx&+sp&*56,cy&,cx&+(sp&*56)+8,cy&+8,backcur$
+PUT cx&+sp&*56,cy&,pe$
+RC_COPY log%,cx&,cy&,250,8 TO phys%,cx&,cy&
+osp&=sp&
+ENDIF
+RETURN
+> PROCEDURE puzzle_peche_check_colide
+LOCAL n&
+FOR n&=0 TO 2
+IF ABS(x1&(n&)-bx&)<10 AND ABS(y1&(n&)-by&)<10 AND penalty&(n&)=0 AND cast!
+penalty&(n&)=1
+RESTORE anim_touche
+ENDIF
+IF penalty&(n&)=1
+puzzle_peche_decathlon_style
+IF c64&>3 THEN      ! ## Et biiiiim, poisson dans la musette :)
+penalty&(n&)=0
+RESTORE anim_bouchon
+c64&=0
+j&=0
+cast!=FALSE
+puzzle_peche_one_more_fish
+ab&=-1                  ! ## Pour forcer la restitution du fond
+ENDIF
+ENDIF
+NEXT n&
+RETURN
+> PROCEDURE puzzle_peche_plot_bouchon
+'
+' Affichage & animation du bouchon (16x16)
+' dans la zone selon vitesse (0-4) & position curseur
+'
+LOCAL m$,s$
+READ ab&
+IF ab&=-1
+cast!=FALSE
+c64&=0
+j&=0
+penalty&(0)=0
+penalty&(1)=0
+penalty&(2)=0
+ELSE IF ab&=-2
+cast!=FALSE
+c64&=0
+j&=0
+penalty&(0)=0
+penalty&(1)=0
+penalty&(2)=0
+ELSE
+m$=MID$(oth$,1+(ab&*268),134)               ! Msk
+s$=MID$(oth$,1+(ab&*268)+134,134)           ! Spr
+PUT bx&,by&,m$,1          ! Plot Mask
+PUT bx&,by&,s$,7          ! Plot Spr
+ENDIF
+anim_bouchon:
+DATA 0,0,1,1,2,2,3,3
+DATA 0,0,1,1,2,2,3,3
+DATA 0,0,1,1,2,2,3,3
+DATA 0,0,1,1,2,2,3,3
+DATA 0,0,1,1,2,2,3,3
+DATA 0,0,1,1,2,2,3,3
+DATA -1
+anim_touche:
+DATA 3,3,4,4,3,3,4,4
+DATA 3,3,4,4,3,3,4,4
+DATA -2
+RETURN
+> PROCEDURE puzzle_peche_plot_fishs
+'
+' puzzle peche … la ligne
+' Spr en 32x32 = 518 octets (1036 = Msk+Spr)
+'
+' x&,y&,s& (PosX, PosY, Spr)
+'
+LOCAL m$,s$,n&
+FOR n&=0 TO 2
+m$=MID$(fish$,1+(s1&(n&)*1036),518)               ! Msk
+s$=MID$(fish$,1+(s1&(n&)*1036)+518,518)           ! Spr
+PUT x1&(n&),y1&(n&),m$,1          ! Plot Mask
+PUT x1&(n&),y1&(n&),s$,7          ! Plot Spr
+NEXT n&
+RETURN
+> PROCEDURE puzzle_peche_plot_all_in_phys
+LOCAL n&
+FOR n&=0 TO 2 ! ## Les poissons
+RC_COPY log%,x1&(n&)-4,y1&(n&)-4,40,40 TO phys%,x1&(n&)-4,y1&(n&)-4
+VSYNC
+NEXT n&
+IF cast! OR ab&<0      ! ## Le bouchon SUR les poissons
+RC_COPY log%,bx&,by&,16,16 TO phys%,bx&,by&
+VSYNC
+ENDIF
+RETURN
+> PROCEDURE puzzle_peche_restore_backs
+LOCAL n&
+FOR n&=0 TO 2
+PUT x1&(n&),y1&(n&),fb$(n&)
+NEXT n&
+IF cast! OR ab&<0
+PUT bx&,by&,fb$(3)
+ab&=0
+ENDIF
+RETURN
+> PROCEDURE puzzle_peche_jauge(j&)
+DEFFILL 3             ! couleur puissance
+PBOX 61,170,61+j&,178
+DEFFILL 15            ! couleur vide
+PBOX 62+j&,170,180,178
+RC_COPY log%,61,170,120,9 TO phys%,61,170
+VSYNC
+RETURN
+> FUNCTION puzzle_peche_calcul_angle(x&,y&)
+s&=0
+IF x&>0            ! <-
+s&=4
+ENDIF
+IF x&<0            ! ->
+s&=12
+ENDIF
+IF y&>0            ! /\
+s&=8
+ENDIF
+IF y&<0            ! \/
+s&=0
+ENDIF
+IF x&>0 AND y&>0  ! <- + /\
+s&=6
+ENDIF
+IF x&<0 AND y&<0  ! -> + /\
+s&=14
+ENDIF
+IF x&>0 AND y&<0  ! -> + \/
+s&=2
+ENDIF
+IF x&<0 AND y&>0  ! <- + \/
+s&=10
+ENDIF
+RETURN s&
+ENDFUNC
+> PROCEDURE puzzle_peche_decathlon_style
+'
+' On se la joue Decathlon C64 !!
+' Quand le joueur a une touche, il doit d‚truire le bouton gauche
+' de la souris pour f‚rer le poisson :D
+'
+IF MOUSEK<>0 AND antir!=FALSE
+INC c64&
+'    ATEXT 16,16,0,STR$(penalty&(3))
+RC_COPY log%,16,16,8,8 TO phys%,16,16
+antir!=TRUE
+ENDIF
+IF MOUSEK=0 AND antir!=TRUE
+antir!=FALSE
+ENDIF
+RETURN
+> PROCEDURE puzzle_peche_one_more_fish
+LOCAL m$,s$
+m$=MID$(oth$,1+5*268,390)               ! Msk
+s$=MID$(oth$,1+5*268+390,390)           ! Spr
+PUT fx&,fy&,m$,1          ! Plot Mask
+PUT fx&,fy&,s$,7          ! Plot Spr
+RC_COPY log%,fx&,fy&,48,48 TO phys%,fx&,fy&
+ADD fx&,16
+INC penalty&(3)
+IF penalty&(3)=3
+' ## On fait flasher les 3 poissons et on sort !
+ENDIF
+RETURN
+> PROCEDURE puzzle_peche_restore
+IF MFREE(tab%)<>0
+PRINT "Mfree(tab%) error !!"
+ENDIF
+ERASE x1&(),y1&(),s1&()
+fish$=""
+oth$=""
+ff%=0         ! Touche commande KEYTEST
+RETURN
+'
+' ## Puzzle Altos
+> PROCEDURE puzzle_altos_init
+'
+' ## ATTENTION, il faut lib‚rer la table des digits charg‚e !!!! #####
+'
+atab%=MALLOC(48)
+IF atab%=0
+PRINT "Malloc atab% error !!"
+~INP(2)
+ENDIF
+symb$=STRING$(32600,0)
+symb%=V:symb$
+~C:fade_to_black%(3)
+charge_file(gfx.folder$+"symboles.pck",symb%)
+taillesrc%=tspr%
+reg%(8)=symb%
+RCALL sp3_unpack%,reg%()
+IF ste!
+nbspl|=0
+digptr%=digbuf%
+charge_spl("wall2")   ! Digit 0
+charge_spl("clic2")   ! Digit 1
+charge_spl("error2")  ! Digit 2
+ENDIF
+puzzle_altos_table
+~XBIOS(5,L:log%,L:XBIOS(2),-1)
+charge_file(gfx.folder$+"vue_39g.sp5",pack_buf%)
+taillesrc%=tspr%
+depack_img
+aff_img(depack_buf%,log%+4*160)     ! Je saute les 4 premiŠres ligne qui ne change pas
+img_to_phys
+fadeto!=FALSE
+set_palette(depack_buf%)
+ARRAYFILL a&(),0              ! ## r‚init. combinaison
+RETURN
+> PROCEDURE puzzle_altos_main
+LOCAL b&
+r&=0                     ! ## Nb de symboles appuy‚s
+puzzle_altos_plot_symbols
+VSYNC
+BMOVE log%,phys%,32000
+~XBIOS(5,L:XBIOS(2),L:XBIOS(2),-1)
+DEFMOUSE 5
+SHOWM
+DO
+IF MOUSEK
+b&=@puzzle_altos_check_button(MOUSEX,MOUSEY)
+IF b&<255
+puzzle_altos_plot_pushed_button(b&)
+IF PEEK(atab%+b&)>47
+a&(r&)=PEEK(atab%+b&)
+INC r&
+IF r&=4 AND a&(0)=48 AND a&(1)=49 AND a&(2)=50 AND a&(3)=51      ! ## You win
+streplayon(spl%(0,0),spl%(0,1),1)
+flag|(26)=1
+EXIT IF TRUE
+ELSE IF r&=4         ! ## You loose
+r&=0
+PAUSE 20
+nst|=3
+streplayon(spl%(2,0),spl%(2,1),1)
+plot_current_dial
+puzzle_altos_reset_all
+ENDIF
+ENDIF
+ENDIF
+'      ATEXT 10,10,0,STR$(b&)+" "+STR$(PEEK(atab%+b&))
+EXIT IF b&=255
+PAUSE 10
+ENDIF
+LOOP
+x&(0)=0
+IF flag|(26)=1                  ! Combinaison entr‚e correcte :)
+~XBIOS(5,L:log%,L:XBIOS(2),-1)
+~C:fade_to_black%(3)                      ! Fade to Black
+PAUSE 50
+script_currentvue("40")             ! AccŠs … la vue40
+nst|=0
+clear_logdialzone
+'    fadeto!=TRUE                              ! Fade to Mr White ;-)
+'    set_palette(depack_buf%)
+~XBIOS(5,L:XBIOS(2),L:XBIOS(2),-1)
+x&(0)=1
+ENDIF
+RETURN
+> PROCEDURE puzzle_altos_table
+'
+' Je m‚lange la table des symboles … chaque entr‚e
+' (avec une petite astuce ;-)
+' Et je mets al‚atoirement les 4 symboles
+' (faut pas d‚conner non plus ;)
+'
+LOCAL n%,a%,b%,t%
+n%=INT(RND(1)*48)
+t%=atab%+n%
+RESTORE alea
+FOR a%=0 TO 47
+READ b%
+IF t%>atab%+47
+t%=atab%
+ENDIF
+POKE t%,b%
+INC t%
+NEXT a%
+alea:
+DATA 1,13,22,4,19,37,38,33,2,41,3,20,9,24,15,39,11,21,17,36,32,29
+DATA 43,0,12,25,6,10,7,18,8,45,34,40,35,28,30,14,27,44,26,42,5,23,31
+DATA 16,46,47
+RETURN
+> PROCEDURE puzzle_altos_plot_symbols
+LOCAL x%,y%,n%,a%,b%,s$
+n%=0
+y%=10
+FOR b%=0 TO 5         ! ## 6 lignes
+x%=48
+FOR a%=0 TO 7       ! ## 8 colonnes
+s$=MID$(symb$,PEEK(atab%+n%)*326+1,326)         ! ## Biiim un symbole
+PUT x%,y%,s$
+INC n%
+ADD x%,22
+NEXT a%
+ADD y%,22
+NEXT b%
+VSYNC
+s$=MID$(symb$,97*326+1,326)   ! ## Exit
+PUT 230,10,s$
+s$=MID$(symb$,99*326+1,326)   ! ## Reset Atari
+PUT 230,120,s$
+RETURN
+> FUNCTION puzzle_altos_check_button(x&,y&)
+' x&,y& = Mouse coord
+' ox&, oy& = Coin sup gauche
+' lx&, ly& = Largeur, hauteur d'un bouton
+'
+LOCAL a&,b&,v&,ox&,oy&,lx&,ly&
+ox&=48
+oy&=10
+lx&=22
+ly&=22
+IF x&>=ox& AND x&<ox&+(lx&*8) AND y&>=oy& AND y&<oy&+(ly&*6) THEN
+a&=(x&-ox&)/lx&
+b&=(y&-oy&)/ly&
+v&=a&+b&*8
+RETURN v&
+ELSE IF x&>230 AND x&<230+20 AND y&>10 AND y&<10+20   ! Exit
+puzzle_altos_plot_pushed_exit
+PAUSE 20
+RETURN 255
+ELSE IF x&>230 AND x&<230+20 AND y&>120 AND y&<120+20   ! Reset
+puzzle_altos_plot_pushed_reset
+PAUSE 10
+puzzle_altos_reset_all
+ENDIF
+RETURN 256
+ENDFUNC
+> PROCEDURE puzzle_altos_plot_pushed_button(a&)
+LOCAL s$,o%,x&,y&,p&
+o%=0
+p&=PEEK(atab%+a&)
+IF p&<48              ! ## Je clic
+o%=15648
+POKE atab%+a&,p&+48
+streplayon(spl%(1,0),spl%(1,1),1)
+ELSE
+DEC r&
+SUB p&,48           ! ## Je d‚clic :)
+POKE atab%+a&,p&
+streplayon(spl%(1,0),spl%(1,1),1)
+ENDIF
+x&=48+(MOD(a&,8)*22)
+y&=10+(INT(a&/8)*22)
+s$=MID$(symb$,o%+(p&*326)+1,326)         ! ## Biiim un symbole
+PUT x&,y&,s$
+RETURN
+> PROCEDURE puzzle_altos_plot_pushed_reset
+LOCAL s$
+s$=MID$(symb$,98*326+1,326)   ! ## Reset Atari On
+PUT 230,120,s$
+streplayon(spl%(2,0),spl%(2,1),1)
+RETURN
+> PROCEDURE puzzle_altos_plot_pushed_exit
+LOCAL s$
+s$=MID$(symb$,96*326+1,326)   ! ## Exit On
+PUT 230,10,s$
+RETURN
+> PROCEDURE puzzle_altos_reset_all
+LOCAL a&,b&
+FOR a&=0 TO 47
+b&=PEEK(atab%+a&)
+IF b&>47
+POKE atab%+a&,b&-48
+ENDIF
+NEXT a&
+puzzle_altos_plot_symbols
+r&=0
+RETURN
+> PROCEDURE puzzle_altos_restore
+IF MFREE(atab%)<>0
+PRINT "Mfree(atab%) error !!"
+ENDIF
+symb$=""
+RETURN
+'
+' ## Puzzle Bousier
+> PROCEDURE puzzle_bousier_init
+OUT 4,18
+backcur$=""
+bouz$=STRING$(7*1024,0)
+bouz%=V:bouz$
+~C:fade_to_black%(3)
+charge_file(gfx.folder$+"spr59.spr",bouz%)
+charge_file(gfx.folder$+"vue_59g.sp5",pack_buf%)
+taillesrc%=tspr%
+depack_img
+aff_img(depack_buf%,log%+4*160)
+img_to_phys
+clear_logdialzone
+fadeto!=TRUE
+set_palette(depack_buf%)
+RESTORE bous_seq
+'  penalty&(0)=5        ! ## Le joueur d‚marre avec une p‚nalit‚
+RETURN
+> PROCEDURE puzzle_bousier_main
+LOCAL px&,py&,n&
+sp&=0
+osp&=sp&
+cx&=12
+cy&=22
+cast!=FALSE
+colide!=FALSE
+track!=FALSE
+~XBIOS(5,L:log%,L:XBIOS(2),-1)
+DEFMOUSE 5
+FOR n&=0 TO 3                 ! Init les XY & sprs des 4 bousiers
+x&(n&)=232
+y&(n&)=22+n&*30
+s&(n&)=0
+fb$(n&)=""
+NEXT n&
+fb$(4)=""
+'  GET cx&,cy&+sp&*30,cx&+16,cy&+(sp&*30)+16,backcur$
+'  puzzle_bousier_plot_rock
+tt=TIMER
+REPEAT
+KEYTEST ff%
+IF ff%=3735584 AND track!=FALSE AND colide!=FALSE        ! ## Cast
+track!=TRUE
+ELSE IF ff%=3735584 AND track!=TRUE AND colide!=FALSE AND MIN(x&(0),x&(1),x&(2),x&(3))>50 ! # CAST
+'      ATEXT 16,16,0,"sp="+STR$(sp&)
+x&(5)=x&(sp&)
+y&(5)=y&(sp&)+4
+l&=(x&(sp&)-50)/2
+h&=20
+s=0.15
+n=0
+track!=FALSE
+cast!=TRUE
+colide!=TRUE
+PUT cx&,cy&+osp&*30,backcur$
+RC_COPY log%,cx&,cy&,16,16 TO phys%,cx&,cy&
+ENDIF
+IF track!
+puzzle_bousier_choose_track
+ENDIF
+puzzle_bousier_move_all
+IF cast!
+puzzle_bousier_parabole_rock       ! ## On a lanc‚ ##
+ENDIF
+IF colide!
+puzzle_bousier_check_colide
+ENDIF
+puzzle_bousier_save_backs       ! ## sauver tout les fonds ##
+puzzle_bousier_plot_all
+puzzle_bousier_plot_all_in_phys
+puzzle_bousier_restore_backs
+EXIT IF MIN(x&(0),x&(1),x&(2),x&(3))<48     ! ## Un bousier gagne ?
+UNTIL ff%=3866624         ! F1 to exit
+IF x&(0)<48
+flag|(31)=2         ! ## Player wins :)
+nst|=8
+script_objetenmain("HACHE")
+'    gere_sacados("HACHE",0)
+ELSE
+flag|(31)=1         ! ## Atari Wins :D
+nst|=10
+ENDIF
+~XBIOS(5,L:XBIOS(2),L:XBIOS(2),-1)
+RETURN
+> PROCEDURE puzzle_bousier_save_backs
+LOCAL n&,m$,s$
+IF cast!
+GET x&(4),y&(4),x&(4)+16,y&(4)+16,fb$(4)
+ENDIF
+IF trick!                             ! ## Je claque la pierre en toute fin de parabole
+' afin quelle soit stock‚e dans le fond du bousier !!
+m$=MID$(bouz$,1+8*780,134)               ! Msk pierre
+s$=MID$(bouz$,1+8*780+134,134)           ! Spr pierre
+PUT x&(4),y&(4),m$,1
+PUT x&(4),y&(4),s$,7
+trick!=FALSE
+ENDIF
+FOR n&=0 TO 3
+GET x&(n&),y&(n&),x&(n&)+24,y&(n&)+24,fb$(n&)
+NEXT n&
+RETURN
+> PROCEDURE puzzle_bousier_plot_all
+LOCAL m$,s$,n&
+IF cast!
+m$=MID$(bouz$,1+8*780,134)               ! Msk pierre
+s$=MID$(bouz$,1+8*780+134,134)           ! Spr pierre
+PUT x&(4),y&(4),m$,1
+PUT x&(4),y&(4),s$,7
+ENDIF
+FOR n&=0 TO 3
+m$=MID$(bouz$,1+(s&(n&)*780),390)               ! Msk
+s$=MID$(bouz$,1+(s&(n&)*780)+390,390)           ! Spr
+PUT x&(n&),y&(n&),m$,1          ! Plot Mask
+PUT x&(n&),y&(n&),s$,7          ! Plot Spr
+NEXT n&
+RETURN
+> PROCEDURE puzzle_bousier_plot_all_in_phys
+LOCAL n&
+IF cast!
+RC_COPY log%,x&(4)-12,y&(4)-12,32,32 TO phys%,x&(4)-12,y&(4)-12
+ENDIF
+FOR n&=0 TO 3 ! ## Les bousiers
+RC_COPY log%,x&(n&)-4,y&(n&)-4,32,32 TO phys%,x&(n&)-4,y&(n&)-4
+NEXT n&
+VSYNC
+RETURN
+> PROCEDURE puzzle_bousier_move_all
+LOCAL n&
+FOR n&=0 TO 3
+IF INT(RND(1)*2)=1
+IF penalty&(n&)=0
+DEC x&(n&)              ! ## Il bouge en X
+READ s&(n&)             ! ## Il bouge ses papattes
+IF s&(n&)=99
+RESTORE bous_seq
+READ s&(n&)
+ENDIF
+IF n&=0                   ! ## Si bousier du joueur, ligne 2
+ADD s&(n&),4
+ENDIF
+ELSE
+DEC penalty&(n&)
+READ s&(n&)             ! ## Il bouge ses papattes
+IF s&(n&)=99
+RESTORE bous_seq
+READ s&(n&)
+ENDIF
+ENDIF
+ENDIF
+NEXT n&
+bous_seq:
+DATA 0,1,0,2,99
+RETURN
+> PROCEDURE puzzle_bousier_plot_rock
+'
+' Affichage de la pierre !
+' au spot sp& (0-3)
+'
+LOCAL m$,s$
+PUT cx&,cy&+osp&*30,backcur$
+GET cx&,cy&+sp&*30,cx&+16,cy&+(sp&*30)+16,backcur$
+m$=MID$(bouz$,1+8*780,134)               ! Msk pierre
+s$=MID$(bouz$,1+8*780+134,134)           ! Spr pierre
+PUT cx&,cy&+sp&*30,m$,1
+PUT cx&,cy&+sp&*30,s$,7
+RC_COPY log%,cx&,cy&,16,150 TO phys%,cx&,cy&
+osp&=sp&
+RETURN
+> PROCEDURE puzzle_bousier_parabole_rock
+ADD n,s
+IF n>PI+s*2
+cast!=FALSE
+trick!=TRUE
+ELSE
+x&(4)=20-l&*(COS(n))+l&
+y&(4)=y&(5)-h&*(SIN(n))
+ENDIF
+RETURN
+> PROCEDURE puzzle_bousier_restore_backs
+LOCAL n&
+FOR n&=0 TO 3
+PUT x&(n&),y&(n&),fb$(n&)
+NEXT n&
+IF cast!
+PUT x&(4),y&(4),fb$(4)
+ENDIF
+RETURN
+> PROCEDURE puzzle_bousier_check_colide
+' ## On va checker si un bousier cogne une pierre
+'
+IF x&(sp&)<x&(4)+12
+colide!=FALSE
+track!=FALSE
+penalty&(sp&)=10
+ENDIF
+RETURN
+> PROCEDURE puzzle_bousier_choose_track
+' ## On va devoir ralentir un peu ;)
+'
+LOCAL n&
+n&=2
+IF ste!
+n&=15
+ENDIF
+IF TIMER>tt+n&
+INC sp&
+tt=TIMER
+ENDIF
+IF sp&>3
+sp&=0
+ENDIF
+puzzle_bousier_plot_rock
+RETURN
+> PROCEDURE puzzle_bousier_restore
+bouz$=""
+ff%=0         ! Touche commande KEYTEST
+OUT 4,8
+RETURN
+'
+' ## Puzzle Pieuvre
+> PROCEDURE puzzle_pieuvre_init
+octo$=STRING$(10*1024,0)
+octo%=V:octo$
+~C:fade_to_black%(3)
+IF ste!
+nbspl|=0
+digptr%=digbuf%
+charge_spl("octo")    ! Digit 0
+charge_spl("clic2")   ! Digit 1
+charge_spl("error2")  ! Digit 2
+ENDIF
+charge_file(gfx.folder$+"spr14.pck",octo%)
+taillesrc%=tspr%
+reg%(8)=octo%
+RCALL sp3_unpack%,reg%()
+charge_file(gfx.folder$+"vue_14g.sp5",pack_buf%)
+taillesrc%=tspr%
+depack_img
+fadetoblack!=TRUE              ! Pour empecher la palette de s'initialiser now
+aff_img(depack_buf%,log%+4*160)
+img_to_phys
+clear_logdialzone
+fadeto!=FALSE
+offbigb%=780                  ! Offset Big buttons
+offlitb%=offbigb%+262*2       ! Offset little buttons
+offocto%=offlitb%+134*4       ! Offset octopus
+offrom%=offocto%+966*6        ! Offset romains
+cr%(2)=RAND(6)                ! # Soluce pos Octo
+'  ATEXT 10,100,0,"rom$ = "+rom$
+'  ATEXT 10,108,0,"dec$ = "+dec$
+'  ATEXT 10,106,0,"cr%(2) = "+STR$(cr%(2))
+RETURN
+> PROCEDURE puzzle_pieuvre_main
+LOCAL o$,a$,b0$,b1$
+~XBIOS(5,L:log%,L:XBIOS(2),-1)
+ox%=0
+oy%=150
+x&(0)=0
+GET 0,0,6*24,24,b0$             ! Sauver fond romains
+GET ox%,oy%,ox%+6*48,oy%+40,b1$ ! Sauver fond octos
+FOR n%=0 TO 5                 ! On plot les 6 chiffres en Log%
+o$=MID$(octo$,1+offrom%+n%*390,390)               ! Spr
+PUT n%*24,0,o$          ! Plot Rom
+NEXT n%
+FOR n%=0 TO 5                 ! On plot les 6 Octos en Log%
+o$=MID$(octo$,1+offocto%+n%*966,966)               ! Spr
+PUT ox%+n%*48,oy%,o$          ! Plot Octo
+NEXT n%
+IF cr%(2)<>5                  ! Je d‚place la bonne Octo :)
+o$=MID$(octo$,1+offocto%+5*966,966)               ! good octo
+a$=MID$(octo$,1+offocto%+cr%(2)*966,966)          ! bad octo
+PUT ox%+5*48,oy%,a$
+PUT ox%+cr%(2)*48,oy%,o$
+ENDIF
+~XBIOS(5,L:XBIOS(2),L:XBIOS(2),-1)
+DEFMOUSE 5
+SHOWM
+co%=0         ! ## Current octo affich‚e
+ov%=0         ! ## Octo vis‚e scroll
+cr%(0)=0        ! ## current Rom1
+cr%(1)=0        ! ## current Rom2
+rv%(0)=0        ! ## rom1 vis‚
+rv%(1)=0        ! ## rom2 vis‚
+rx%(0)=88
+ry%(0)=96
+rx%(1)=160
+ry%(1)=96
+'
+VSYNC
+RC_COPY log%,ox%,oy%,48,40 TO phys%,112,24    ! Octo de base
+VSYNC
+RC_COPY log%,0,0,24,24 TO phys%,rx%(0),ry%(0)    ! Rom1 de base
+VSYNC
+RC_COPY log%,0,0,24,24 TO phys%,rx%(1),ry%(1)    ! Rom2 de base
+ox%=0
+b&=0
+set_palette(depack_buf%)      ! Palette au dernier moment (clean)
+REPEAT
+ff%=PEEK(&HFFFFC02)
+~@puzzle_pieuvre_check_keyboard(ff%)
+IF MOUSEK
+b&=@puzzle_pieuvre_check_button(MOUSEX,MOUSEY)
+puzzle_pieuvre_plot_pushed_button(b&)
+'      ATEXT 0,100,0,"b&= "+STR$(b&)
+ENDIF
+UNTIL b&=134 OR x&(0)=1         ! EXIT or Win to exit
+'
+~XBIOS(5,L:log%,L:XBIOS(2),-1)
+PUT 0,0,b0$         ! Restaure fond romains
+PUT 0,150,b1$       ! Restaure fond octos
+IF x&(0)=1
+nst|=4
+plot_current_dial
+PAUSE 150
+~C:fade_to_black%(3)                      ! Fade to Black
+PAUSE 50
+script_currentvue("15")             ! AccŠs vue15
+nst|=0
+clear_logdialzone
+ELSE
+script_stopzik("")
+script_playzik("plgop102")
+ENDIF
+~XBIOS(5,L:XBIOS(2),L:XBIOS(2),-1)
+RETURN
+> PROCEDURE puzzle_pieuvre_scroll_octo(ov%)
+'
+' ## ov% = Pieuvre vis‚e (0 - 5)
+'
+LOCAL n%,x%,y%,sx%,sy%
+x%=112        ! X Octo
+y%=24        ! Y Octo
+sx%=48        ! Sixe X
+sy%=40        ! Size Y
+oy%=150
+IF ov%>co%              ! >
+streplayon(spl%(0,0),spl%(0,1)-4096,1)
+ox%=co%*sx%
+FOR n%=1 TO sx%
+RC_COPY log%,ox%+n%,oy%,sx%,sy% TO phys%,x%,y%
+VSYNC
+NEXT n%
+co%=ov%
+ELSE IF ov%<co%         ! <
+streplayon(spl%(0,0),spl%(0,1)-4096,1)
+ox%=co%*sx%
+FOR n%=1 TO sx%
+RC_COPY log%,ox%-n%,oy%,sx%,sy% TO phys%,x%,y%
+VSYNC
+NEXT n%
+co%=ov%
+ENDIF
+RETURN
+> PROCEDURE puzzle_pieuvre_scroll_rom(v%,r%)
+'
+' ##  v% = chiffre vis‚ (0 - 5)
+' ##  r% = rom1 /  rom2 (0 - 1)
+'
+LOCAL n%,x%,y%,sx%,sy%
+x%=rx%(r%)        ! X rom1
+y%=ry%(r%)        ! Y rom1
+sx%=24        ! Sixe X
+sy%=24        ! Size Y
+oy%=0
+IF v%>cr%(r%)              ! >
+streplayon(spl%(0,0),spl%(0,1)-6000,1)
+ox%=cr%(r%)*sx%
+FOR n%=1 TO sx%
+RC_COPY log%,ox%+n%,oy%,sx%,sy% TO phys%,x%,y%
+VSYNC
+NEXT n%
+cr%(r%)=v%
+ELSE IF v%<cr%(r%)         ! <
+streplayon(spl%(0,0),spl%(0,1)-6000,1)
+ox%=cr%(r%)*sx%
+FOR n%=1 TO sx%
+RC_COPY log%,ox%-n%,oy%,sx%,sy% TO phys%,x%,y%
+VSYNC
+NEXT n%
+cr%(r%)=v%
+ENDIF
+RETURN
+> FUNCTION puzzle_pieuvre_check_keyboard(ff%)
+IF ff%=75 AND co%>0                    ! # <
+DEC ov%
+puzzle_pieuvre_scroll_octo(ov%)
+ELSE IF ff%=77 AND co%<5               ! # >
+INC ov%
+puzzle_pieuvre_scroll_octo(ov%)
+ENDIF
+RETURN TRUE
+ENDFUNC
+> FUNCTION puzzle_pieuvre_check_button(x&,y&)
+' x&,y& = Mouse coord
+' ox&, oy& = Coin sup gauche
+' lx&, ly& = Largeur, hauteur d'un bouton
+'
+' # return 128 = clic pieuvre <
+' # return 129 = clic pieuvre >
+' # return 130 = clic romain1 <
+' # return 131 = clic romain1 >
+' # return 132 = clic romain2 <
+' # return 133 = clic romain2 >
+' # return 134 = clic EXIT
+' # return 135 = clic CONFIRM
+'
+LOCAL a&,b&,v&,bx&,by&,lx&,ly&
+RESTORE buttonsxy
+v&=0
+DO
+READ bx&,by&,lx&,ly&
+EXIT IF bx&=-1
+IF x&>bx& AND x&<bx&+lx& AND y&>by& AND y&<by&+ly&   ! Pieuvre <
+RETURN 128+v&
+ENDIF
+INC v&
+LOOP
+RETURN 256
+buttonsxy:
+' ## X, Y, SizeX, SizeY ##
+'
+DATA 86,40,24,16,170,40,24,16
+buttonromcurs:
+DATA 67,106,16,16,121,106,16,16,139,106,16,16,193,106,16,16
+buttonexit:
+DATA 232,8,24,24
+buttonconfirm:
+DATA 232,120,24,24
+DATA -1,-1,-1,-1
+ENDFUNC
+> PROCEDURE puzzle_pieuvre_plot_pushed_button(b&)
+'
+' Plot bouton appuy‚
+'
+LOCAL x&,y&,l&,h&,dummy&,b$,s$
+~XBIOS(5,L:log%,L:XBIOS(2),-1)
+IF b&=128 AND co%>0                   ! ## < octo
+DEC ov%
+puzzle_pieuvre_scroll_octo(ov%)
+ELSE IF b&=129 AND co%<5              ! ## > octo
+INC ov%
+puzzle_pieuvre_scroll_octo(ov%)
+ELSE IF b&=130 AND cr%(0)>0           ! ## < rom1
+DEC rv%(0)
+puzzle_pieuvre_scroll_rom(rv%(0),0)
+ELSE IF b&=131 AND cr%(0)<5           ! ## > rom1
+INC rv%(0)
+puzzle_pieuvre_scroll_rom(rv%(0),0)
+ELSE IF b&=132 AND cr%(1)>0           ! ## < rom2
+DEC rv%(1)
+puzzle_pieuvre_scroll_rom(rv%(1),1)
+ELSE IF b&=133 AND cr%(1)<5           ! ## > rom2
+INC rv%(1)
+puzzle_pieuvre_scroll_rom(rv%(1),1)
+ENDIF
+SELECT b&
+CASE 134      ! ## EXIT
+streplayon(spl%(1,0),spl%(1,1),1)
+RESTORE buttonexit
+READ x&,y&,l&,h&
+GET x&,y&,x&+l&,y&+h&,b$
+s$=MID$(octo$,1,390)
+PUT x&,y&,s$
+RC_COPY log%,x&,y&,l&,h& TO phys%,x&,y&
+PAUSE 20
+PUT x&,y&,b$
+RC_COPY log%,x&,y&,l&,h& TO phys%,x&,y&
+PAUSE 20
+CASE 135      ! ## Confirm
+streplayon(spl%(1,0),spl%(1,1),1)
+RESTORE buttonconfirm
+READ x&,y&,l&,h&
+GET x&,y&,x&+l&,y&+h&,b$
+s$=MID$(octo$,1+390,390)
+PUT x&,y&,s$
+RC_COPY log%,x&,y&,l&,h& TO phys%,x&,y&
+PAUSE 20
+' ## On va checker ici si bonne combinaison ##
+puzzle_pieuvre_check_combination
+PUT x&,y&,b$
+RC_COPY log%,x&,y&,l&,h& TO phys%,x&,y&
+ENDSELECT
+~XBIOS(5,L:XBIOS(2),L:XBIOS(2),-1)
+RETURN
+> PROCEDURE puzzle_pieuvre_check_combination
+IF cr%(0)=VAL(LEFT$(rom$,1)) AND cr%(1)=VAL(RIGHT$(rom$,1)) AND cr%(2)=co%
+'    streplayon(spl%(1,0),spl%(1,1),1)
+x&(0)=1
+ELSE
+PAUSE 20
+'    nst|=3
+'    plot_current_dial
+'    script_dial("SYS10")
+streplayon(spl%(2,0),spl%(2,1),1)
+ENDIF
+RETURN
+> PROCEDURE puzzle_pieuvre_restore
+octo$=""
+RETURN
+> PROCEDURE puzzle_pieuvre_init_romain
+'
+' # Je tire ici le code romain al‚atoire
+' # Pour le puzzle de la pieuvre
+' # Ce code se retrouve grav‚ sur le tentacule
+' # trouv‚ chez Altos !
+' # Je patch donc les r‚pliques concern‚es !
+'
+LOCAL n%,r%
+RESTORE romain
+r%=RAND(22)
+FOR n%=0 TO r%
+READ rom$,dec$
+NEXT n%
+puzzle_pieuvre_tag_dialogue
+romain:
+DATA 00,002
+DATA 01,004,10,006
+DATA 02,009,20,011,22,020
+DATA 03,049,30,051,13,045,31,055
+DATA 04,099,40,101,41,105,42,110,43,150
+DATA 05,499,15,495,25,490,50,501,51,505,52,510,53,550
+RETURN
+> PROCEDURE puzzle_pieuvre_tag_dialogue
+'
+' # Attention cette routine peut etre appel‚e
+' # plusieurs fois par fichier dial en m‚moire !
+' # Au risque de ne pas trouver le Tag %%%
+' # (A moins qu'il soit pr‚sent plusieurs fois dans le dial.txt courant)
+'
+' # Compl‚ter le systŠme des TAG dans la V2. (afin de rendre les dialogues
+' # dynamiques)
+'
+LOCAL a&
+a&=INSTR(dial$,"%%%")         ! On cherche le TAG
+IF a&>1
+MID$(dial$,a&,3)=dec$         ! Dialogue custom
+ENDIF
+RETURN
+'
+' ########################
+' ### Gestion fichiers ###
+' ########################
+'
+> PROCEDURE init_palettes
+' ## Fichiers des palettes initialis‚es par le Script
+' ## (Limite de 16 palettes donc 16 lignes)
+'
+LOCAL z$
+z$=chap.folder$+"palettes.txt"
+IF EXIST(z$)
+OPEN "U",#1,z$
+RECALL #1,pal$(),16,nbpal%
+CLOSE #1
+IF info!
+ATEXT 10,ay%,0,z$+" charg‚"
+ADD ay%,6
+ENDIF
+ELSE
+PRINT AT(2,20);z$;" does not exist !"
+~INP(2)
+ENDIF
+RETURN
+> PROCEDURE init_new_defnames
+' ## Limite symbolique fix‚e … MAX 128 variables ! (maxvar&)
+' ## (Donc 128 lignes)
+'
+LOCAL z$
+z$=chap.folder$+"defnames.txt"
+IF EXIST(z$)
+OPEN "U",#1,z$
+RECALL #1,var.cmd$(),128,nbvar%
+CLOSE #1
+IF info!
+ATEXT 10,ay%,0,z$+" charg‚"
+ADD ay%,6
+ENDIF
+ELSE
+PRINT AT(2,20);z$;" does not exist !"
+~INP(2)
+ENDIF
+RETURN
+> FUNCTION recall_chapter(cch$)
+LOCAL n%
+n%=0
+IF EXIST(cch$)
+OPEN "U",#1,cch$
+RECALL #1,con$(),max_line%,n%
+ELSE
+PRINT AT(2,20);cch$;" does not exist !"
+~INP(2)
+ENDIF
+RETURN n%
+ENDFUNC
+> FUNCTION store_chapter(nbl%)
+LOCAL r&
+ALERT 3,"Save current chapter ?",2,"OUI|NON",r&
+IF r&=1
+SEEK #1,0
+STORE #1,con$(),nbl%
+CLOSE #1
+ALERT 0,"Chapter saved !",1,"OK",r&
+ELSE
+CLOSE #1
+ENDIF
+RETURN TRUE
+ENDFUNC
+> PROCEDURE charge_zne2(n$)
+' charge le fichier n$.zne
+' 256 zones MAX par .zne
+'
+LOCAL z$,a%,b%
+FOR a%=0 TO nbvue&-1                  ! ## Vider toutes les zones
+FOR b%=0 TO max_clic_per_vue&-1
+vue.clic$(a%,b%)=""
+NEXT b%
+NEXT a%
+'  FOR b%=0 TO max_digit_per_vue&-1      ! ## Vider toutes les digits
+'  spl.name$(b%)=""
+' NEXT b%
+ARRAYFILL vue.id&(),0
+ARRAYFILL vue.zclic&(),0
+z$=zne.folder$+n$+zne.ext$
+IF EXIST(z$)
+OPEN "U",#1,z$
+RECALL #1,tmp$(),256,nbz%
+CLOSE #1
+'    buf%=zne%
+ENDIF
+convert_zne(nbz%)           ! Je remplit les tableaux
+RETURN
+> PROCEDURE init_sys
+' charge le fichier sysFR.txt (selon la langue)
+' 48 messages systemes MAX (on peut augmenter)
+'
+LOCAL z$,n%,il%
+il%=48
+z$=dial.folder$+"sys"+lang$(language&)+".txt"
+IF EXIST(z$)
+OPEN "U",#1,z$
+RECALL #1,sys$(),il%,nbsys%
+CLOSE #1
+IF info!
+ATEXT 10,ay%,0,z$+" charg‚"
+ADD ay%,6
+ENDIF
+ELSE
+PRINT AT(2,20);z$;" does not exist !"
+~INP(2)
+ENDIF
+RETURN
+> PROCEDURE init_loc
+' charge le fichier loc.txt
+' 5 langues MAX (on peut augmenter)
+'
+LOCAL z$,n%,lm%
+lm%=5*5
+z$=dial.folder$+"loc.txt"
+IF EXIST(z$)
+OPEN "U",#1,z$
+RECALL #1,loc$(),lm%,nbloc%
+CLOSE #1
+IF info!
+ATEXT 10,ay%,0,z$+" charg‚"
+ADD ay%,6
+ENDIF
+ELSE
+PRINT AT(2,20);z$;" does not exist !"
+~INP(2)
+ENDIF
+RETURN
+> PROCEDURE init_combi
+' charge le fichier combi.txt
+' 8 combis MAX (on peut augmenter)
+'
+LOCAL z$
+z$=chap.folder$+"combi.txt"
+IF EXIST(z$)
+OPEN "U",#1,z$
+RECALL #1,combi$(),8,combi%
+CLOSE #1
+IF info!
+ATEXT 10,ay%,0,z$+" charg‚"
+ADD ay%,6
+ENDIF
+ELSE
+PRINT AT(2,20);z$;" does not exist !"
+~INP(2)
+ENDIF
+RETURN
+> PROCEDURE init_bulle
+LOCAL z$
+z$=dial.folder$+"bulle"+lang$(language&)+".txt"
+IF EXIST(z$)
+OPEN "U",#1,z$
+RECALL #1,bulle$(),64,bulle%
+CLOSE #1
+IF info!
+ATEXT 10,ay%,0,z$+" charg‚"
+ADD ay%,6
+ENDIF
+ELSE
+PRINT AT(2,20);z$;" does not exist !"
+~INP(2)
+ENDIF
+RETURN
+> PROCEDURE convert_zne(nbz%)
+' #############################################
+' #
+' # Dans le .zne, diverses zones sont cod‚es :
+' # '#' - Indique une zone de clic
+' # '*' - Indique une digit
+' # (MODIF : compter le nbr de # pour le passer
+'            en param pour la boucle des digit
+'            gros gain de temps sur la boucle
+' #############################################
+'
+LOCAL a&,v&,n&
+FOR n&=0 TO nbz%-1
+IF LEFT$(tmp$(n&),1)="#"     ! Une Zone de clic ?
+v&=VAL(MID$(tmp$(n&),2,2))
+a&=0
+WHILE (vue.clic$(v&,a&)<>"")
+INC a&
+WEND
+vue.clic$(v&,a&)=MID$(tmp$(n&),4,LEN(tmp$(n&))-3)
+ENDIF
+NEXT n&
+IF ste!
+initdigits_fromzne            ! # Externe pour appel autonome
+ENDIF
+FOR n&=0 TO nbz%-1            ! LibŠre moi tout ‡a !!
+tmp$(n&)=""
+NEXT n&
+RETURN
+> PROCEDURE initdigits_fromzne
+LOCAL n&
+digptr%=digbuf%               ! Digit StackPtr to start of buf
+nbspl|=0                      ! Nouveau .zne donc ERASE all digits
+FOR n&=0 TO nbz%-1
+IF LEFT$(tmp$(n&),1)="*"     ! Une digit ?
+charge_spl(RIGHT$(tmp$(n&),LEN(tmp$(n&))-1))
+ENDIF
+NEXT n&
+RETURN
+> PROCEDURE charge_gui
+'
+' Charge la GUI complŠte.
+' C'est une .neo compress‚e en .SP3 (SuperPacker III)
+'
+LOCAL back$,n&
+back$=gfx.folder$+"gui2.sp3"
+IF EXIST(back$)
+OPEN "i",#69,back$
+taillesrc%=LOF(#69)
+CLOSE #69
+'    FILES back$ TO "BUFFDAT"
+'    buf$=SPACE$(44)
+'    BLOAD "BUFFDAT",VARPTR(buf$)
+'    KILL "BUFFDAT"
+'    taillesrc%=VAL(MID$(buf$,15,8))
+BLOAD back$,pack_buf%
+IF info!
+ATEXT 10,ay%,0,back$+" charg‚"
+ADD ay%,6
+ENDIF
+depack_img                  ! D‚compression du GUI
+plot_gui(phys%)
+clear_dialzone
+BMOVE phys%,log%,32000
+VSYNC
+ELSE
+PRINT AT(2,20);back$;" does not exist !"
+taillesrc%=0
+~INP(2)
+ENDIF
+GET ix1%,iy1%,ix1%+il%,iy1%+ih%,ico$
+RETURN
+> PROCEDURE charge_img
+LOCAL vue$,m!
+vue$=gfx.folder$+vue.name$(cv&)+vue.ext$
+m!=@gere_multi_screen("OUT")          ! Est-elle dans les bufs ? :)
+IF NOT m!
+IF NOT EXIST(vue$)
+check_insertdisk(currentdisk|)
+ENDIF
+IF EXIST(vue$)
+OPEN "i",#69,vue$
+taillesrc%=LOF(#69)
+CLOSE #69
+'      FILES vue$ TO "BUFFDAT"
+'      buf$=SPACE$(44)
+'      BLOAD "BUFFDAT",VARPTR(buf$)
+'      KILL "BUFFDAT"
+'      taillesrc%=VAL(MID$(buf$,15,8))
+'    ATEXT 274,102,0,"#"+STR$(cv&)
+IF info!
+ATEXT 10,14,0,"Size = "+STR$(taillesrc%)
+ENDIF
+BLOAD vue$,pack_buf%
+depack_img
+~@gere_multi_screen("IN")         ! On l'a fait entrer dans les bufs !
+ELSE
+VOID XBIOS(5,L:log%,L:XBIOS(2),-1)
+PBOX 8,4,263,147
+ATEXT 8,80,0,vue$+" doesn't exist."
+img_to_phys
+VOID XBIOS(5,L:XBIOS(2),L:XBIOS(2),-1)
+taillesrc%=0
+ENDIF
+ENDIF
+IF taillesrc%
+init_img                            ! Toutes les ‚ventuelles INIT … faire suite au changement de vue
+aff_img(depack_buf%,log%+4*160)     ! Je saute les 4 premiŠres ligne qui ne change pas
+ENDIF
+RETURN
+> PROCEDURE charge_file(back$,buf%)
+'
+' Charge le fichier back$
+' dans le buffer 'buf%'
+'
+'  LOCAL buf$
+IF EXIST(back$)
+OPEN "i",#69,back$
+tspr%=LOF(#69)
+CLOSE #69
+'    FILES back$ TO "BUFFDAT"
+'    buf$=SPACE$(44)
+'    BLOAD "BUFFDAT",VARPTR(buf$)
+'    KILL "BUFFDAT"
+'    tspr%=VAL(MID$(buf$,15,8))          ! ## Taille du fichier charg‚ ! (‡a peut servir)
+BLOAD back$,buf%
+'    PRINT back$;" = ";tspr%
+'    ~INP(2)
+IF info!
+ATEXT 10,ay%,0,back$+" charg‚"
+ADD ay%,6
+ENDIF
+ELSE
+PRINT AT(2,20);back$;" does not exist !"
+~INP(2)
+ENDIF
+RETURN
+> PROCEDURE charge_vignette(n$)
+'
+' Routine … part pour les vignettes car gestion des masks
+' Un peu particuliŠres
+'
+LOCAL vig$,t%
+vig$=gfx.folder$+n$+spr.ext$
+IF EXIST(vig$)
+OPEN "i",#69,vig$
+t%=LOF(#69)
+CLOSE #69
+'    FILES vig$ TO "BUFFDAT"
+'    buf$=SPACE$(44)
+'    BLOAD "BUFFDAT",VARPTR(buf$)
+'    KILL "BUFFDAT"
+'    t%=VAL(MID$(buf$,15,8))
+sprdial$=STRING$(t%,0)
+BLOAD vig$,V:sprdial$
+IF info!
+ATEXT 10,ay%,0,vig$+" charg‚"
+ADD ay%,6
+ENDIF
+ELSE
+ATEXT 8,80,0,vig$+" doesn't exist."
+ENDIF
+RETURN
+> PROCEDURE charge_spl(n$)
+' #############################################################
+' #
+' # On charge le fichier n$ en m‚moire
+' # Attention 1 : Cette routine "empile" les digits !
+' # Attention 2 : Taille buffer digit limit‚e … 48000 octets
+' # Attention 3 : Le format attendu est compress‚ en .PCK
+' # Attention 4 : Je me sers du buffer des sprites pour LOAD
+' #############################################################
+LOCAL spl$
+spl$=sfx.folder$+n$+sfx.ext$
+IF EXIST(spl$)
+charge_file(spl$,sprbuf%)   ! ## Attention les .spl sont en .pck
+taillesrc%=tspr%
+reg%(8)=sprbuf%
+RCALL sp3_unpack%,reg%()
+BMOVE sprbuf%,digptr%,reg%(0)
+taillesrc%=reg%(0)
+tspl%=reg%(0)                       ! On r‚cupŠre la taille depack
+spl%(nbspl|,0)=digptr%              ! Adr% du sample
+spl%(nbspl|,1)=tspl%                ! Taille du sample
+ADD digptr%,tspl%
+IF digptr%>digbuf%+(64*1024)        ! C'est un peu pourri ‡a Eric non ?
+PBOX 8,4,263,147
+ATEXT 8,80,0,"Digit buffer full !!!!"
+~INP(2)
+ENDIF
+INC nbspl|
+IF info!
+ATEXT 10,ay%,0,spl$+" charg‚"
+ADD ay%,6
+ENDIF
+ELSE
+PBOX 8,4,263,147
+ATEXT 8,80,0,spl$+" doesn't exist."
+~INP(2)
+ENDIF
+RETURN
+> PROCEDURE charger_partie
+' ###############
+' #  LOAD GAME  #
+' ###############
+'
+LOCAL name$,n&,r&,serial$,z$,a$,a%,sc$
+sprbckdial$=""
+FOR n&=0 TO 255
+tmp$(n&)=""
+NEXT n&
+~FRE(0)
+IF falcon!
+SGET sc$
+ENDIF
+'  ATEXT 10,10,1,RIGHT$(sys$(12),LEN(sys$(12))-6)
+pro_print(10,10,RIGHT$(sys$(12),LEN(sys$(12))-6),phys%,0)
+'  pro_print(10,10,"dec$ = "+dec$,phys%,0)
+FILESELECT "\*.sav",".sav",name$
+IF name$<>""
+ALERT 3,RIGHT$(sys$(25),LEN(sys$(25))-6),2,RIGHT$(sys$(27),LEN(sys$(27))-6),n%
+IF name$<>"" AND name$<>"\" AND n%=1
+OPEN "I",#69,name$,512
+INPUT #69,serial$
+IF serial$="650268000"
+HIDEM
+clear_img_zone
+clear_logdialzone
+pro_print(100,170,MID$(sys$(12),6,LEN(sys$(12))),phys%,0)
+INPUT #69,currentdisk|
+INPUT #69,world&
+INPUT #69,cv&
+INPUT #69,cc&
+INPUT #69,nbspr&
+INPUT #69,nb_obj&
+INPUT #69,timer1%
+INPUT #69,timer2%
+INPUT #69,a%
+SLPOKE &H462,a%
+INPUT #69,a%
+SLPOKE &H466,a%
+nst|=0                      ! R‚plique courante … 0
+FOR n&=0 TO 255
+INPUT #69,flag|(n&)
+NEXT n&
+FOR n&=0 TO nbvue&-1
+INPUT #69,vue.issue$(n&)
+NEXT n&
+FOR n&=0 TO max_in_sacados|-1
+INPUT #69,sac.id$(n&)
+INPUT #69,sac.spr|(n&)
+INPUT #69,sac.place|(n&)
+'          INPUT #69,sac.bulle$(n&)
+NEXT n&
+FOR n&=0 TO nbsprmax&-1
+INPUT #69,spr.onoff!(n&)
+NEXT n&
+INPUT #69,z$
+INPUT #69,rom$
+INPUT #69,dec$
+CLOSE #69
+'
+'
+FOR n&=0 TO max_in_sacados|-1  ! ## On r‚attribue les info-bulles !
+r&=0
+RESTORE cnossos_invent
+DO
+READ a$,s|
+EXIT IF a$="CRYO"
+IF sac.id$(n&)=a$
+sac.bulle$(n&)=bulle$(r&)
+EXIT IF TRUE
+ENDIF
+INC r&
+LOOP
+NEXT n&
+'      pro_print(100,180,"dec$ = "+dec$,phys%,0)
+'      ~INP(2)
+oldcv&=cv&
+init_world
+script_chapter(STR$(cc&))
+charge_img                   ! Charge la nouvelle vue
+~C:fade_to_black%(3)         ! Fade to Black
+PAUSE 30
+IF z$<>"" AND z$<>zik$
+script_playzik(z$)
+'        script_playzik("")
+ENDIF
+init_boussole(VAL(LEFT$(vue.issue$(cv&),2)))
+plot_boussole                ! Plot Nouvelles issues
+plot_all_spr_in_log          ! Affiche les sprites de la vue
+img_to_phys_with_effect(1)   ! On balance l'image ‚cran LOG => PHYS avec effet
+check_initzone               ! Il existe une /INIT pour cette vue ?
+clear_logdialzone
+plot_current_dial
+fadeto!=TRUE                              ! Fade to Mr White ;-)
+set_palette(depack_buf%)
+ELSE
+'        ATEXT 10,6,0,RIGHT$(sys$(24),LEN(sys$(24))-6)
+pro_print(10,6,RIGHT$(sys$(24),LEN(sys$(24))-6),phys%,0)
+CLOSE #69
+~INP(2)
+FOR n&=0 TO 16
+RC_COPY log%,10,5,10+(LEN(sys$(12))-6)*8,5+n& TO phys%,10,5
+PAUSE 3
+NEXT n&
+ENDIF
+ENDIF
+ENDIF
+FOR n&=0 TO 16
+RC_COPY log%,10,5,10+(LEN(sys$(12))-6)*8,5+n& TO phys%,10,5
+PAUSE 3
+NEXT n&
+DEFMOUSE 5
+SHOWM
+IF falcon!
+SPUT sc$
+ENDIF
+RETURN
+> PROCEDURE sauver_partie
+' ###############
+' #  SAVE GAME  #
+' ###############
+'
+' Reste … impl‚menter : V‚rification de place restante sur le disk !
+'                       *Avec la commande DFREE()
+LOCAL name$,n&,sc$
+sprbckdial$=""
+FOR n&=0 TO 255
+tmp$(n&)=""
+NEXT n&
+~FRE(0)
+IF falcon!
+SGET sc$
+ENDIF
+'  ATEXT 10,10,2,RIGHT$(sys$(13),LEN(sys$(13))-6)
+pro_print(10,10,RIGHT$(sys$(13),LEN(sys$(13))-6),phys%,0)
+FILESELECT "\*.sav",".sav",name$
+IF name$<>""
+ALERT 3,RIGHT$(sys$(26),LEN(sys$(26))-6),2,RIGHT$(sys$(27),LEN(sys$(27))-6),n%
+IF name$<>"" AND name$<>"/" AND n%=1
+OPEN "O",#69,name$,512
+PRINT #69,"650268000"
+PRINT #69,currentdisk|
+PRINT #69,world&
+PRINT #69,cv&
+PRINT #69,cc&
+PRINT #69,nbspr&
+PRINT #69,nb_obj&
+PRINT #69,timer1%
+PRINT #69,timer2%
+PRINT #69,LPEEK(&H462)
+PRINT #69,LPEEK(&H466)
+FOR n&=0 TO 255
+PRINT #69,flag|(n&)
+NEXT n&
+FOR n&=0 TO nbvue&-1
+PRINT #69,vue.issue$(n&)
+NEXT n&
+FOR n&=0 TO max_in_sacados|-1
+PRINT #69,sac.id$(n&)
+PRINT #69,sac.spr|(n&)
+PRINT #69,sac.place|(n&)
+'        PRINT #69,sac.bulle$(n&)
+NEXT n&
+FOR n&=0 TO nbsprmax&-1
+PRINT #69,spr.onoff!(n&)
+NEXT n&
+PRINT #69,zik$
+PRINT #69,rom$
+PRINT #69,dec$
+CLOSE #69
+'      ATEXT 10,10,2,RIGHT$(sys$(14),LEN(sys$(14))-6)
+pro_print(10,10,RIGHT$(sys$(14),LEN(sys$(14))-6),phys%,0)
+PAUSE 100
+FOR n&=0 TO 16
+RC_COPY log%,10,5,10+(LEN(sys$(14))-6)*8,5+n& TO phys%,10,5
+PAUSE 5
+NEXT n&
+ENDIF
+ENDIF
+FOR n&=0 TO 16
+RC_COPY log%,10,5,10+(LEN(sys$(13))-6)*8,5+n& TO phys%,10,5
+PAUSE 3
+NEXT n&
+DEFMOUSE 5
+IF falcon!
+SPUT sc$
+ENDIF
+RETURN
+> PROCEDURE check_insertdisk(d|)
+'
+' On s'assure d'avoir ins‚r‚ le bon disk !
+' sinon on demande l'insertion
+' SYS15 = Please insert disk 1
+' SYS16 = Please insert disk 2
+'
+' Impl‚menter la v‚rification sur lecteur A & B
+'
+LOCAL x&,y&,l&,h&
+LOCAL b$
+x&=96
+y&=80
+l&=124
+h&=16
+GET x&,y&,x&+l&,y&+h&,b$              ! ## Sauve le fond mec
+'  DEFFILL 0
+'  DEFMOUSE 5
+WHILE NOT EXIST(hd$+"disko"+STR$(d|))
+PUT 90,80,friseback$
+ATEXT 154-(LEN(sys$(14+d|))-6)*3,y&+7,0,RIGHT$(sys$(14+d|),LEN(sys$(14+d|))-6)
+~INP(2)
+WEND
+PUT x&,y&,b$               ! ## On restaure le fond
+currentdisk|=d|
+RETURN
+'
+> FUNCTION check_icones(x%,y%)
+LOCAL a%,b%,a|
+IF x%>=ix& AND x%<ix&+(il&*2) AND y%>=iy& AND y%<iy&+(3*ih&) THEN
+a%=(x%-ix&)/il&
+b%=(y%-iy&)/ih&
+a|=a%+b%*2
+RETURN a|
+ENDIF
+RETURN 255
+ENDFUNC
+> FUNCTION check_boussole(x%,y%)
+' Les zones de clics sont un peu arbitraires
+' Return :
+'   1 = nord
+'   2 = sud
+'   8 = est
+'   4 = ouest
+' sinon FALSE
+'
+IF x%>290 AND x%<302 AND y%>150 AND y%<166
+RETURN 1
+ELSE IF x%>292 AND x%<300 AND y%>179 AND y%<194
+RETURN 2
+ELSE IF x%>302 AND x%<316 AND y%>166 AND y%<179
+RETURN 8
+ELSE IF x%>274 AND x%<292 AND y%>166 AND y%<179
+RETURN 4
+ENDIF
+RETURN FALSE
+ENDFUNC
+> PROCEDURE init_boussole(is&)
+clear_boussole
+IF is& AND 1
+bou.on!(0)=TRUE     ! Nord
+ENDIF
+IF is& AND 2
+bou.on!(1)=TRUE     ! Sud
+ENDIF
+IF is& AND 8
+bou.on!(2)=TRUE     ! Est
+ENDIF
+IF is& AND 4
+bou.on!(3)=TRUE     ! Ouest
+ENDIF
+RETURN
+> PROCEDURE clear_boussole
+bou.on!(0)=FALSE
+bou.on!(1)=FALSE
+bou.on!(2)=FALSE
+bou.on!(3)=FALSE
+RETURN
+> FUNCTION check_keyboard
+LOCAL k%
+DO
+KEYTEST k%
+PRINT k%
+EXIT IF k%=33619995
+LOOP
+END
+RETURN k%
+ENDFUNC
+> FUNCTION check_fffc02
+LOCAL k%
+DO
+k%=PEEK(&HFFFFC02)
+PRINT k%
+EXIT IF k%=1
+LOOP
+END
+RETURN k%
+ENDFUNC
+> PROCEDURE depack(origine%,taille_packee%)
+' le fichier depack‚ est stock‚ dans adr2
+'
+BMOVE origine%,depack_buf%,taille_packee%
+reg%(8)=depack_buf%
+RCALL sp3_unpack%,reg%()
+RETURN
