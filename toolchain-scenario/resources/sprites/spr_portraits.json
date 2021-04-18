@@ -1,0 +1,12 @@
+{
+	"portraits": [
+		{
+			"name": "colonel",
+			"vue": 10
+		},
+		{
+			"name": "robot",
+			"vue": 10
+		}
+	]
+}

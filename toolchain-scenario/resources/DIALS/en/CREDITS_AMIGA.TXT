@@ -1,0 +1,113 @@
+#
+#----------------------------
+#A few  words  from the team
+behind  "ATHANOR  2  AMIGA"
+#
+#For   the  AMIGA  version,
+special  efforts and  tools
+were used  to get  the most
+of our beloved machine.@@@@
+
+#CODE:
+Athanor  2  was  ported  to
+the Amiga  during  a course
+of ~3 years,  using VSCODE,
+GIT, PYTHON, WINUAE, SAS/C,
+a  MIST  (FPGA  Amiga)  and
+an ESCOM A1200 (thx Petro!)
+The last rush was completed
+on a MacBook M1 (ARM FTW!),
+using both FS-UAE & vAmiga.
+
+#99% of Athanor 2 relies on
+the GRAPHICS LIBRARY.  This
+means that  the  whole game
+is meant to be os-friendly.
+
+#The game runs entirely in C
+except  for a couple of 3rd
+parties  unpacking routines
+(Shrinkler / NRV2x).@@@@@@@ 
+
+#GRAPHICS:
+PHOTOSHOP   for   the  main
+part,  using either a WACOM
+BAMBOO  and  INTUOS tablets.
+Then COSMIGO PRO-MOTION and
+DELUXE PAINT,  for all  the
+pixel  and  dither tweaking.
+
+#MUSICS:
+Finally,  for those  who'd
+like  some  music technical
+details,  here's  what  was
+used  by David to make  the
+soundtracks:@@@@@@@@@@@@@@@
+The PROTRACKER 3.15 as main
+sequencer.  Most of samples
+created  using  the  ROLAND
+JV-1080 &  the YAMAHA MOTIF
+XF.  Composition & research
+done on  the KORG TR-76 and
+YAMAHA PSR S500 keyboards.@
+
+#
+#And now, the  greetings for
+the  Amiga  version.@@@@@@@
+#Many  thanks to  all these
+inspiring people:@@@@@@@@@@
+#4play
+Akaobi
+Aseyn
+BeeMixsy
+David @davidb2111_ Barbion
+Nicolas Bauw
+Batteman
+BjornNah
+C418
+Chris Covell
+Exocet
+FibreTigre
+Frost242
+Flopine
+Gelmir
+Gligli
+Jylam
+Kara N. Blohm
+MadMarie
+Mike 'DBug' Pointier
+MO5.COM
+Mooz
+Ninomojo
+NoRecess
+Oriens
+The Ptoing!
+Rahow
+RESISTANCE.NO
+Andr‚ & Louis-Marie Rocques
+Roudoudou
+Serge Fiedos
+St‚phane F.
+Stingray
+Superchlo
+XBarr
+Yosshin4004
+Z-Team
+Zerkman
+
+#
+#External libraries:
+MT_ADPCM (MastaTabs)
+EasySound (Anders Bjerin)
+Miniz (Richard Geldreich)
+NRV2 (Ross)
+PTReplay.library (Stingray)
+Shrinkler (Blueberry)
+#
+#
+#
+#
+#
+Athanor Out!
+Press the mouse button
+to exit.

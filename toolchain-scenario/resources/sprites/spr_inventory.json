@@ -1,0 +1,8 @@
+{
+	"specs": { "width": 24, "height": 24},
+	"sprites": [
+		"go_CROCUS", "go_CRUCHE", "go_CAILLOU", "go_TENTACULE", "go_POISSON", "go_POISSON_SAU", "go_SAFRAN", "go_VER", "go_CRUCHE_PLEINE", "go_POISSON_SECHE", "go_FEUILLES", "empty0", "empty1",
+		"go_MARTEAU", "go_SNAKE", "go_EAU", "go_TERRE", "go_ARGILE", "go_BOUSIER", "go_BOUSIER2", "go_BRINDILLE", "go_BOUSE", "go_HACHE", "go_TORCHE", "go_SYMBOL1", "go_SYMBOL2",
+		"go_STATUETTE2", "go_MASQUE", "go_STATUETTE", "go_CRISTAL"
+	]
+}

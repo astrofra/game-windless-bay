@@ -13,16 +13,12 @@ typedef struct {
 } file_dispatch;
 
 #define DATA_DISK_ANY 0
-#define DATA_DISK_0 (1 << 0) /* Ath1: */
-#define DATA_DISK_1 (1 << 1) /* Ath2: */
-#define DATA_DISK_2 (1 << 2) /* Ath3: */
-#define DATA_DISK_MAX 3
+#define DATA_DISK_0 (1 << 0) /* wind1: */
+#define DATA_DISK_MAX 1
 
-#define DISK_NAME_0 "Ath1:"
-#define DISK_NAME_1 "Ath2:"
-#define DISK_NAME_2 "Ath3:"
+#define DISK_NAME_0 "wind1:"
 
-#define FILE_DISPATCH_LIST_SIZE 143
+#define FILE_DISPATCH_LIST_SIZE 40
 extern file_dispatch file_dispatch_list[FILE_DISPATCH_LIST_SIZE];
 
 #endif

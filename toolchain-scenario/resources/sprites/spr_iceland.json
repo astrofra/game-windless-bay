@@ -1,0 +1,23 @@
+{
+	"world": "cnossos",
+	"sprites": [
+		{
+			"name": "go_CABLE",
+			"vue": 1,
+			"source": [0,0,31,109],
+			"destination": [54,31]
+		},
+		{
+			"name": "go_COMBINE",
+			"vue": 2,
+			"source": [32,0,95,94],
+			"destination": [80, 50]
+		},
+		{
+			"name": "go_TELEPHONE",
+			"vue": 2,
+			"source": [96,0,127,39],
+			"destination": [132,102]
+		}
+	]
+}

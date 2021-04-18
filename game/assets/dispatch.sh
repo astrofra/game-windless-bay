@@ -6,770 +6,201 @@ failat 21
 
 ;create the assets folder on each disk
 
-makedir "Ath1:assets"
-makedir "Ath2:assets"
-makedir "Ath3:assets"
+makedir "wind1:assets"
 
 ;update each file
 
 ;txt_dialog_fr.pak -> DATA_DISK_0
 echo "updating (txt_dialog_fr.pak)"
-delete "Ath1:assets/txt_dialog_fr.pak"
-copy "txt_dialog_fr.pak" "Ath1:assets/txt_dialog_fr.pak"
+delete "wind1:assets/txt_dialog_fr.pak"
+copy "txt_dialog_fr.pak" "wind1:assets/txt_dialog_fr.pak"
 
 ;txt_system_fr.pak -> DATA_DISK_0
 echo "updating (txt_system_fr.pak)"
-delete "Ath1:assets/txt_system_fr.pak"
-copy "txt_system_fr.pak" "Ath1:assets/txt_system_fr.pak"
+delete "wind1:assets/txt_system_fr.pak"
+copy "txt_system_fr.pak" "wind1:assets/txt_system_fr.pak"
 
 ;txt_tooltip_fr.pak -> DATA_DISK_0
 echo "updating (txt_tooltip_fr.pak)"
-delete "Ath1:assets/txt_tooltip_fr.pak"
-copy "txt_tooltip_fr.pak" "Ath1:assets/txt_tooltip_fr.pak"
+delete "wind1:assets/txt_tooltip_fr.pak"
+copy "txt_tooltip_fr.pak" "wind1:assets/txt_tooltip_fr.pak"
 
 ;txt_credits_fr.pak -> DATA_DISK_0
 echo "updating (txt_credits_fr.pak)"
-delete "Ath1:assets/txt_credits_fr.pak"
-copy "txt_credits_fr.pak" "Ath1:assets/txt_credits_fr.pak"
+delete "wind1:assets/txt_credits_fr.pak"
+copy "txt_credits_fr.pak" "wind1:assets/txt_credits_fr.pak"
 
 ;txt_dialog_en.pak -> DATA_DISK_0
 echo "updating (txt_dialog_en.pak)"
-delete "Ath1:assets/txt_dialog_en.pak"
-copy "txt_dialog_en.pak" "Ath1:assets/txt_dialog_en.pak"
+delete "wind1:assets/txt_dialog_en.pak"
+copy "txt_dialog_en.pak" "wind1:assets/txt_dialog_en.pak"
 
 ;txt_system_en.pak -> DATA_DISK_0
 echo "updating (txt_system_en.pak)"
-delete "Ath1:assets/txt_system_en.pak"
-copy "txt_system_en.pak" "Ath1:assets/txt_system_en.pak"
+delete "wind1:assets/txt_system_en.pak"
+copy "txt_system_en.pak" "wind1:assets/txt_system_en.pak"
 
 ;txt_tooltip_en.pak -> DATA_DISK_0
 echo "updating (txt_tooltip_en.pak)"
-delete "Ath1:assets/txt_tooltip_en.pak"
-copy "txt_tooltip_en.pak" "Ath1:assets/txt_tooltip_en.pak"
+delete "wind1:assets/txt_tooltip_en.pak"
+copy "txt_tooltip_en.pak" "wind1:assets/txt_tooltip_en.pak"
 
 ;txt_credits_en.pak -> DATA_DISK_0
 echo "updating (txt_credits_en.pak)"
-delete "Ath1:assets/txt_credits_en.pak"
-copy "txt_credits_en.pak" "Ath1:assets/txt_credits_en.pak"
+delete "wind1:assets/txt_credits_en.pak"
+copy "txt_credits_en.pak" "wind1:assets/txt_credits_en.pak"
 
 ;txt_dialog_es.pak -> DATA_DISK_0
 echo "updating (txt_dialog_es.pak)"
-delete "Ath1:assets/txt_dialog_es.pak"
-copy "txt_dialog_es.pak" "Ath1:assets/txt_dialog_es.pak"
+delete "wind1:assets/txt_dialog_es.pak"
+copy "txt_dialog_es.pak" "wind1:assets/txt_dialog_es.pak"
 
 ;txt_system_es.pak -> DATA_DISK_0
 echo "updating (txt_system_es.pak)"
-delete "Ath1:assets/txt_system_es.pak"
-copy "txt_system_es.pak" "Ath1:assets/txt_system_es.pak"
+delete "wind1:assets/txt_system_es.pak"
+copy "txt_system_es.pak" "wind1:assets/txt_system_es.pak"
 
 ;txt_tooltip_es.pak -> DATA_DISK_0
 echo "updating (txt_tooltip_es.pak)"
-delete "Ath1:assets/txt_tooltip_es.pak"
-copy "txt_tooltip_es.pak" "Ath1:assets/txt_tooltip_es.pak"
+delete "wind1:assets/txt_tooltip_es.pak"
+copy "txt_tooltip_es.pak" "wind1:assets/txt_tooltip_es.pak"
 
 ;txt_credits_es.pak -> DATA_DISK_0
 echo "updating (txt_credits_es.pak)"
-delete "Ath1:assets/txt_credits_es.pak"
-copy "txt_credits_es.pak" "Ath1:assets/txt_credits_es.pak"
+delete "wind1:assets/txt_credits_es.pak"
+copy "txt_credits_es.pak" "wind1:assets/txt_credits_es.pak"
 
 ;gui.pak -> DATA_DISK_0
 echo "updating (gui.pak)"
-delete "Ath1:assets/gui.pak"
-copy "gui.pak" "Ath1:assets/gui.pak"
+delete "wind1:assets/gui.pak"
+copy "gui.pak" "wind1:assets/gui.pak"
 
 ;gui_compass_hilite.pak -> DATA_DISK_0
 echo "updating (gui_compass_hilite.pak)"
-delete "Ath1:assets/gui_compass_hilite.pak"
-copy "gui_compass_hilite.pak" "Ath1:assets/gui_compass_hilite.pak"
+delete "wind1:assets/gui_compass_hilite.pak"
+copy "gui_compass_hilite.pak" "wind1:assets/gui_compass_hilite.pak"
 
 ;gui_compass_hilite_mask.pak -> DATA_DISK_0
 echo "updating (gui_compass_hilite_mask.pak)"
-delete "Ath1:assets/gui_compass_hilite_mask.pak"
-copy "gui_compass_hilite_mask.pak" "Ath1:assets/gui_compass_hilite_mask.pak"
+delete "wind1:assets/gui_compass_hilite_mask.pak"
+copy "gui_compass_hilite_mask.pak" "wind1:assets/gui_compass_hilite_mask.pak"
 
 ;icons.pak -> DATA_DISK_0
 echo "updating (icons.pak)"
-delete "Ath1:assets/icons.pak"
-copy "icons.pak" "Ath1:assets/icons.pak"
+delete "wind1:assets/icons.pak"
+copy "icons.pak" "wind1:assets/icons.pak"
 
 ;inventory_panel.pak -> DATA_DISK_0
 echo "updating (inventory_panel.pak)"
-delete "Ath1:assets/inventory_panel.pak"
-copy "inventory_panel.pak" "Ath1:assets/inventory_panel.pak"
+delete "wind1:assets/inventory_panel.pak"
+copy "inventory_panel.pak" "wind1:assets/inventory_panel.pak"
 
 ;travel_menu.pak -> DATA_DISK_0
 echo "updating (travel_menu.pak)"
-delete "Ath1:assets/travel_menu.pak"
-copy "travel_menu.pak" "Ath1:assets/travel_menu.pak"
+delete "wind1:assets/travel_menu.pak"
+copy "travel_menu.pak" "wind1:assets/travel_menu.pak"
 
 ;spr_inventory.pak -> DATA_DISK_0
 echo "updating (spr_inventory.pak)"
-delete "Ath1:assets/spr_inventory.pak"
-copy "spr_inventory.pak" "Ath1:assets/spr_inventory.pak"
+delete "wind1:assets/spr_inventory.pak"
+copy "spr_inventory.pak" "wind1:assets/spr_inventory.pak"
 
 ;spr_inventory_mask.pak -> DATA_DISK_0
 echo "updating (spr_inventory_mask.pak)"
-delete "Ath1:assets/spr_inventory_mask.pak"
-copy "spr_inventory_mask.pak" "Ath1:assets/spr_inventory_mask.pak"
+delete "wind1:assets/spr_inventory_mask.pak"
+copy "spr_inventory_mask.pak" "wind1:assets/spr_inventory_mask.pak"
 
-;intro_screen.pak -> DATA_DISK_0
-echo "updating (intro_screen.pak)"
-delete "Ath1:assets/intro_screen.pak"
-copy "intro_screen.pak" "Ath1:assets/intro_screen.pak"
-
-;pal_intro_screen.pak -> DATA_DISK_0
-echo "updating (pal_intro_screen.pak)"
-delete "Ath1:assets/pal_intro_screen.pak"
-copy "pal_intro_screen.pak" "Ath1:assets/pal_intro_screen.pak"
-
-;athanor_title.pak -> DATA_DISK_0
-echo "updating (athanor_title.pak)"
-delete "Ath1:assets/athanor_title.pak"
-copy "athanor_title.pak" "Ath1:assets/athanor_title.pak"
-
-;athanor_title_mask.pak -> DATA_DISK_0
-echo "updating (athanor_title_mask.pak)"
-delete "Ath1:assets/athanor_title_mask.pak"
-copy "athanor_title_mask.pak" "Ath1:assets/athanor_title_mask.pak"
-
-;logo_safar_games.pak -> DATA_DISK_0
-echo "updating (logo_safar_games.pak)"
-delete "Ath1:assets/logo_safar_games.pak"
-copy "logo_safar_games.pak" "Ath1:assets/logo_safar_games.pak"
-
-;pal_logo_safar_games.pak -> DATA_DISK_0
-echo "updating (pal_logo_safar_games.pak)"
-delete "Ath1:assets/pal_logo_safar_games.pak"
-copy "pal_logo_safar_games.pak" "Ath1:assets/pal_logo_safar_games.pak"
-
-;logo_safar_games_c.pak -> DATA_DISK_0
-echo "updating (logo_safar_games_c.pak)"
-delete "Ath1:assets/logo_safar_games_c.pak"
-copy "logo_safar_games_c.pak" "Ath1:assets/logo_safar_games_c.pak"
-
-;pal_logo_safar_games_c.pak -> DATA_DISK_0
-echo "updating (pal_logo_safar_games_c.pak)"
-delete "Ath1:assets/pal_logo_safar_games_c.pak"
-copy "pal_logo_safar_games_c.pak" "Ath1:assets/pal_logo_safar_games_c.pak"
-
-;game_over.pak -> DATA_DISK_ANY
-echo "updating (game_over.pak)"
-delete "Ath1:assets/game_over.pak"
-copy "game_over.pak" "Ath1:assets/game_over.pak"
-delete "Ath2:assets/game_over.pak"
-copy "game_over.pak" "Ath2:assets/game_over.pak"
-delete "Ath3:assets/game_over.pak"
-copy "game_over.pak" "Ath3:assets/game_over.pak"
-
-;spr_cnossos.pak -> DATA_DISK_1
-echo "updating (spr_cnossos.pak)"
-delete "Ath2:assets/spr_cnossos.pak"
-copy "spr_cnossos.pak" "Ath2:assets/spr_cnossos.pak"
-
-;spr_cnossos_mask.pak -> DATA_DISK_1
-echo "updating (spr_cnossos_mask.pak)"
-delete "Ath2:assets/spr_cnossos_mask.pak"
-copy "spr_cnossos_mask.pak" "Ath2:assets/spr_cnossos_mask.pak"
-
-;spr_indus.pak -> DATA_DISK_2
-echo "updating (spr_indus.pak)"
-delete "Ath3:assets/spr_indus.pak"
-copy "spr_indus.pak" "Ath3:assets/spr_indus.pak"
-
-;spr_indus_mask.pak -> DATA_DISK_2
-echo "updating (spr_indus_mask.pak)"
-delete "Ath3:assets/spr_indus_mask.pak"
-copy "spr_indus_mask.pak" "Ath3:assets/spr_indus_mask.pak"
-
-;spr_rapanui.pak -> DATA_DISK_2
-echo "updating (spr_rapanui.pak)"
-delete "Ath3:assets/spr_rapanui.pak"
-copy "spr_rapanui.pak" "Ath3:assets/spr_rapanui.pak"
-
-;spr_rapanui_mask.pak -> DATA_DISK_2
-echo "updating (spr_rapanui_mask.pak)"
-delete "Ath3:assets/spr_rapanui_mask.pak"
-copy "spr_rapanui_mask.pak" "Ath3:assets/spr_rapanui_mask.pak"
-
-;spr_rapanui_end.pak -> DATA_DISK_0
-echo "updating (spr_rapanui_end.pak)"
-delete "Ath1:assets/spr_rapanui_end.pak"
-copy "spr_rapanui_end.pak" "Ath1:assets/spr_rapanui_end.pak"
-
-;spr_rapanui_end_mask.pak -> DATA_DISK_0
-echo "updating (spr_rapanui_end_mask.pak)"
-delete "Ath1:assets/spr_rapanui_end_mask.pak"
-copy "spr_rapanui_end_mask.pak" "Ath1:assets/spr_rapanui_end_mask.pak"
-
-;spr_boat.pak -> DATA_DISK_ANY
-echo "updating (spr_boat.pak)"
-delete "Ath1:assets/spr_boat.pak"
-copy "spr_boat.pak" "Ath1:assets/spr_boat.pak"
-delete "Ath2:assets/spr_boat.pak"
-copy "spr_boat.pak" "Ath2:assets/spr_boat.pak"
-delete "Ath3:assets/spr_boat.pak"
-copy "spr_boat.pak" "Ath3:assets/spr_boat.pak"
-
-;spr_boat_mask.pak -> DATA_DISK_ANY
-echo "updating (spr_boat_mask.pak)"
-delete "Ath1:assets/spr_boat_mask.pak"
-copy "spr_boat_mask.pak" "Ath1:assets/spr_boat_mask.pak"
-delete "Ath2:assets/spr_boat_mask.pak"
-copy "spr_boat_mask.pak" "Ath2:assets/spr_boat_mask.pak"
-delete "Ath3:assets/spr_boat_mask.pak"
-copy "spr_boat_mask.pak" "Ath3:assets/spr_boat_mask.pak"
-
-;game_altos_board.pak -> DATA_DISK_1
-echo "updating (game_altos_board.pak)"
-delete "Ath2:assets/game_altos_board.pak"
-copy "game_altos_board.pak" "Ath2:assets/game_altos_board.pak"
-
-;game_altos_sprites.pak -> DATA_DISK_1
-echo "updating (game_altos_sprites.pak)"
-delete "Ath2:assets/game_altos_sprites.pak"
-copy "game_altos_sprites.pak" "Ath2:assets/game_altos_sprites.pak"
-
-;game_altos_sprites_mask.pak -> DATA_DISK_1
-echo "updating (game_altos_sprites_mask.pak)"
-delete "Ath2:assets/game_altos_sprites_mask.pak"
-copy "game_altos_sprites_mask.pak" "Ath2:assets/game_altos_sprites_mask.pak"
-
-;fish_sprite.pak -> DATA_DISK_1
-echo "updating (fish_sprite.pak)"
-delete "Ath2:assets/fish_sprite.pak"
-copy "fish_sprite.pak" "Ath2:assets/fish_sprite.pak"
-
-;fish_sprite_mask.pak -> DATA_DISK_1
-echo "updating (fish_sprite_mask.pak)"
-delete "Ath2:assets/fish_sprite_mask.pak"
-copy "fish_sprite_mask.pak" "Ath2:assets/fish_sprite_mask.pak"
-
-;beetle_race_sprites.pak -> DATA_DISK_2
-echo "updating (beetle_race_sprites.pak)"
-delete "Ath3:assets/beetle_race_sprites.pak"
-copy "beetle_race_sprites.pak" "Ath3:assets/beetle_race_sprites.pak"
-
-;beetle_race_sprites_mask.pak -> DATA_DISK_2
-echo "updating (beetle_race_sprites_mask.pak)"
-delete "Ath3:assets/beetle_race_sprites_mask.pak"
-copy "beetle_race_sprites_mask.pak" "Ath3:assets/beetle_race_sprites_mask.pak"
-
-;game_squid.pak -> DATA_DISK_2
-echo "updating (game_squid.pak)"
-delete "Ath3:assets/game_squid.pak"
-copy "game_squid.pak" "Ath3:assets/game_squid.pak"
-
-;game_squid_sprites.pak -> DATA_DISK_2
-echo "updating (game_squid_sprites.pak)"
-delete "Ath3:assets/game_squid_sprites.pak"
-copy "game_squid_sprites.pak" "Ath3:assets/game_squid_sprites.pak"
-
-;game_squid_sprites_mask.pak -> DATA_DISK_2
-echo "updating (game_squid_sprites_mask.pak)"
-delete "Ath3:assets/game_squid_sprites_mask.pak"
-copy "game_squid_sprites_mask.pak" "Ath3:assets/game_squid_sprites_mask.pak"
-
-;npc_altos_17.pak -> DATA_DISK_0
-echo "updating (npc_altos_17.pak)"
-delete "Ath1:assets/npc_altos_17.pak"
-copy "npc_altos_17.pak" "Ath1:assets/npc_altos_17.pak"
-
-;npc_fisherman_05.pak -> DATA_DISK_2
-echo "updating (npc_fisherman_05.pak)"
-delete "Ath3:assets/npc_fisherman_05.pak"
-copy "npc_fisherman_05.pak" "Ath3:assets/npc_fisherman_05.pak"
-
-;npc_guard_37.pak -> DATA_DISK_1
-echo "updating (npc_guard_37.pak)"
-delete "Ath2:assets/npc_guard_37.pak"
-copy "npc_guard_37.pak" "Ath2:assets/npc_guard_37.pak"
-
-;npc_hermit_56.pak -> DATA_DISK_2
-echo "updating (npc_hermit_56.pak)"
-delete "Ath3:assets/npc_hermit_56.pak"
-copy "npc_hermit_56.pak" "Ath3:assets/npc_hermit_56.pak"
-
-;npc_lilla_34.pak -> DATA_DISK_1
-echo "updating (npc_lilla_34.pak)"
-delete "Ath2:assets/npc_lilla_34.pak"
-copy "npc_lilla_34.pak" "Ath2:assets/npc_lilla_34.pak"
-
-;npc_lilla_35.pak -> DATA_DISK_1
-echo "updating (npc_lilla_35.pak)"
-delete "Ath2:assets/npc_lilla_35.pak"
-copy "npc_lilla_35.pak" "Ath2:assets/npc_lilla_35.pak"
-
-;npc_merchant_31.pak -> DATA_DISK_1
-echo "updating (npc_merchant_31.pak)"
-delete "Ath2:assets/npc_merchant_31.pak"
-copy "npc_merchant_31.pak" "Ath2:assets/npc_merchant_31.pak"
-
-;npc_potter_51.pak -> DATA_DISK_2
-echo "updating (npc_potter_51.pak)"
-delete "Ath3:assets/npc_potter_51.pak"
-copy "npc_potter_51.pak" "Ath3:assets/npc_potter_51.pak"
-
-;npc_street_merchant_41.pak -> DATA_DISK_1
-echo "updating (npc_street_merchant_41.pak)"
-delete "Ath2:assets/npc_street_merchant_41.pak"
-copy "npc_street_merchant_41.pak" "Ath2:assets/npc_street_merchant_41.pak"
-
-;vue_01.pak -> DATA_DISK_2
+;vue_01.pak -> DATA_DISK_0
 echo "updating (vue_01.pak)"
-delete "Ath3:assets/vue_01.pak"
-copy "vue_01.pak" "Ath3:assets/vue_01.pak"
+delete "wind1:assets/vue_01.pak"
+copy "vue_01.pak" "wind1:assets/vue_01.pak"
 
-;vue_02.pak -> DATA_DISK_2
+;vue_02.pak -> DATA_DISK_0
 echo "updating (vue_02.pak)"
-delete "Ath3:assets/vue_02.pak"
-copy "vue_02.pak" "Ath3:assets/vue_02.pak"
+delete "wind1:assets/vue_02.pak"
+copy "vue_02.pak" "wind1:assets/vue_02.pak"
 
-;vue_03.pak -> DATA_DISK_2
+;vue_03.pak -> DATA_DISK_0
 echo "updating (vue_03.pak)"
-delete "Ath3:assets/vue_03.pak"
-copy "vue_03.pak" "Ath3:assets/vue_03.pak"
+delete "wind1:assets/vue_03.pak"
+copy "vue_03.pak" "wind1:assets/vue_03.pak"
 
-;vue_04.pak -> DATA_DISK_2
+;vue_04.pak -> DATA_DISK_0
 echo "updating (vue_04.pak)"
-delete "Ath3:assets/vue_04.pak"
-copy "vue_04.pak" "Ath3:assets/vue_04.pak"
+delete "wind1:assets/vue_04.pak"
+copy "vue_04.pak" "wind1:assets/vue_04.pak"
 
-;vue_05.pak -> DATA_DISK_2
+;vue_05.pak -> DATA_DISK_0
 echo "updating (vue_05.pak)"
-delete "Ath3:assets/vue_05.pak"
-copy "vue_05.pak" "Ath3:assets/vue_05.pak"
+delete "wind1:assets/vue_05.pak"
+copy "vue_05.pak" "wind1:assets/vue_05.pak"
 
-;vue_06.pak -> DATA_DISK_2
+;vue_06.pak -> DATA_DISK_0
 echo "updating (vue_06.pak)"
-delete "Ath3:assets/vue_06.pak"
-copy "vue_06.pak" "Ath3:assets/vue_06.pak"
+delete "wind1:assets/vue_06.pak"
+copy "vue_06.pak" "wind1:assets/vue_06.pak"
 
-;vue_07.pak -> DATA_DISK_2
+;vue_07.pak -> DATA_DISK_0
 echo "updating (vue_07.pak)"
-delete "Ath3:assets/vue_07.pak"
-copy "vue_07.pak" "Ath3:assets/vue_07.pak"
+delete "wind1:assets/vue_07.pak"
+copy "vue_07.pak" "wind1:assets/vue_07.pak"
 
-;vue_08.pak -> DATA_DISK_2
+;vue_08.pak -> DATA_DISK_0
 echo "updating (vue_08.pak)"
-delete "Ath3:assets/vue_08.pak"
-copy "vue_08.pak" "Ath3:assets/vue_08.pak"
+delete "wind1:assets/vue_08.pak"
+copy "vue_08.pak" "wind1:assets/vue_08.pak"
 
-;vue_09.pak -> DATA_DISK_2
+;vue_09.pak -> DATA_DISK_0
 echo "updating (vue_09.pak)"
-delete "Ath3:assets/vue_09.pak"
-copy "vue_09.pak" "Ath3:assets/vue_09.pak"
+delete "wind1:assets/vue_09.pak"
+copy "vue_09.pak" "wind1:assets/vue_09.pak"
 
-;vue_10.pak -> DATA_DISK_2
+;vue_10.pak -> DATA_DISK_0
 echo "updating (vue_10.pak)"
-delete "Ath3:assets/vue_10.pak"
-copy "vue_10.pak" "Ath3:assets/vue_10.pak"
+delete "wind1:assets/vue_10.pak"
+copy "vue_10.pak" "wind1:assets/vue_10.pak"
 
-;vue_11.pak -> DATA_DISK_2
+;vue_11.pak -> DATA_DISK_0
 echo "updating (vue_11.pak)"
-delete "Ath3:assets/vue_11.pak"
-copy "vue_11.pak" "Ath3:assets/vue_11.pak"
+delete "wind1:assets/vue_11.pak"
+copy "vue_11.pak" "wind1:assets/vue_11.pak"
 
-;vue_12.pak -> DATA_DISK_2
+;vue_12.pak -> DATA_DISK_0
 echo "updating (vue_12.pak)"
-delete "Ath3:assets/vue_12.pak"
-copy "vue_12.pak" "Ath3:assets/vue_12.pak"
+delete "wind1:assets/vue_12.pak"
+copy "vue_12.pak" "wind1:assets/vue_12.pak"
 
-;vue_13.pak -> DATA_DISK_2
+;vue_13.pak -> DATA_DISK_0
 echo "updating (vue_13.pak)"
-delete "Ath3:assets/vue_13.pak"
-copy "vue_13.pak" "Ath3:assets/vue_13.pak"
+delete "wind1:assets/vue_13.pak"
+copy "vue_13.pak" "wind1:assets/vue_13.pak"
 
-;vue_14.pak -> DATA_DISK_2
+;vue_14.pak -> DATA_DISK_0
 echo "updating (vue_14.pak)"
-delete "Ath3:assets/vue_14.pak"
-copy "vue_14.pak" "Ath3:assets/vue_14.pak"
+delete "wind1:assets/vue_14.pak"
+copy "vue_14.pak" "wind1:assets/vue_14.pak"
 
 ;vue_15.pak -> DATA_DISK_0
 echo "updating (vue_15.pak)"
-delete "Ath1:assets/vue_15.pak"
-copy "vue_15.pak" "Ath1:assets/vue_15.pak"
+delete "wind1:assets/vue_15.pak"
+copy "vue_15.pak" "wind1:assets/vue_15.pak"
 
 ;vue_16.pak -> DATA_DISK_0
 echo "updating (vue_16.pak)"
-delete "Ath1:assets/vue_16.pak"
-copy "vue_16.pak" "Ath1:assets/vue_16.pak"
+delete "wind1:assets/vue_16.pak"
+copy "vue_16.pak" "wind1:assets/vue_16.pak"
 
 ;vue_17.pak -> DATA_DISK_0
 echo "updating (vue_17.pak)"
-delete "Ath1:assets/vue_17.pak"
-copy "vue_17.pak" "Ath1:assets/vue_17.pak"
+delete "wind1:assets/vue_17.pak"
+copy "vue_17.pak" "wind1:assets/vue_17.pak"
 
 ;vue_18.pak -> DATA_DISK_0
 echo "updating (vue_18.pak)"
-delete "Ath1:assets/vue_18.pak"
-copy "vue_18.pak" "Ath1:assets/vue_18.pak"
+delete "wind1:assets/vue_18.pak"
+copy "vue_18.pak" "wind1:assets/vue_18.pak"
 
 ;vue_19.pak -> DATA_DISK_0
 echo "updating (vue_19.pak)"
-delete "Ath1:assets/vue_19.pak"
-copy "vue_19.pak" "Ath1:assets/vue_19.pak"
-
-;pal_vue_19.pak -> DATA_DISK_0
-echo "updating (pal_vue_19.pak)"
-delete "Ath1:assets/pal_vue_19.pak"
-copy "pal_vue_19.pak" "Ath1:assets/pal_vue_19.pak"
-
-;vue_25.pak -> DATA_DISK_1
-echo "updating (vue_25.pak)"
-delete "Ath2:assets/vue_25.pak"
-copy "vue_25.pak" "Ath2:assets/vue_25.pak"
-
-;vue_26.pak -> DATA_DISK_1
-echo "updating (vue_26.pak)"
-delete "Ath2:assets/vue_26.pak"
-copy "vue_26.pak" "Ath2:assets/vue_26.pak"
-
-;vue_27.pak -> DATA_DISK_1
-echo "updating (vue_27.pak)"
-delete "Ath2:assets/vue_27.pak"
-copy "vue_27.pak" "Ath2:assets/vue_27.pak"
-
-;vue_27_game.pak -> DATA_DISK_1
-echo "updating (vue_27_game.pak)"
-delete "Ath2:assets/vue_27_game.pak"
-copy "vue_27_game.pak" "Ath2:assets/vue_27_game.pak"
-
-;vue_28.pak -> DATA_DISK_1
-echo "updating (vue_28.pak)"
-delete "Ath2:assets/vue_28.pak"
-copy "vue_28.pak" "Ath2:assets/vue_28.pak"
-
-;vue_29.pak -> DATA_DISK_1
-echo "updating (vue_29.pak)"
-delete "Ath2:assets/vue_29.pak"
-copy "vue_29.pak" "Ath2:assets/vue_29.pak"
-
-;vue_30.pak -> DATA_DISK_1
-echo "updating (vue_30.pak)"
-delete "Ath2:assets/vue_30.pak"
-copy "vue_30.pak" "Ath2:assets/vue_30.pak"
-
-;vue_31.pak -> DATA_DISK_1
-echo "updating (vue_31.pak)"
-delete "Ath2:assets/vue_31.pak"
-copy "vue_31.pak" "Ath2:assets/vue_31.pak"
-
-;vue_32.pak -> DATA_DISK_1
-echo "updating (vue_32.pak)"
-delete "Ath2:assets/vue_32.pak"
-copy "vue_32.pak" "Ath2:assets/vue_32.pak"
-
-;vue_33.pak -> DATA_DISK_1
-echo "updating (vue_33.pak)"
-delete "Ath2:assets/vue_33.pak"
-copy "vue_33.pak" "Ath2:assets/vue_33.pak"
-
-;vue_34.pak -> DATA_DISK_1
-echo "updating (vue_34.pak)"
-delete "Ath2:assets/vue_34.pak"
-copy "vue_34.pak" "Ath2:assets/vue_34.pak"
-
-;vue_35.pak -> DATA_DISK_1
-echo "updating (vue_35.pak)"
-delete "Ath2:assets/vue_35.pak"
-copy "vue_35.pak" "Ath2:assets/vue_35.pak"
-
-;vue_36.pak -> DATA_DISK_1
-echo "updating (vue_36.pak)"
-delete "Ath2:assets/vue_36.pak"
-copy "vue_36.pak" "Ath2:assets/vue_36.pak"
-
-;vue_37.pak -> DATA_DISK_1
-echo "updating (vue_37.pak)"
-delete "Ath2:assets/vue_37.pak"
-copy "vue_37.pak" "Ath2:assets/vue_37.pak"
-
-;vue_38.pak -> DATA_DISK_1
-echo "updating (vue_38.pak)"
-delete "Ath2:assets/vue_38.pak"
-copy "vue_38.pak" "Ath2:assets/vue_38.pak"
-
-;vue_39.pak -> DATA_DISK_1
-echo "updating (vue_39.pak)"
-delete "Ath2:assets/vue_39.pak"
-copy "vue_39.pak" "Ath2:assets/vue_39.pak"
-
-;vue_40.pak -> DATA_DISK_1
-echo "updating (vue_40.pak)"
-delete "Ath2:assets/vue_40.pak"
-copy "vue_40.pak" "Ath2:assets/vue_40.pak"
-
-;vue_41.pak -> DATA_DISK_1
-echo "updating (vue_41.pak)"
-delete "Ath2:assets/vue_41.pak"
-copy "vue_41.pak" "Ath2:assets/vue_41.pak"
-
-;vue_42.pak -> DATA_DISK_1
-echo "updating (vue_42.pak)"
-delete "Ath2:assets/vue_42.pak"
-copy "vue_42.pak" "Ath2:assets/vue_42.pak"
-
-;vue_45.pak -> DATA_DISK_2
-echo "updating (vue_45.pak)"
-delete "Ath3:assets/vue_45.pak"
-copy "vue_45.pak" "Ath3:assets/vue_45.pak"
-
-;vue_46.pak -> DATA_DISK_2
-echo "updating (vue_46.pak)"
-delete "Ath3:assets/vue_46.pak"
-copy "vue_46.pak" "Ath3:assets/vue_46.pak"
-
-;vue_47.pak -> DATA_DISK_2
-echo "updating (vue_47.pak)"
-delete "Ath3:assets/vue_47.pak"
-copy "vue_47.pak" "Ath3:assets/vue_47.pak"
-
-;vue_48.pak -> DATA_DISK_2
-echo "updating (vue_48.pak)"
-delete "Ath3:assets/vue_48.pak"
-copy "vue_48.pak" "Ath3:assets/vue_48.pak"
-
-;vue_49.pak -> DATA_DISK_2
-echo "updating (vue_49.pak)"
-delete "Ath3:assets/vue_49.pak"
-copy "vue_49.pak" "Ath3:assets/vue_49.pak"
-
-;vue_51.pak -> DATA_DISK_2
-echo "updating (vue_51.pak)"
-delete "Ath3:assets/vue_51.pak"
-copy "vue_51.pak" "Ath3:assets/vue_51.pak"
-
-;vue_52.pak -> DATA_DISK_2
-echo "updating (vue_52.pak)"
-delete "Ath3:assets/vue_52.pak"
-copy "vue_52.pak" "Ath3:assets/vue_52.pak"
-
-;vue_53.pak -> DATA_DISK_2
-echo "updating (vue_53.pak)"
-delete "Ath3:assets/vue_53.pak"
-copy "vue_53.pak" "Ath3:assets/vue_53.pak"
-
-;vue_54.pak -> DATA_DISK_2
-echo "updating (vue_54.pak)"
-delete "Ath3:assets/vue_54.pak"
-copy "vue_54.pak" "Ath3:assets/vue_54.pak"
-
-;vue_55.pak -> DATA_DISK_2
-echo "updating (vue_55.pak)"
-delete "Ath3:assets/vue_55.pak"
-copy "vue_55.pak" "Ath3:assets/vue_55.pak"
-
-;vue_56.pak -> DATA_DISK_2
-echo "updating (vue_56.pak)"
-delete "Ath3:assets/vue_56.pak"
-copy "vue_56.pak" "Ath3:assets/vue_56.pak"
-
-;vue_57.pak -> DATA_DISK_2
-echo "updating (vue_57.pak)"
-delete "Ath3:assets/vue_57.pak"
-copy "vue_57.pak" "Ath3:assets/vue_57.pak"
-
-;vue_58.pak -> DATA_DISK_2
-echo "updating (vue_58.pak)"
-delete "Ath3:assets/vue_58.pak"
-copy "vue_58.pak" "Ath3:assets/vue_58.pak"
-
-;vue_59.pak -> DATA_DISK_2
-echo "updating (vue_59.pak)"
-delete "Ath3:assets/vue_59.pak"
-copy "vue_59.pak" "Ath3:assets/vue_59.pak"
-
-;vue_59_game.pak -> DATA_DISK_2
-echo "updating (vue_59_game.pak)"
-delete "Ath3:assets/vue_59_game.pak"
-copy "vue_59_game.pak" "Ath3:assets/vue_59_game.pak"
-
-;vue_60.pak -> DATA_DISK_2
-echo "updating (vue_60.pak)"
-delete "Ath3:assets/vue_60.pak"
-copy "vue_60.pak" "Ath3:assets/vue_60.pak"
-
-;vue_61.pak -> DATA_DISK_2
-echo "updating (vue_61.pak)"
-delete "Ath3:assets/vue_61.pak"
-copy "vue_61.pak" "Ath3:assets/vue_61.pak"
-
-;vue_71.pak -> DATA_DISK_ANY
-echo "updating (vue_71.pak)"
-delete "Ath1:assets/vue_71.pak"
-copy "vue_71.pak" "Ath1:assets/vue_71.pak"
-delete "Ath2:assets/vue_71.pak"
-copy "vue_71.pak" "Ath2:assets/vue_71.pak"
-delete "Ath3:assets/vue_71.pak"
-copy "vue_71.pak" "Ath3:assets/vue_71.pak"
-
-;vue_72.pak -> DATA_DISK_ANY
-echo "updating (vue_72.pak)"
-delete "Ath1:assets/vue_72.pak"
-copy "vue_72.pak" "Ath1:assets/vue_72.pak"
-delete "Ath2:assets/vue_72.pak"
-copy "vue_72.pak" "Ath2:assets/vue_72.pak"
-delete "Ath3:assets/vue_72.pak"
-copy "vue_72.pak" "Ath3:assets/vue_72.pak"
-
-;vue_73n.pak -> DATA_DISK_ANY
-echo "updating (vue_73n.pak)"
-delete "Ath1:assets/vue_73n.pak"
-copy "vue_73n.pak" "Ath1:assets/vue_73n.pak"
-delete "Ath2:assets/vue_73n.pak"
-copy "vue_73n.pak" "Ath2:assets/vue_73n.pak"
-delete "Ath3:assets/vue_73n.pak"
-copy "vue_73n.pak" "Ath3:assets/vue_73n.pak"
-
-;vue_74n.pak -> DATA_DISK_ANY
-echo "updating (vue_74n.pak)"
-delete "Ath1:assets/vue_74n.pak"
-copy "vue_74n.pak" "Ath1:assets/vue_74n.pak"
-delete "Ath2:assets/vue_74n.pak"
-copy "vue_74n.pak" "Ath2:assets/vue_74n.pak"
-delete "Ath3:assets/vue_74n.pak"
-copy "vue_74n.pak" "Ath3:assets/vue_74n.pak"
-
-;pal_073.pak -> DATA_DISK_ANY
-echo "updating (pal_073.pak)"
-delete "Ath1:assets/pal_073.pak"
-copy "pal_073.pak" "Ath1:assets/pal_073.pak"
-delete "Ath2:assets/pal_073.pak"
-copy "pal_073.pak" "Ath2:assets/pal_073.pak"
-delete "Ath3:assets/pal_073.pak"
-copy "pal_073.pak" "Ath3:assets/pal_073.pak"
-
-;pal_074.pak -> DATA_DISK_ANY
-echo "updating (pal_074.pak)"
-delete "Ath1:assets/pal_074.pak"
-copy "pal_074.pak" "Ath1:assets/pal_074.pak"
-delete "Ath2:assets/pal_074.pak"
-copy "pal_074.pak" "Ath2:assets/pal_074.pak"
-delete "Ath3:assets/pal_074.pak"
-copy "pal_074.pak" "Ath3:assets/pal_074.pak"
-
-;sfx_voice_intro.pak -> DATA_DISK_0
-echo "updating (sfx_voice_intro.pak)"
-delete "Ath1:assets/sfx_voice_intro.pak"
-copy "sfx_voice_intro.pak" "Ath1:assets/sfx_voice_intro.pak"
-
-;sfx_altos_puzzle_click.pak -> DATA_DISK_1
-echo "updating (sfx_altos_puzzle_click.pak)"
-delete "Ath2:assets/sfx_altos_puzzle_click.pak"
-copy "sfx_altos_puzzle_click.pak" "Ath2:assets/sfx_altos_puzzle_click.pak"
-
-;sfx_altos_puzzle_error.pak -> DATA_DISK_1
-echo "updating (sfx_altos_puzzle_error.pak)"
-delete "Ath2:assets/sfx_altos_puzzle_error.pak"
-copy "sfx_altos_puzzle_error.pak" "Ath2:assets/sfx_altos_puzzle_error.pak"
-
-;sfx_altos_puzzle_open.pak -> DATA_DISK_1
-echo "updating (sfx_altos_puzzle_open.pak)"
-delete "Ath2:assets/sfx_altos_puzzle_open.pak"
-copy "sfx_altos_puzzle_open.pak" "Ath2:assets/sfx_altos_puzzle_open.pak"
-
-;sfx_squid_puzzle_click.pak -> DATA_DISK_2
-echo "updating (sfx_squid_puzzle_click.pak)"
-delete "Ath3:assets/sfx_squid_puzzle_click.pak"
-copy "sfx_squid_puzzle_click.pak" "Ath3:assets/sfx_squid_puzzle_click.pak"
-
-;sfx_squid_puzzle_open.pak -> DATA_DISK_2
-echo "updating (sfx_squid_puzzle_open.pak)"
-delete "Ath3:assets/sfx_squid_puzzle_open.pak"
-copy "sfx_squid_puzzle_open.pak" "Ath3:assets/sfx_squid_puzzle_open.pak"
-
-;sfx_miaou2.pak -> DATA_DISK_1
-echo "updating (sfx_miaou2.pak)"
-delete "Ath2:assets/sfx_miaou2.pak"
-copy "sfx_miaou2.pak" "Ath2:assets/sfx_miaou2.pak"
-
-;sfx_wouaf2.pak -> DATA_DISK_1
-echo "updating (sfx_wouaf2.pak)"
-delete "Ath2:assets/sfx_wouaf2.pak"
-copy "sfx_wouaf2.pak" "Ath2:assets/sfx_wouaf2.pak"
-
-;sfx_ronfle6k.pak -> DATA_DISK_1
-echo "updating (sfx_ronfle6k.pak)"
-delete "Ath2:assets/sfx_ronfle6k.pak"
-copy "sfx_ronfle6k.pak" "Ath2:assets/sfx_ronfle6k.pak"
-
-;sfx_mouette2.pak -> DATA_DISK_ANY
-echo "updating (sfx_mouette2.pak)"
-delete "Ath1:assets/sfx_mouette2.pak"
-copy "sfx_mouette2.pak" "Ath1:assets/sfx_mouette2.pak"
-delete "Ath2:assets/sfx_mouette2.pak"
-copy "sfx_mouette2.pak" "Ath2:assets/sfx_mouette2.pak"
-delete "Ath3:assets/sfx_mouette2.pak"
-copy "sfx_mouette2.pak" "Ath3:assets/sfx_mouette2.pak"
-
-;sfx_axe.pak -> DATA_DISK_ANY
-echo "updating (sfx_axe.pak)"
-delete "Ath1:assets/sfx_axe.pak"
-copy "sfx_axe.pak" "Ath1:assets/sfx_axe.pak"
-delete "Ath2:assets/sfx_axe.pak"
-copy "sfx_axe.pak" "Ath2:assets/sfx_axe.pak"
-delete "Ath3:assets/sfx_axe.pak"
-copy "sfx_axe.pak" "Ath3:assets/sfx_axe.pak"
-
-;sfx_river6k.pak -> DATA_DISK_2
-echo "updating (sfx_river6k.pak)"
-delete "Ath3:assets/sfx_river6k.pak"
-copy "sfx_river6k.pak" "Ath3:assets/sfx_river6k.pak"
-
-;sfx_cow6000.pak -> DATA_DISK_2
-echo "updating (sfx_cow6000.pak)"
-delete "Ath3:assets/sfx_cow6000.pak"
-copy "sfx_cow6000.pak" "Ath3:assets/sfx_cow6000.pak"
-
-;sfx_raven6k.pak -> DATA_DISK_2
-echo "updating (sfx_raven6k.pak)"
-delete "Ath3:assets/sfx_raven6k.pak"
-copy "sfx_raven6k.pak" "Ath3:assets/sfx_raven6k.pak"
-
-;sfx_laugh.pak -> DATA_DISK_ANY
-echo "updating (sfx_laugh.pak)"
-delete "Ath1:assets/sfx_laugh.pak"
-copy "sfx_laugh.pak" "Ath1:assets/sfx_laugh.pak"
-delete "Ath2:assets/sfx_laugh.pak"
-copy "sfx_laugh.pak" "Ath2:assets/sfx_laugh.pak"
-delete "Ath3:assets/sfx_laugh.pak"
-copy "sfx_laugh.pak" "Ath3:assets/sfx_laugh.pak"
-
-;mus_intro.pak -> DATA_DISK_0
-echo "updating (mus_intro.pak)"
-delete "Ath1:assets/mus_intro.pak"
-copy "mus_intro.pak" "Ath1:assets/mus_intro.pak"
-
-;mus_boat.pak -> DATA_DISK_ANY
-echo "updating (mus_boat.pak)"
-delete "Ath1:assets/mus_boat.pak"
-copy "mus_boat.pak" "Ath1:assets/mus_boat.pak"
-delete "Ath2:assets/mus_boat.pak"
-copy "mus_boat.pak" "Ath2:assets/mus_boat.pak"
-delete "Ath3:assets/mus_boat.pak"
-copy "mus_boat.pak" "Ath3:assets/mus_boat.pak"
-
-;mus_cnossos.pak -> DATA_DISK_1
-echo "updating (mus_cnossos.pak)"
-delete "Ath2:assets/mus_cnossos.pak"
-copy "mus_cnossos.pak" "Ath2:assets/mus_cnossos.pak"
-
-;mus_indus.pak -> DATA_DISK_2
-echo "updating (mus_indus.pak)"
-delete "Ath3:assets/mus_indus.pak"
-copy "mus_indus.pak" "Ath3:assets/mus_indus.pak"
-
-;mus_rapanui.pak -> DATA_DISK_2
-echo "updating (mus_rapanui.pak)"
-delete "Ath3:assets/mus_rapanui.pak"
-copy "mus_rapanui.pak" "Ath3:assets/mus_rapanui.pak"
-
-;mus_ending.pak -> DATA_DISK_0
-echo "updating (mus_ending.pak)"
-delete "Ath1:assets/mus_ending.pak"
-copy "mus_ending.pak" "Ath1:assets/mus_ending.pak"
-
-;mus_ending_dmasc.pak -> DATA_DISK_0
-echo "updating (mus_ending_dmasc.pak)"
-delete "Ath1:assets/mus_ending_dmasc.pak"
-copy "mus_ending_dmasc.pak" "Ath1:assets/mus_ending_dmasc.pak"
+delete "wind1:assets/vue_19.pak"
+copy "vue_19.pak" "wind1:assets/vue_19.pak"

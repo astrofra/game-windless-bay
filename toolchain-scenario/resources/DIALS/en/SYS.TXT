@@ -1,0 +1,33 @@
+vide
+SYS01 In the pocket.
+SYS02 Nothing interesting here!
+SYS03 I keep looking, but there is nothing.
+SYS04 Nothing worth checking for.
+SYS05 No time to waste.
+SYS06 Leave me alone,œ I have nothing to tell you...
+SYS07 I told you all I know.
+SYS08 I cannot do this.
+SYS09 You are not using the right item!
+SYS10 No effect.
+SYS11 You already have what you need!
+SYS12 Load game
+SYS13 Save game
+SYS14 Game saved!
+SYS15 Insert Disk 1
+SYS16 Insert Disk 2
+SYS17 Press Space
+SYS18 Loading Athanor 2
+SYS19 Navigate to
+SYS20 Stay on board
+SYS21 City of Cnossos
+SYS22 Indus Valley
+SYS23 Rapa Nui
+SYS24 Wrong file!
+SYS25 BEWARE!|You are going to load|the game!
+SYS26 BEWARE!|You are going to save|the game!
+SYS27 Yes|No
+SYS28 There is nothing to take here!
+SYS29 I keep looking, but nothing.
+SYS30 Nothing to be found.
+SYS31 FRENCH
+SYS32 ENGLISH

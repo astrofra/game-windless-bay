@@ -119,7 +119,7 @@ sprites = []
 
 if os.path.exists(gfa_listing_file):
 	with open(gfa_listing_file, encoding='cp437') as listing_raw:
-		out = open(world_file, "w")
+		out = open(world_file, "r")
 		listing_raw_str = listing_raw.readlines()
 		for listing_line in listing_raw_str:
 			listing_line = listing_line.strip()
@@ -170,7 +170,7 @@ if os.path.exists(sprites_portraits):
 # Dans le jeu je considère des MAX à 32 zones/vue et 8 Digits/vue.
 # Ce qui fait que j'ai deux tableaux à deux dimensions du style.
 
-if False:
+if True:
 	zones, zone_max = zone_parser(zone_native_files)
 else:
 	zones, zone_max = {}, 0
@@ -652,7 +652,7 @@ if os.path.exists(world_file):
 			raise ValueError('No current_room defined.')
 
 		out.write('short previous_vue = ' + str(-1) + ';\n')
-		out.write('short current_world = world_cnossos;\n')
+		out.write('short current_world = world_' + world_dict[1] + ';\n')
 
 		# World data
 		# Collect all variables
@@ -680,7 +680,8 @@ if os.path.exists(world_file):
 
 		for _var in athanor_missing_vars:
 			variables.insert(0, _var)
-		variables.remove("VIDE")
+		if "VIDE" in variables:
+			variables.remove("VIDE")
 		variables.sort()
 		variables.insert(0, "VIDE")
 
@@ -783,7 +784,7 @@ if os.path.exists(world_file):
 
 		# dumping the so-called "game objects"
 		if enum_instead_of_defines:
-			if zone_max > 0:
+			if zone_max > 0 or len(variables) > 0:
 				# enum
 				out_h.write('\n')
 				out_h.write('enum game_object {')
@@ -795,7 +796,7 @@ if os.path.exists(world_file):
 							out_h.write('\n\t')
 				out_h.write('};\n')
 		else:
-			if zone_max > 0:
+			if zone_max > 0 or len(variables) > 0:
 				for i in range(len(variables)):
 					out_h.write("#define " + athanor_var(variables[i]) + " " + str(i) + "\n")
 

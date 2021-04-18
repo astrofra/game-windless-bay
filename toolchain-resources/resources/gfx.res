@@ -6,24 +6,24 @@
 
 
 // texts
-//TEXT txt_dialog_fr "dialog_fr.bintext" SHRINKLER
-//TEXT txt_system_fr "system_fr.bintext" SHRINKLER
-//TEXT txt_tooltip_fr "tooltip_fr.bintext" SHRINKLER
-//TEXT txt_credits_fr "credits_fr.bintext" SHRINKLER
-//
-//TEXT txt_dialog_en "dialog_en.bintext" SHRINKLER
-//TEXT txt_system_en "system_en.bintext" SHRINKLER
-//TEXT txt_tooltip_en "tooltip_en.bintext" SHRINKLER
-//TEXT txt_credits_en "credits_en.bintext" SHRINKLER
-//
+TEXT txt_dialog_fr "dialog_fr.bintext" SHRINKLER
+TEXT txt_system_fr "system_fr.bintext" SHRINKLER
+TEXT txt_tooltip_fr "tooltip_fr.bintext" SHRINKLER
+TEXT txt_credits_fr "credits_fr.bintext" SHRINKLER
+
+TEXT txt_dialog_en "dialog_en.bintext" SHRINKLER
+TEXT txt_system_en "system_en.bintext" SHRINKLER
+TEXT txt_tooltip_en "tooltip_en.bintext" SHRINKLER
+TEXT txt_credits_en "credits_en.bintext" SHRINKLER
+
 //TEXT txt_dialog_es "dialog_es.bintext" SHRINKLER
 //TEXT txt_system_es "system_es.bintext" SHRINKLER
 //TEXT txt_tooltip_es "tooltip_es.bintext" SHRINKLER
 //TEXT txt_credits_es "credits_es.bintext" SHRINKLER
 //
 //// Title screen
-//IMAGE gui "gui.png" SHRINKLER
-//IMAGE icons "icons.png" SHRINKLER
+IMAGE gui "gui.png" SHRINKLER
+IMAGE icons "icons.png" SHRINKLER
 //IMAGE logo_safar_games "logo_safar_games.png" SHRINKLER
 //IMAGE logo_safar_games_c "logo_safar_games_color.png" SHRINKLER
 //PALETTE pal_logo_safar_games "logo_safar_games.png" 32
@@ -59,49 +59,17 @@ IMAGE vue_19 "vue_19.png" nrv2x
 //PALETTE pal_073 "vue_73d.png" 32
 //PALETTE pal_074 "vue_74d.png" 32
 //
-//IMAGE gui_compass_hilite "gui_compass_hilite.png" SHRINKLER
-//MASK gui_compass_hilite_mask "gui_compass_hilite_mask.png" SHRINKLER
-//
-//// Mini games & sprites
-//// Altos puzzle
-//IMAGE game_altos_sprites "game_altos_sprites.png" nrv2x
-//MASK game_altos_sprites_mask "game_altos_sprites_mask.png" nrv2x
-//IMAGE game_altos_board "game_altos_board.png" SHRINKLER
-//IMAGE game_squid "game_squid.png" SHRINKLER
-//IMAGE game_squid_sprites "game_squid_sprites.png" nrv2x
-//MASK game_squid_sprites_mask "game_squid_sprites_mask.png" nrv2x
-//
-//// Fishing game
-//IMAGE fish_sprite "fish_sprite.png" SHRINKLER NO_COLOR_SWAP
-//MASK fish_sprite_mask "fish_sprite_mask.png" SHRINKLER
-//IMAGE vue_27_game "vue_27_game.png" nrv2x NO_COLOR_SWAP
-//// IMAGE fish_float_sprite "fish_float_sprite.png" SHRINKLER NO_COLOR_SWAP
-//// MASK fish_float_sprite_mask "fish_float_sprite_mask.png" SHRINKLER
-//SPRITE sprite_fishing_scan "sprite_fishing_scan.png" 16
-//
-//// Beetle race
-//IMAGE vue_59_game "vue_59_game.png" SHRINKLER
-//IMAGE beetle_race_sprites "beetle_race_sprites.png" nrv2x
-//MASK beetle_race_sprites_mask "beetle_race_sprites_mask.png" nrv2x
-//SPRITE beetle_ball_sprite "spr_beetle_ball.png" 16
+IMAGE gui_compass_hilite "gui_compass_hilite.png" SHRINKLER
+MASK gui_compass_hilite_mask "gui_compass_hilite_mask.png" SHRINKLER
+
 //
 //IMAGE spr_cnossos "spr_cnossos.png" SHRINKLER
 //MASK spr_cnossos_mask "spr_cnossos_mask.png" SHRINKLER
 //
-//IMAGE spr_indus "spr_indus.png" SHRINKLER
-//MASK spr_indus_mask "spr_indus_mask.png" SHRINKLER
 //
-//IMAGE spr_rapanui "spr_rapanui.png" SHRINKLER
-//MASK spr_rapanui_mask "spr_rapanui_mask.png" SHRINKLER
 //
-//IMAGE spr_rapanui_end "spr_rapanui_end.png" nrv2x
-//MASK spr_rapanui_end_mask "spr_rapanui_end_mask.png" nrv2x
-//
-//IMAGE spr_boat "spr_boat.png" SHRINKLER
-//MASK spr_boat_mask "spr_boat_mask.png" SHRINKLER
-//
-//IMAGE inventory_panel "inventory_panel.png" SHRINKLER
-//IMAGE travel_menu "travel_menu.png" SHRINKLER
+IMAGE inventory_panel "inventory_panel.png" SHRINKLER
+IMAGE travel_menu "travel_menu.png" SHRINKLER
 //
 //IMAGE spr_inventory "spr_inventory.png" SHRINKLER
 //MASK spr_inventory_mask "spr_inventory_mask.png" SHRINKLER
@@ -113,22 +81,9 @@ IMAGE vue_19 "vue_19.png" nrv2x
 //// NPC
 //IMAGE npc_altos_17 "npc_altos_17.png" nrv2x
 //IMAGE npc_fisherman_05 "npc_fisherman_05.png" miniz
-//IMAGE npc_guard_37 "npc_guard_37.png" nrv2x
-//IMAGE npc_hermit_56 "npc_hermit_56.png" nrv2x
-//IMAGE npc_lilla_34 "npc_lilla_34.png" nrv2x
-//IMAGE npc_lilla_35 "npc_lilla_35.png" nrv2x
-//IMAGE npc_merchant_31 "npc_merchant_31.png" nrv2x
-//IMAGE npc_potter_51 "npc_potter_51.png" nrv2x
-//IMAGE npc_street_merchant_41 "npc_street_merchant_41.png" nrv2x
 //
 //// Audio
 //MODULE mus_intro "mus_intro.mod" nrv2x
-//MODULE mus_boat "mus_boat.mod" SHRINKLER
-//MODULE mus_cnossos "mus_cnossos.mod" nrv2x
-//MODULE mus_indus "mus_indus.mod" MINIZ
-//MODULE mus_rapanui "mus_rapanui.mod" nrv2x
-//MODULE mus_ending "mus_ending.mod" nrv2x
-//MODULE mus_ending_dmasc "mus_ending_dmasc.mod" SHRINKLER
 //
 //SAMPLE sfx_miaou2 "sfx_cat.wav" nrv2x 8SVX 8000
 //SAMPLE sfx_wouaf2 "sfx_dog.wav" nrv2x 8SVX 8000
@@ -141,12 +96,4 @@ IMAGE vue_19 "vue_19.png" nrv2x
 //// SAMPLE sfx_fight "sfx_fight.wav" SHRINKLER 8SVX 4000
 //SAMPLE sfx_laugh "sfx_laugh.wav" SHRINKLER 8SVX 6000
 //
-//SAMPLE sfx_altos_puzzle_click "sfx_altos_puzzle_click.wav" nrv2x 8SVX 4000
-//SAMPLE sfx_altos_puzzle_error "sfx_altos_puzzle_error.wav" nrv2x 8SVX 4000
-//SAMPLE sfx_altos_puzzle_open "sfx_altos_puzzle_open.wav" nrv2x 8SVX 6000
-//
-//SAMPLE sfx_squid_puzzle_click "sfx_squid_puzzle_click.wav" miniz 8SVX 4000
-//SAMPLE sfx_squid_puzzle_open "sfx_squid_puzzle_open.wav" miniz 8SVX 4000
-//
-//SAMPLE sfx_voice_intro "sfx_voice_intro.wav" nrv2x 8SVX 6000
 //

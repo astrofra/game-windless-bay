@@ -14,13 +14,7 @@ def untag_digit(_str):
 
 
 def vue_index_to_game_part(idx):
-    if idx < 25:
-        return "rapa"
-    if idx < 45:
-        return "cnossos"
-    if idx < 71:
-        return "indus"
-    return "boat"
+    return "iceland"
 
 
 def replace_athanor_semantic(_str):
@@ -31,8 +25,8 @@ def replace_athanor_semantic(_str):
     return _str
 
 
-world_dict = ["blank", "cnossos", "indus", "rapanui", "boat"]
-chapter_dict = ["blank", "cnossos", "boat", "indus", "rapanui"]
+world_dict = ["blank", "iceland"]
+chapter_dict = ["blank", "iceland"]
 
 game_native_text_dict = {
     "%%%": "%s",
@@ -44,14 +38,6 @@ game_native_text_dict = {
 
 # Patch !!!
 athanor_missing_vars = [
-    "CLEF_MAGIQUE",
-    # "LARGE",
-    # "POULPE",
-    # # "STATUETTE02",
-    # "AUTEL",
-    # # "OFFRANDE",
-    # "ALTOS",
-    # "POISSON_SAUR"
 ]
 
 athanor_con_dict = {

@@ -1,5 +1,67 @@
 [
     {
+        "asset_name": "txt_dialog_fr",
+        "asset_type": "text",
+        "file_compressor": "shrinkler",
+        "file_name": "dialog_fr.bintext"
+    },
+    {
+        "asset_name": "txt_system_fr",
+        "asset_type": "text",
+        "file_compressor": "shrinkler",
+        "file_name": "system_fr.bintext"
+    },
+    {
+        "asset_name": "txt_tooltip_fr",
+        "asset_type": "text",
+        "file_compressor": "shrinkler",
+        "file_name": "tooltip_fr.bintext"
+    },
+    {
+        "asset_name": "txt_credits_fr",
+        "asset_type": "text",
+        "file_compressor": "shrinkler",
+        "file_name": "credits_fr.bintext"
+    },
+    {
+        "asset_name": "txt_dialog_en",
+        "asset_type": "text",
+        "file_compressor": "shrinkler",
+        "file_name": "dialog_en.bintext"
+    },
+    {
+        "asset_name": "txt_system_en",
+        "asset_type": "text",
+        "file_compressor": "shrinkler",
+        "file_name": "system_en.bintext"
+    },
+    {
+        "asset_name": "txt_tooltip_en",
+        "asset_type": "text",
+        "file_compressor": "shrinkler",
+        "file_name": "tooltip_en.bintext"
+    },
+    {
+        "asset_name": "txt_credits_en",
+        "asset_type": "text",
+        "file_compressor": "shrinkler",
+        "file_name": "credits_en.bintext"
+    },
+    {
+        "asset_name": "gui",
+        "asset_type": "image",
+        "data_processor": null,
+        "file_compressor": "shrinkler",
+        "file_name": "gui.png"
+    },
+    {
+        "asset_name": "icons",
+        "asset_type": "image",
+        "data_processor": null,
+        "file_compressor": "shrinkler",
+        "file_name": "icons.png"
+    },
+    {
         "asset_name": "vue_01",
         "asset_type": "image",
         "data_processor": null,
@@ -131,5 +193,33 @@
         "data_processor": null,
         "file_compressor": "miniz",
         "file_name": "vue_19.png"
+    },
+    {
+        "asset_name": "gui_compass_hilite",
+        "asset_type": "image",
+        "data_processor": null,
+        "file_compressor": "shrinkler",
+        "file_name": "gui_compass_hilite.png"
+    },
+    {
+        "asset_name": "gui_compass_hilite_mask",
+        "asset_type": "mask",
+        "data_processor": null,
+        "file_compressor": "shrinkler",
+        "file_name": "gui_compass_hilite_mask.png"
+    },
+    {
+        "asset_name": "inventory_panel",
+        "asset_type": "image",
+        "data_processor": null,
+        "file_compressor": "shrinkler",
+        "file_name": "inventory_panel.png"
+    },
+    {
+        "asset_name": "travel_menu",
+        "asset_type": "image",
+        "data_processor": null,
+        "file_compressor": "shrinkler",
+        "file_name": "travel_menu.png"
     }
 ]

@@ -1,0 +1,36 @@
+#00100Le pupitre de la station d'‚coute.
+D'ici cr‚pitent les ondes du monde entier.
+#00200Vous ˆtes dans le local technique.
+On y trouve un peu de tout.
+#00201Le code de d‚v‚rouillage est le %%%.
+#00300Au pied de la tour radio, le froid … l'exterieur
+est difficilement supportable.
+#00400La lande … perte de vue.
+DerriŠre les montagnes...
+#00500Vous ˆtes au bord du monde, un puit naturel
+crache de la vapeur sans discontinuer.
+#00600Une autre station radio? Ou bien est-ce
+une habitation?
+#00700A l'interieur tout est vide.
+Une porte semble mener au sous-sol.
+#00800Le sous-sol ‚tait en r‚alit‚ un gigantesque
+puit d'aeration.
+#00900Un long tunnel porte quelques traces de
+#01000Une lourde porte semble mener vers l'exterieur.
+passage relativement r‚centes.
+#01100Une splendide antenne radar vous observe
+dans un silence absolu.
+#01200Vous longer un canal vide et d‚sol‚, une rumeur
+maritime vous parvient depuis le sud.
+#01300Quelqu'un ‚tait ici il y a peu. Un feu improvis‚
+vous rechauffe les mains.
+#01400Le port, d‚sert, mais les installations sont
+encore en place !
+#01500Sur les quais, les entr‚es maritimes vous appellent.
+#01600En haute mer, a des lieues de la c“t‚,
+vous accostez sur une station maritime!
+#01700Le hangar … bateaux, dans un style digne
+des constructions Eiffel!
+#01800Un petit salon, le cadre est accueillant.
+#01900Au sommet de la tour, le soleil r‚apparait.
+#0000

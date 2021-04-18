@@ -27,7 +27,7 @@ gfa_listing_file = "resources/LEGEND10.LST"
 
 resources_out_path = "../toolchain-resources/resources/"
 
-enum_link_direction = ["north", "east", "south", "west", "up", "down", "other"]
+enum_link_direction = ["north", "east", "south", "west"]
 
 # disk_dispatch_file = "../toolchain-resources/resources/dispatch.json"
 
@@ -36,8 +36,7 @@ dialogs_path = "resources/DIALS"
 
 dialog_files = ["iceland.TXT"]
 
-world_rooms = [{'min': 1, 'max': 24, 'world_name': 'rapanui'}, {'min': 25, 'max': 42, 'world_name': 'cnossos'},
-			   {'min': 45, 'max': 61, 'world_name': 'indus'}, {'min': 71, 'max': 72, 'world_name': 'boat'}]
+world_rooms = [{'min': 1, 'max': 00, 'world_name': 'iceland'}]
 
 system_files = ["SYS.TXT"] # , "AMI.TXT"]
 

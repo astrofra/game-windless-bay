@@ -1,0 +1,33 @@
+vide
+SYS01 C'est dans la poche.
+SYS02 Je ne vois rien d'int‚ressant ici!
+SYS03 J'ai beau scruter, il n'y a rien.
+SYS04 Rien de notable.
+SYS05 Ne perdez pas de temps.
+SYS06 Laissez-moi tranquille,œje n'ai rien … vous dire.
+SYS07 Je vous ai tout dit.
+SYS08 Je ne peux pas faire ‡a.
+SYS09 Vous n'utilisez pas le bon objet!
+SYS10 ‡a ne donne rien.
+SYS11 Vous avez d‚j… ce qu'il vous faut!
+SYS12 Charger partie
+SYS13 Sauver partie
+SYS14 Partie sauvegard‚e!
+SYS15 Ins‚rez disquette 1
+SYS16 Ins‚rez disquette 2
+SYS17 Appuyer Espace
+SYS18 Chargement d'Athanor 2
+SYS19 Voguons vers
+SYS20 Rester … bord
+SYS21 Cit‚ de Cnossos
+SYS22 Vall‚e de l'Indus
+SYS23 Rapa Nui
+SYS24 Mauvais fichier!
+SYS25 ATTENTION|Vous allez charger|Une partie!
+SYS26 ATTENTION|Vous allez sauvegarder|Une partie!
+SYS27 Oui|Non
+SYS28 Je ne vois rien … prendre ici!
+SYS29 Je fouille, mais rien.
+SYS30 Je ne trouve rien.
+SYS31 FRANCAIS
+SYS32 ENGLISH

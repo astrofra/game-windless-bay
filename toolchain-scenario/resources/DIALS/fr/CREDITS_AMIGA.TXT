@@ -1,0 +1,113 @@
+#
+#----------------------------
+#Quelques  mots  de  la team
+"ATHANOR  2,  AMIGA VERSION"
+#
+#Voici  avec  quels   outils
+nous  avons  travaill‚ afin
+d'exploiter au mieux  votre
+machine favorite:@@@@@@@@@@
+
+#CODE :
+Le   travail   d'adaptation
+d'Athanor  2  vers  l'Amiga
+a pris ~3 ans,  a l'aide de
+VSCODE,  UAE,  PYTHON, GIT,
+SAS/C, un MIST (Amiga FPGA)
+& un A1200 ESCOM (Petro <3)
+La fin  du  d‚veloppement a
+‚t‚ faite sur un MacBook M1
+avec FS-UAE et vAmiga.@@@@@
+
+#99% d'Athanor est bas‚ sur
+la GRAPHICS.LIBRARY! Ce qui
+veut  dire que la  totalit‚
+du code  est "OS-friendly".
+
+#Le jeu est  tout ‚crit en C
+sauf  quelques  routines de
+d‚compression  des  donn‚es
+(Shrinkler / NRV2x).@@@@@@@ 
+
+#GRAPHISMES :
+PHOTOSHOP,  principalement,
+sur  WACOM BAMBOO / INTUOS.
+Puis,   COSMIGO  PRO-MOTION
+et DELUXE PAINT,  pour  les
+finition & trames au pixel.
+
+#MUSIQUE :
+Pour  ceux  qui  aiment les
+d‚tails  techniques,  voici
+les  outils  utilis‚s   par
+David  pour  la bande son :
+PROTRACKER   v3.15,   comme
+s‚quenceur. La plupart  des
+samples     viennent    des
+ROLAND  JV-1080  et  YAMAHA
+MOTIF  XF.  La  composition
+et  les recherches ont  ‚t‚
+faites   sur  des  claviers
+KORG  TR-76 et  YAMAHA  PSR
+S500.@@@@@@@@@@@@@@@@@@@@@@
+
+#
+#Nos  remerciements  pour la
+version Amiga.@@@@@@@@@@@@@
+Merci … vous  tous  pour la
+motivation & l'inspiration:
+#4play
+Akaobi
+Aseyn
+BeeMixsy
+David @davidb2111_ Barbion
+Nicolas Bauw
+Batteman
+BjornNah
+C418
+Chris Covell
+Exocet
+FibreTigre
+Frost242
+Flopine
+Gelmir
+Gligli
+Jylam
+Kara N. Blohm
+MadMarie
+Mike 'DBug' Pointier
+MO5.COM
+Mooz
+Ninomojo
+NoRecess
+Oriens
+The Ptoing!
+Rahow
+RESISTANCE.NO
+Andr‚ & Louis-Marie Rocques
+Roudoudou
+Serge Fiedos
+St‚phane F.
+Stingray
+Superchlo
+XBarr
+Yosshin4004
+Z-Team
+Zerkman
+
+#
+#Libs. externes:
+MT_ADPCM (MastaTabs)
+EasySound (Anders Bjerin)
+Miniz (Richard Geldreich)
+NRV2 (Ross)
+PTReplay.library (Stingray)
+Shrinkler (Blueberry)
+#
+#
+#
+#
+#
+ATHANOR OUT!
+Appuyez sur le bouton de
+la souris pour sortir.
