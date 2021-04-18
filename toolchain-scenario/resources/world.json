@@ -35,10 +35,10 @@
             "bitmap": "vue_03.pak",
             "links": {
                 "south": {
-                    "room": "vue_01"
+                    "room": "vue_04"
                 },
                 "north": {
-                    "room": "vue_04"
+                    "room": "vue_01"
                 }
             }
         },
@@ -49,13 +49,13 @@
             "bitmap": "vue_04.pak",
             "links": {
                 "south": {
-                    "room": "vue_03"
+                    "room": "vue_06"
                 },
                 "west": {
                     "room": "vue_05"
                 },
                 "north": {
-                    "room": "vue_06"
+                    "room": "vue_03"
                 }
             }
         },
@@ -77,10 +77,10 @@
             "bitmap": "vue_06.pak",
             "links": {
                 "south": {
-                    "room": "vue_04"
+                    "room": "vue_07"
                 },
                 "north": {
-                    "room": "vue_07"
+                    "room": "vue_04"
                 }
             }
         },
@@ -110,7 +110,7 @@
                 "west": {
                     "room": "vue_07"
                 },
-                "north": {
+                "south": {
                     "room": "vue_10"
                 }
             }

@@ -1,5 +1,6 @@
-/*  Athanor 2, Original game by Eric "Atlantis" Safar, (C) Safargames 2021  
-    Amiga version by Francois "Astrofra" Gutherz.
+/*  	Windless Bay, Mount Erebus.
+	Original game by Francois "Astrofra" Gutherz. 
+	Amiga version (C) RESISTANCE 2021 
 */
 
 #include <stdarg.h>
@@ -705,8 +706,8 @@ void game_intro_screen(void)
 //     // Game title
 //     rpage_video_sync_buffers();
 //     rpage_video_flip_buffers();
-//     rpage_load_pak_to_new_bitmap(&endscreen_a, NULL, game_get_unpacking_buffer(), asset_build_device_path("athanor_title", ".pak"));
-//     rpage_load_pak_to_new_bitmap(&endscreen_b, NULL, game_get_unpacking_buffer(), asset_build_device_path("athanor_title_mask", ".pak"));
+//     rpage_load_pak_to_new_bitmap(&endscreen_a, NULL, game_get_unpacking_buffer(), asset_build_device_path("windless_title", ".pak"));
+//     rpage_load_pak_to_new_bitmap(&endscreen_b, NULL, game_get_unpacking_buffer(), asset_build_device_path("windless_title_mask", ".pak"));
 
 //     _tmp = rpage_bitmap_get_height(endscreen_a);
 //     save_h = min(DEFAULT_HEIGHT, LOGO_POS_Y + _tmp + LOGO_Y_ANIM) - LOGO_POS_Y;

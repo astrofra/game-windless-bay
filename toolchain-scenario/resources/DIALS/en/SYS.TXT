@@ -16,7 +16,7 @@ SYS14 Game saved!
 SYS15 Insert Disk 1
 SYS16 Insert Disk 2
 SYS17 Press Space
-SYS18 Loading Athanor 2
+SYS18 Loading...
 SYS19 Navigate to
 SYS20 Stay on board
 SYS21 City of Cnossos

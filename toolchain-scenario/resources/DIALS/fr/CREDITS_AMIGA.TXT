@@ -1,61 +1,61 @@
 #
 #----------------------------
-#Quelques  mots  de  la team
-"ATHANOR  2,  AMIGA VERSION"
+#A few  words  from the team
+behind "WINDLESS BAY  AMIGA"
 #
-#Voici  avec  quels   outils
-nous  avons  travaill‚ afin
-d'exploiter au mieux  votre
-machine favorite:@@@@@@@@@@
+#For   the  AMIGA  version,
+special  efforts and  tools
+were used  to get  the most
+of our beloved machine.@@@@
 
-#CODE :
-Le   travail   d'adaptation
-d'Athanor  2  vers  l'Amiga
-a pris ~3 ans,  a l'aide de
-VSCODE,  UAE,  PYTHON, GIT,
-SAS/C, un MIST (Amiga FPGA)
-& un A1200 ESCOM (Petro <3)
-La fin  du  d‚veloppement a
-‚t‚ faite sur un MacBook M1
-avec FS-UAE et vAmiga.@@@@@
+#CODE:
+WINDLESS BAY  was ported to
+the Amiga  during  a course
+of ~3 years,  using VSCODE,
+GIT, PYTHON, WINUAE, SAS/C,
+a  MIST  (FPGA  Amiga)  and
+an ESCOM A1200 (thx Petro!)
+The last rush was completed
+on a MacBook M1 (ARM FTW!),
+using both FS-UAE & vAmiga.
 
-#99% d'Athanor est bas‚ sur
-la GRAPHICS.LIBRARY! Ce qui
-veut  dire que la  totalit‚
-du code  est "OS-friendly".
+#99% of this game relies on
+the GRAPHICS LIBRARY.  This
+means that  the  whole game
+is meant to be os-friendly.
 
-#Le jeu est  tout ‚crit en C
-sauf  quelques  routines de
-d‚compression  des  donn‚es
+#The game runs entirely in C
+except  for a couple of 3rd
+parties  unpacking routines
 (Shrinkler / NRV2x).@@@@@@@ 
 
-#GRAPHISMES :
-PHOTOSHOP,  principalement,
-sur  WACOM BAMBOO / INTUOS.
-Puis,   COSMIGO  PRO-MOTION
-et DELUXE PAINT,  pour  les
-finition & trames au pixel.
+#GRAPHICS:
+PHOTOSHOP   for   the  main
+part,  using either a WACOM
+BAMBOO  and  INTUOS tablets.
+Then COSMIGO PRO-MOTION and
+DELUXE PAINT,  for all  the
+pixel  and  dither tweaking.
 
-#MUSIQUE :
-Pour  ceux  qui  aiment les
-d‚tails  techniques,  voici
-les  outils  utilis‚s   par
-David  pour  la bande son :
-PROTRACKER   v3.15,   comme
-s‚quenceur. La plupart  des
-samples     viennent    des
-ROLAND  JV-1080  et  YAMAHA
-MOTIF  XF.  La  composition
-et  les recherches ont  ‚t‚
-faites   sur  des  claviers
-KORG  TR-76 et  YAMAHA  PSR
-S500.@@@@@@@@@@@@@@@@@@@@@@
+#MUSICS:
+Finally,  for those  who'd
+like  some  music technical
+details,  here's  what  was
+used  by David to make  the
+soundtracks:@@@@@@@@@@@@@@@
+The PROTRACKER 3.15 as main
+sequencer.  Most of samples
+created  using  the  ROLAND
+JV-1080 &  the YAMAHA MOTIF
+XF.  Composition & research
+done on  the KORG TR-76 and
+YAMAHA PSR S500 keyboards.@
 
 #
-#Nos  remerciements  pour la
-version Amiga.@@@@@@@@@@@@@
-Merci … vous  tous  pour la
-motivation & l'inspiration:
+#And now, the  greetings for
+the  Amiga  version.@@@@@@@
+#Many  thanks to  all these
+inspiring people:@@@@@@@@@@
 #4play
 Akaobi
 Aseyn
@@ -96,7 +96,7 @@ Z-Team
 Zerkman
 
 #
-#Libs. externes:
+#External libraries:
 MT_ADPCM (MastaTabs)
 EasySound (Anders Bjerin)
 Miniz (Richard Geldreich)
@@ -108,6 +108,6 @@ Shrinkler (Blueberry)
 #
 #
 #
-ATHANOR OUT!
-Appuyez sur le bouton de
-la souris pour sortir.
+WINDLESS BAY OUT!
+Press the mouse button
+to exit.

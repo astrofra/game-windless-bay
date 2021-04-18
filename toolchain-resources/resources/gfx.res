@@ -30,8 +30,8 @@ IMAGE icons "icons.png" SHRINKLER
 //PALETTE pal_logo_safar_games_c "logo_safar_games_color.png" 32
 //IMAGE intro_screen "intro_screen.png" nrv2x
 //PALETTE pal_intro_screen "intro_screen.png" 32
-//IMAGE athanor_title "athanor_title.png" SHRINKLER
-//MASK athanor_title_mask "athanor_title_mask.png" SHRINKLER
+//IMAGE windless_title "windless_title.png" SHRINKLER
+//MASK windless_title_mask "windless_title_mask.png" SHRINKLER
 //IMAGE game_over "game_over.png" SHRINKLER
 //
 //// Main game visuals

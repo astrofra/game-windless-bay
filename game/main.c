@@ -1,17 +1,13 @@
 /*
-	Athanor 2
+	Windless Bay, Mount Erebus. 
+	A research station deep into Antarctica, this is where your journey begins...
 	
-	Original game by Eric "Atlantis" Safar, (C) Safargames 2021  
-	Amiga version by Francois "Astrofra" Gutherz.
+	Original game by Francois "Astrofra" Gutherz. 
+	Amiga version (C) RESISTANCE 2021 
 
-	The source code of Athanor 2 Amiga is based on:
+	The source code of this game is based on:
 	* R-PAGE (the Resistance's Portable-Adventure-Game-Engine, C language)
 	* AmigaOS for all the access to the Amiga hardware
-	* The data files of the ATARI ST version of Athanor 2 (parsed using a set of Python 3 scripts)
-
-	For more information about Athanor, visit : http://safargames.fr/
-
-	1 -> 2 -> 6 -> 7 -> 8 -> 9
 */
 
 #include <stdio.h>
@@ -84,7 +80,7 @@ int main(int argc, char *argv[])
 		struct DiskObject *disk_obj;
 		char **toolarray;
 		char *tool_type;
-		char *exe_names[2] = {"main.exe", "Athanor"};
+		char *exe_names[2] = {"main.exe", "WindlessBay"};
 		
 		// Open the icon library
 		// to be able to read icon's tool types
@@ -124,7 +120,7 @@ int main(int argc, char *argv[])
 			// else
 			// 	printf("no disk object for %s!\n", exe_names[g_loop]);
 		}
-		// get the icon of the Athanor binary
+		// get the icon of the game binary
 
 		CloseLibrary(IconBase);
 	}

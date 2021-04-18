@@ -16,7 +16,7 @@ SYS14 Partie sauvegard‚e!
 SYS15 Ins‚rez disquette 1
 SYS16 Ins‚rez disquette 2
 SYS17 Appuyer Espace
-SYS18 Chargement d'Athanor 2
+SYS18 Chargement en cours.
 SYS19 Voguons vers
 SYS20 Rester … bord
 SYS21 Cit‚ de Cnossos

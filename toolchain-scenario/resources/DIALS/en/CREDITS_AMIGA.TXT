@@ -1,7 +1,7 @@
 #
 #----------------------------
 #A few  words  from the team
-behind  "ATHANOR  2  AMIGA"
+behind "WINDLESS BAY  AMIGA"
 #
 #For   the  AMIGA  version,
 special  efforts and  tools
@@ -9,7 +9,7 @@ were used  to get  the most
 of our beloved machine.@@@@
 
 #CODE:
-Athanor  2  was  ported  to
+WINDLESS BAY  was ported to
 the Amiga  during  a course
 of ~3 years,  using VSCODE,
 GIT, PYTHON, WINUAE, SAS/C,
@@ -19,7 +19,7 @@ The last rush was completed
 on a MacBook M1 (ARM FTW!),
 using both FS-UAE & vAmiga.
 
-#99% of Athanor 2 relies on
+#99% of this game relies on
 the GRAPHICS LIBRARY.  This
 means that  the  whole game
 is meant to be os-friendly.
@@ -108,6 +108,6 @@ Shrinkler (Blueberry)
 #
 #
 #
-Athanor Out!
+WINDLESS BAY OUT!
 Press the mouse button
 to exit.

@@ -12,7 +12,7 @@
 
 #define SYS_MAX_DIALOG 33
 #define TOOLTIP_MAX_DIALOG 28
-#define CREDITS_MAX_DIALOG 235
+#define CREDITS_MAX_DIALOG 130
 
 extern short dialog_per_room[GAME_MAX_ROOM][GAME_MAX_DIALOG_PER_ROOM];
 extern char *dialogs[GAME_MAX_DIALOG];

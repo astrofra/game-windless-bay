@@ -72,7 +72,7 @@ short dialog_per_room[GAME_MAX_ROOM][GAME_MAX_DIALOG_PER_ROOM] =
 	/* SYS15 "Insérez disquette", */
 	/* SYS16 "Insérez disquette 2", */
 	/* SYS17 "Appuyez sur le bouton de la souris", */
-	/* SYS18 "Chargement d\'Athanor 2", */
+	/* SYS18 "Chargement en cours.", */
 	/* SYS19 "Voguons vers", */
 	/* SYS20 "Rester à bord", */
 	/* SYS21 "Cité de Cnossos", */
@@ -125,241 +125,136 @@ short dialog_per_room[GAME_MAX_ROOM][GAME_MAX_DIALOG_PER_ROOM] =
 /* Credits */
 /* char *credits_dialogs[CREDITS_MAX_DIALOG] =
 { /*
-	/* 00 " ", */
-	/* 01 "Crée et Réalisé par", */
-	/* 02 "ERIC SAFAR", */
+	/* 00 "...", */
+	/* 01 " ", */
+	/* 02 "STOP", */
 	/* 03 " ", */
-	/* 04 "Moteur & Atari code", */
-	/* 05 "ERIC SAFAR", */
-	/* 06 " ", */
-	/* 07 "Amiga code", */
-	/* 08 "FRANCOIS GUTHERZ", */
-	/* 09 " ", */
-	/* 10 "Illustrations", */
-	/* 11 "ANGEL BAUTISTA", */
+	/* 04 "", */
+	/* 05 " ", */
+	/* 06 "----------------------------", */
+	/* 07 " ", */
+	/* 08 "A few  words  from the team", */
+	/* 09 "behind "WINDLESS BAY  AMIGA"", */
+	/* 10 " ", */
+	/* 11 "", */
 	/* 12 " ", */
-	/* 13 "Infographie", */
-	/* 14 "FRANCOIS GUTHERZ", */
-	/* 15 "VINCENT JAMBUT", */
-	/* 16 " ", */
-	/* 17 "Atari Musics", */
-	/* 18 "MATHIEU STEMPELL", */
-	/* 19 " ", */
-	/* 20 "Amiga Musics", */
-	/* 21 "DAVID VANDENSTEEN", */
-	/* 22 " ", */
-	/* 23 "Traduction Anglaise", */
-	/* 24 "ERNEST SAFAR", */
-	/* 25 "CHEN CHEN", */
-	/* 26 " ", */
-	/* 27 "Conception manuel", */
-	/* 28 "JEAN-FRANCOIS REVEL", */
-	/* 29 " ", */
-	/* 30 "Routines additionnelles", */
-	/* 31 "GT-Turbo", */
-	/* 32 "SPEED PACKER V3", */
-	/* 33 "maxYMiser Replayer", */
-	/* 34 "WIZZCAT ROUTINE", */
-	/* 35 "THE SPRITEWORKS KIT", */
-	/* 36 " ", */
-	/* 37 "Remerciements Spéciaux", */
-	/* 38 "REMI HERBULOT", */
-	/* 39 "DANIELE HERBULOT", */
-	/* 40 " ", */
-	/* 41 "Remerciements", */
-	/* 42 "FRANK OSTROWSKI", */
-	/* 43 "MON AMI ROGER BOUR", */
-	/* 44 "MISS POLLY", */
-	/* 45 "ATARI LEGEND", */
-	/* 46 "RGC & AC CONVENTIONS TEAM", */
-	/* 47 "PRINCEPS-BONUS", */
-	/* 48 "Freesound.org", */
-	/* 49 "Dr Floyd from GAMOPAT", */
-	/* 50 "All the SILICIUM members", */
-	/* 51 "All the GFA forum members", */
-	/* 52 "All the 3614 RTEL members", */
-	/* 53 "PHF Intro", */
-	/* 54 "LAURENT VICOMTE", */
-	/* 55 "TCB", */
-	/* 56 "THE REPLICANTS", */
-	/* 57 "Steve Bak (RIP)", */
-	/* 58 "Jean Martial Lefranc", */
-	/* 59 "Philippe Ulrich", */
-	/* 60 "Patrick Dublanchet", */
-	/* 61 "Olivier Robin", */
-	/* 62 "Christophe Le Bouil", */
-	/* 63 "Eric Gachons", */
-	/* 64 "Ugo Robain", */
-	/* 65 "Manuel Alvarez", */
-	/* 66 "Nicolas Gohin (RIP l'ami)", */
-	/* 67 "Olivier Morazé", */
-	/* 68 "Didier Quentin", */
-	/* 69 "Franck Quero", */
-	/* 70 " ", */
-	/* 71 "Salutations de Mathieu Stempell", */
-	/* 72 "ST Survivor / NLC", */
-	/* 73 "gwEm / PHF", */
-	/* 74 "Cooper / Paradise", */
-	/* 75 "Frost / Sector One", */
-	/* 76 "Zerkman / Sector One", */
-	/* 77 "Mic / Dune", */
-	/* 78 "Chuck / Dune", */
-	/* 79 "Thadoss / Dune", */
-	/* 80 "Lotek Style / TSCC", */
-	/* 81 "Tomchi / MJJ Prod", */
-	/* 82 "Havoc / Lineout", */
-	/* 83 "Evil / DHS", */
-	/* 84 "bob_er / MEC", */
-	/* 85 "Cyg / BlaBla", */
-	/* 86 "Bod / Stax (RIP)", */
-	/* 87 "Other Atari demosceners", */
-	/* 88 "Hally / VORC", */
-	/* 89 "Talus / Kohina", */
-	/* 90 "Stefan Lindberg", */
-	/* 91 "All at atari-forum", */
-	/* 92 "StickHead", */
-	/* 93 "Cogweasel", */
-	/* 94 "BouleDeFeu crew", */
-	/* 95 " ", */
-	/* 96 "Eric's Playlist", */
-	/* 97 "Barclay James Harvest", */
-	/* 98 "Ten years after", */
-	/* 99 "Dire Straits", */
-	/* 100 "AC/DC", */
-	/* 101 "The Strokes", */
-	/* 102 "Blue Oster Cult", */
-	/* 103 "Curtis Harding", */
-	/* 104 "Dinah Washington", */
-	/* 105 "J.S Bach", */
-	/* 106 "W.A Mozart", */
+	/* 13 "For   the  AMIGA  version,", */
+	/* 14 "special  efforts and  tools", */
+	/* 15 "were used  to get  the most", */
+	/* 16 "of our beloved machine.    ", */
+	/* 17 " ", */
+	/* 18 "CODE:", */
+	/* 19 "WINDLESS BAY  was ported to", */
+	/* 20 "the Amiga  during  a course", */
+	/* 21 "of ~3 years,  using VSCODE,", */
+	/* 22 "GIT, PYTHON, WINUAE, SAS/C,", */
+	/* 23 "a  MIST  (FPGA  Amiga)  and", */
+	/* 24 "an ESCOM A1200 (thx Petro!)", */
+	/* 25 "The last rush was completed", */
+	/* 26 "on a MacBook M1 (ARM FTW!),", */
+	/* 27 "using both FS-UAE & vAmiga.", */
+	/* 28 " ", */
+	/* 29 "99% of this game relies on", */
+	/* 30 "the GRAPHICS LIBRARY.  This", */
+	/* 31 "means that  the  whole game", */
+	/* 32 "is meant to be os-friendly.", */
+	/* 33 " ", */
+	/* 34 "The game runs entirely in C", */
+	/* 35 "except  for a couple of 3rd", */
+	/* 36 "parties  unpacking routines", */
+	/* 37 "(Shrinkler / NRV2x).       ", */
+	/* 38 " ", */
+	/* 39 "GRAPHICS:", */
+	/* 40 "PHOTOSHOP   for   the  main", */
+	/* 41 "part,  using either a WACOM", */
+	/* 42 "BAMBOO  and  INTUOS tablets.", */
+	/* 43 "Then COSMIGO PRO-MOTION and", */
+	/* 44 "DELUXE PAINT,  for all  the", */
+	/* 45 "pixel  and  dither tweaking.", */
+	/* 46 " ", */
+	/* 47 "MUSICS:", */
+	/* 48 "Finally,  for those  who'd", */
+	/* 49 "like  some  music technical", */
+	/* 50 "details,  here's  what  was", */
+	/* 51 "used  by David to make  the", */
+	/* 52 "soundtracks:               ", */
+	/* 53 "The PROTRACKER 3.15 as main", */
+	/* 54 "sequencer.  Most of samples", */
+	/* 55 "created  using  the  ROLAND", */
+	/* 56 "JV-1080 &  the YAMAHA MOTIF", */
+	/* 57 "XF.  Composition & research", */
+	/* 58 "done on  the KORG TR-76 and", */
+	/* 59 "YAMAHA PSR S500 keyboards. ", */
+	/* 60 " ", */
+	/* 61 "", */
+	/* 62 " ", */
+	/* 63 "And now, the  greetings for", */
+	/* 64 "the  Amiga  version.       ", */
+	/* 65 " ", */
+	/* 66 "Many  thanks to  all these", */
+	/* 67 "inspiring people:          ", */
+	/* 68 " ", */
+	/* 69 "4play", */
+	/* 70 "Akaobi", */
+	/* 71 "Aseyn", */
+	/* 72 "BeeMixsy", */
+	/* 73 "David  davidb2111_ Barbion", */
+	/* 74 "Nicolas Bauw", */
+	/* 75 "Batteman", */
+	/* 76 "BjornNah", */
+	/* 77 "C418", */
+	/* 78 "Chris Covell", */
+	/* 79 "Exocet", */
+	/* 80 "FibreTigre", */
+	/* 81 "Frost242", */
+	/* 82 "Flopine", */
+	/* 83 "Gelmir", */
+	/* 84 "Gligli", */
+	/* 85 "Jylam", */
+	/* 86 "Kara N. Blohm", */
+	/* 87 "MadMarie", */
+	/* 88 "Mike 'DBug' Pointier", */
+	/* 89 "MO5.COM", */
+	/* 90 "Mooz", */
+	/* 91 "Ninomojo", */
+	/* 92 "NoRecess", */
+	/* 93 "Oriens", */
+	/* 94 "The Ptoing!", */
+	/* 95 "Rahow", */
+	/* 96 "RESISTANCE.NO", */
+	/* 97 "André & Louis-Marie Rocques", */
+	/* 98 "Roudoudou", */
+	/* 99 "Serge Fiedos", */
+	/* 100 "Stéphane F.", */
+	/* 101 "Stingray", */
+	/* 102 "Superchlo", */
+	/* 103 "XBarr", */
+	/* 104 "Yosshin4004", */
+	/* 105 "Z-Team", */
+	/* 106 "Zerkman", */
 	/* 107 " ", */
-	/* 108 "STOP", */
+	/* 108 "", */
 	/* 109 " ", */
-	/* 110 "", */
-	/* 111 " ", */
-	/* 112 "----------------------------", */
-	/* 113 " ", */
-	/* 114 "Quelques  mots  de  la team", */
-	/* 115 ""ATHANOR  2,  AMIGA VERSION"", */
-	/* 116 " ", */
-	/* 117 "", */
-	/* 118 " ", */
-	/* 119 "Voici  avec  quels   outils", */
-	/* 120 "nous  avons  travaillé afin", */
-	/* 121 "d'exploiter au mieux  votre", */
-	/* 122 "machine favorite:          ", */
+	/* 110 "External libraries:", */
+	/* 111 "MT_ADPCM (MastaTabs)", */
+	/* 112 "EasySound (Anders Bjerin)", */
+	/* 113 "Miniz (Richard Geldreich)", */
+	/* 114 "NRV2 (Ross)", */
+	/* 115 "PTReplay.library (Stingray)", */
+	/* 116 "Shrinkler (Blueberry)", */
+	/* 117 " ", */
+	/* 118 "", */
+	/* 119 " ", */
+	/* 120 "", */
+	/* 121 " ", */
+	/* 122 "", */
 	/* 123 " ", */
-	/* 124 "CODE :", */
-	/* 125 "Le   travail   d'adaptation", */
-	/* 126 "d'Athanor  2  vers  l'Amiga", */
-	/* 127 "a pris ~3 ans,  a l'aide de", */
-	/* 128 "VSCODE,  UAE,  PYTHON, GIT,", */
-	/* 129 "SAS/C, un MIST (Amiga FPGA)", */
-	/* 130 "& un A1200 ESCOM (Petro <3)", */
-	/* 131 "La fin  du  développement a", */
-	/* 132 "été faite sur un MacBook M1", */
-	/* 133 "avec FS-UAE et vAmiga.     ", */
-	/* 134 " ", */
-	/* 135 "99% d'Athanor est basé sur", */
-	/* 136 "la GRAPHICS.LIBRARY! Ce qui", */
-	/* 137 "veut  dire que la  totalité", */
-	/* 138 "du code  est "OS-friendly".", */
-	/* 139 " ", */
-	/* 140 "Le jeu est  tout écrit en C", */
-	/* 141 "sauf  quelques  routines de", */
-	/* 142 "décompression  des  données", */
-	/* 143 "(Shrinkler / NRV2x).       ", */
-	/* 144 " ", */
-	/* 145 "GRAPHISMES :", */
-	/* 146 "PHOTOSHOP,  principalement,", */
-	/* 147 "sur  WACOM BAMBOO / INTUOS.", */
-	/* 148 "Puis,   COSMIGO  PRO-MOTION", */
-	/* 149 "et DELUXE PAINT,  pour  les", */
-	/* 150 "finition & trames au pixel.", */
-	/* 151 " ", */
-	/* 152 "MUSIQUE :", */
-	/* 153 "Pour  ceux  qui  aiment les", */
-	/* 154 "détails  techniques,  voici", */
-	/* 155 "les  outils  utilisés   par", */
-	/* 156 "David  pour  la bande son :", */
-	/* 157 "PROTRACKER   v3.15,   comme", */
-	/* 158 "séquenceur. La plupart  des", */
-	/* 159 "samples     viennent    des", */
-	/* 160 "ROLAND  JV-1080  et  YAMAHA", */
-	/* 161 "MOTIF  XF.  La  composition", */
-	/* 162 "et  les recherches ont  été", */
-	/* 163 "faites   sur  des  claviers", */
-	/* 164 "KORG  TR-76 et  YAMAHA  PSR", */
-	/* 165 "S500.                      ", */
-	/* 166 " ", */
-	/* 167 "", */
-	/* 168 " ", */
-	/* 169 "Nos  remerciements  pour la", */
-	/* 170 "version Amiga.             ", */
-	/* 171 "Merci à vous  tous  pour la", */
-	/* 172 "motivation & l'inspiration:", */
-	/* 173 " ", */
-	/* 174 "4play", */
-	/* 175 "Akaobi", */
-	/* 176 "Aseyn", */
-	/* 177 "BeeMixsy", */
-	/* 178 "David  davidb2111_ Barbion", */
-	/* 179 "Nicolas Bauw", */
-	/* 180 "Batteman", */
-	/* 181 "BjornNah", */
-	/* 182 "C418", */
-	/* 183 "Chris Covell", */
-	/* 184 "Exocet", */
-	/* 185 "FibreTigre", */
-	/* 186 "Frost242", */
-	/* 187 "Flopine", */
-	/* 188 "Gelmir", */
-	/* 189 "Gligli", */
-	/* 190 "Jylam", */
-	/* 191 "Kara N. Blohm", */
-	/* 192 "MadMarie", */
-	/* 193 "Mike 'DBug' Pointier", */
-	/* 194 "MO5.COM", */
-	/* 195 "Mooz", */
-	/* 196 "Ninomojo", */
-	/* 197 "NoRecess", */
-	/* 198 "Oriens", */
-	/* 199 "The Ptoing!", */
-	/* 200 "Rahow", */
-	/* 201 "RESISTANCE.NO", */
-	/* 202 "André & Louis-Marie Rocques", */
-	/* 203 "Roudoudou", */
-	/* 204 "Serge Fiedos", */
-	/* 205 "Stéphane F.", */
-	/* 206 "Stingray", */
-	/* 207 "Superchlo", */
-	/* 208 "XBarr", */
-	/* 209 "Yosshin4004", */
-	/* 210 "Z-Team", */
-	/* 211 "Zerkman", */
-	/* 212 " ", */
-	/* 213 "", */
-	/* 214 " ", */
-	/* 215 "Libs. externes:", */
-	/* 216 "MT_ADPCM (MastaTabs)", */
-	/* 217 "EasySound (Anders Bjerin)", */
-	/* 218 "Miniz (Richard Geldreich)", */
-	/* 219 "NRV2 (Ross)", */
-	/* 220 "PTReplay.library (Stingray)", */
-	/* 221 "Shrinkler (Blueberry)", */
-	/* 222 " ", */
-	/* 223 "", */
-	/* 224 " ", */
-	/* 225 "", */
-	/* 226 " ", */
-	/* 227 "", */
-	/* 228 " ", */
-	/* 229 "", */
-	/* 230 " ", */
-	/* 231 "", */
-	/* 232 "ATHANOR OUT!", */
-	/* 233 "Appuyez sur le bouton de", */
-	/* 234 "la souris pour sortir.", */
+	/* 124 "", */
+	/* 125 " ", */
+	/* 126 "", */
+	/* 127 "WINDLESS BAY OUT!", */
+	/* 128 "Press the mouse button", */
+	/* 129 "to exit.", */
 /* }; */
 
 /* Dynamic dialogs indexes */

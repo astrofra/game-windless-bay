@@ -1,5 +1,6 @@
-/*  Athanor 2, Original game by Eric "Atlantis" Safar, (C) Safargames 2021  
-Amiga version by Francois "Astrofra" Gutherz.
+/*  	Windless Bay, Mount Erebus.
+	Original game by Francois "Astrofra" Gutherz. 
+	Amiga version (C) RESISTANCE 2021 
 */
 
 #include <stdarg.h>
@@ -1350,19 +1351,19 @@ void game_update(game_internals *gi)
             rpage_video_present_screen();
             rpage_video_sync_buffers();
 
-            // game logic patch specific to Athanor 2!
-            switch(roomGetVueIndex(worldGetCurrentRoom()))
-            {
-                case 73:
-                    if (Flag022 == 1)
-                        game_set_palette("pal_073");
-                    break;
+            // // game logic patch
+            // switch(roomGetVueIndex(worldGetCurrentRoom()))
+            // {
+            //     case 73:
+            //         if (Flag022 == 1)
+            //             game_set_palette("pal_073");
+            //         break;
 
-                case 74:
-                    if (Flag023 == 1)
-                        game_set_palette("pal_074");
-                    break;
-            }
+            //     case 74:
+            //         if (Flag023 == 1)
+            //             game_set_palette("pal_074");
+            //         break;
+            // }
 
             game_display_dialog(next_vue_dialog);
 

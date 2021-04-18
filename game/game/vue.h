@@ -1,5 +1,6 @@
-/*  Athanor 2, Original game by Eric "Atlantis" Safar, (C) Safargames 2021  
-    Amiga version by Francois "Astrofra" Gutherz.
+/*  	Windless Bay, Mount Erebus.
+	Original game by Francois "Astrofra" Gutherz. 
+	Amiga version (C) RESISTANCE 2021 
 */
 
 #ifndef _VUE_HEADERS_

@@ -1,5 +1,6 @@
-/*  Athanor 2, Original game by Eric "Atlantis" Safar, (C) Safargames 2021  
-    Amiga version by Francois "Astrofra" Gutherz.
+/*  	Windless Bay, Mount Erebus.
+	Original game by Francois "Astrofra" Gutherz. 
+	Amiga version (C) RESISTANCE 2021 
 */
 
 #include "rpage/aos/bitmap.h"
@@ -811,7 +812,7 @@ void gui_show_debug_flags(char **flags, short n)
         rpage_video_blt_bmp(inventory_bitmap, 0, 16, INVENTORY_WIDTH, INVENTORY_HEIGHT - 16, INVENTORY_POS_X, y + (i * 32) + INVENTORY_HEIGHT - 16);
 
     y += 3;
-    gui_draw_text_shadowed("Athanor Flags Debug", INVENTORY_POS_X + INVENTORY_CONTENT_POS_X + 8, y, 30, 0);
+    gui_draw_text_shadowed("Game Flags Debug", INVENTORY_POS_X + INVENTORY_CONTENT_POS_X + 8, y, 30, 0);
     y += 10;
 
     x = INVENTORY_POS_X + 8;
@@ -859,7 +860,7 @@ void gui_show_debug_visuals(void)
     rpage_video_blt_bmp(inventory_bitmap, 0, 16, INVENTORY_WIDTH, INVENTORY_HEIGHT - 16, INVENTORY_POS_X, y + INVENTORY_HEIGHT - 16);
 
     y += 3;
-    gui_draw_text_shadowed("Athanor Visual Debug", INVENTORY_POS_X + INVENTORY_CONTENT_POS_X + 8, y, 30, 0);
+    gui_draw_text_shadowed("Game Visual Debug", INVENTORY_POS_X + INVENTORY_CONTENT_POS_X + 8, y, 30, 0);
     y += 2;
 
     for(i = 0, j = 0; i < (1 << SCREEN_DEPTH); i++)
@@ -908,8 +909,8 @@ void gui_show_debug_metrics(system_metrics *metrics)
     ui_pos.y += 5;
 
     i = 0;
-    rpage_video_draw_text("   Athanor Debug", ui_pos.x + 1, ui_pos.y + (i * ys) + 1, 2);
-    rpage_video_draw_text("   Athanor Debug", ui_pos.x, ui_pos.y + (i * ys), 30);
+    rpage_video_draw_text("   Game Debug", ui_pos.x + 1, ui_pos.y + (i * ys) + 1, 2);
+    rpage_video_draw_text("   Game Debug", ui_pos.x, ui_pos.y + (i * ys), 30);
     ui_pos.y += 2;
     i++;    
     rpage_video_draw_text(metrics->chipmem_avail, ui_pos.x + 1, ui_pos.y + (i * ys) + 1, 2);
